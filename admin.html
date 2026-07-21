@@ -5,17 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Promptica · Admin Panel</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
 
-  <!-- Quill.js (WYSIWYG Editor) -->
-  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
-  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-
   <style>
-    /* ===== RESET & BASE ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
@@ -30,7 +24,6 @@
     html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow: hidden; }
     #admin-app { display: flex; height: 100vh; overflow: hidden; }
 
-    /* ===== SIDEBAR ===== */
     #sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; padding: 24px 0; }
     #sidebar .logo { padding: 0 20px 30px 20px; font-size: 20px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
     #sidebar .logo span { background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 10px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -41,14 +34,13 @@
     .nav-item .badge { margin-left: auto; background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 8px; border-radius: 20px; }
     #sidebar .bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
 
-    /* ===== CONTENT ===== */
     #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-primary); padding: 24px 32px 32px 32px; }
 
-    .admin-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 24px; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 24px; backdrop-filter: blur(8px); background: rgba(11,11,11,0.6); border-radius: 12px 12px 0 0; padding: 16px 24px; }
     .admin-header h1 { font-size: 24px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
     .admin-header h1 small { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
     .admin-header .actions { display: flex; gap: 10px; }
-    .admin-header .btn { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .admin-header .btn { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
     .admin-header .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
     .admin-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
     .admin-header .btn-primary:hover { background: var(--accent-hover); }
@@ -57,7 +49,7 @@
     .page.active { display: flex; }
 
     .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
-    .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; backdrop-filter: blur(4px); }
     .stat-card .label { font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
     .stat-card .value { font-size: 28px; font-weight: 600; margin-top: 4px; }
 
@@ -68,40 +60,50 @@
     .list-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
 
     .list-container { flex: 1; overflow-y: auto; min-height: 0; }
-    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; flex-wrap: wrap; gap: 8px; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; flex-wrap: wrap; gap: 8px; backdrop-filter: blur(4px); }
     .list-item:hover { border-color: var(--accent); }
     .list-item .info { flex: 1; min-width: 0; }
     .list-item .info .title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .list-item .info .meta { font-size: 12px; color: var(--text-secondary); }
+    .list-item .info .preview-text { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
     .list-item .actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
     .list-item .actions .btn { padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-family: var(--font-sans); font-size: 12px; cursor: pointer; transition: all 0.2s; }
     .list-item .actions .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
-    .list-item .actions .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
-    .list-item .actions .btn-success:hover { border-color: var(--success); color: var(--success); }
-    .list-item .preview-text { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .list-item .actions .btn-danger:hover { border-color: #ef5350; color: #ef5350; }
+    .list-item .actions .btn-success:hover { border-color: #4caf50; color: #4caf50; }
 
     .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
     .empty-state .icon { font-size: 40px; opacity: 0.3; margin-bottom: 8px; }
 
+    /* ===== MODAL (fullscreen editor) ===== */
     .modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.active { display: flex; }
-    .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 28px 32px; box-shadow: var(--shadow); }
-    .modal-box .close-btn { float: right; background: none; border: none; color: var(--text-secondary); font-size: 28px; cursor: pointer; }
-    .modal-box h2 { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
-    .modal-box label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; margin-top: 14px; }
-    .modal-box label:first-of-type { margin-top: 0; }
-    .modal-box input, .modal-box textarea, .modal-box select { width: 100%; padding: 10px 12px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-sans); font-size: 14px; outline: none; transition: border-color 0.2s; }
-    .modal-box input:focus, .modal-box textarea:focus, .modal-box select:focus { border-color: var(--accent); }
-    .modal-box textarea { min-height: 80px; resize: vertical; }
-    .modal-box .btn-row { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-    .modal-box .btn-row .btn { padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; cursor: pointer; transition: all 0.2s; }
-    .modal-box .btn-row .btn:hover { background: var(--bg-secondary); }
-    .modal-box .btn-row .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
-    .modal-box .btn-row .btn-primary:hover { background: var(--accent-hover); }
-    .modal-box .editor-wrapper { background: #fff; border-radius: 6px; overflow: hidden; margin: 8px 0; }
-    .modal-box .editor-wrapper .ql-container { min-height: 200px; font-family: var(--font-sans); }
-    .modal-box .settings-preview { background: var(--bg-primary); border-radius: 8px; padding: 16px; margin-top: 12px; border: 1px solid var(--border-color); }
-    .modal-box .settings-preview .preview-text { font-size: 20px; color: #f5efe8; }
+    .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 1100px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 0; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .modal-box .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+    .modal-box .modal-header h2 { font-size: 20px; font-weight: 600; }
+    .modal-box .modal-header .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer; }
+    .modal-box .modal-body { padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; flex: 1; }
+    .modal-box .modal-body .editor-wrapper { background: #fff; border-radius: 8px; overflow: hidden; min-height: 300px; }
+    .modal-box .modal-body .editor-wrapper .ql-container { min-height: 300px; font-family: var(--font-sans); font-size: 16px; }
+    .modal-box .modal-body .editor-wrapper .ql-editor { min-height: 300px; }
+    .modal-box .modal-body .metadata-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
+    .modal-box .modal-body .metadata-sidebar label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .modal-box .modal-body .metadata-sidebar input, .modal-box .modal-body .metadata-sidebar select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 10px; font-size: 14px; width: 100%; outline: none; }
+    .modal-box .modal-body .metadata-sidebar input:focus, .modal-box .modal-body .metadata-sidebar select:focus { border-color: var(--accent); }
+    .modal-box .modal-body .btn-row { display: flex; gap: 10px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--border-color); }
+    .modal-box .modal-body .btn-row .btn { padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .modal-box .modal-body .btn-row .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+    .modal-box .modal-body .btn-row .btn-primary:hover { background: var(--accent-hover); }
+    .modal-box .modal-body .preview-toggle { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); }
+    .modal-box .modal-body .preview-toggle .toggle-switch { position: relative; width: 40px; height: 22px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: 0.25s; }
+    .modal-box .modal-body .preview-toggle .toggle-switch.active { background: var(--accent); }
+    .modal-box .modal-body .preview-toggle .toggle-switch .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: transform 0.25s; }
+    .modal-box .modal-body .preview-toggle .toggle-switch.active .knob { transform: translateX(18px); }
+    .modal-box .modal-body .preview-area { background: #0b0b0b; border-radius: 8px; padding: 20px; border: 1px solid var(--border-color); min-height: 200px; display: none; color: #f5efe8; font-family: 'Inter', sans-serif; font-size: 18px; line-height: 1.6; }
+    .modal-box .modal-body .preview-area.show { display: block; }
+    .modal-box .modal-body .preview-area h1, .modal-box .modal-body .preview-area h2, .modal-box .modal-body .preview-area h3 { color: #f5efe8; }
+    .modal-box .modal-body .preview-area p { color: #e0dcd6; }
+    .modal-box .modal-body .preview-area strong { color: #f5efe8; }
 
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); color: var(--text-primary); padding: 12px 24px; border-radius: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow); z-index: 9999; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(12px); }
     .toast.show { opacity: 1; }
@@ -121,8 +123,8 @@
       .admin-header .actions { flex-wrap: wrap; }
       .list-item { flex-wrap: wrap; gap: 8px; }
       .list-item .actions { margin-left: 0; width: 100%; justify-content: flex-end; }
-      .modal-box { padding: 20px; }
-      .list-item .preview-text { max-width: 100px; }
+      .modal-box .modal-body .metadata-sidebar { grid-template-columns: 1fr; }
+      .list-item .info .preview-text { max-width: 100px; }
     }
     @media (max-width: 480px) {
       .stats-row { grid-template-columns: 1fr; }
@@ -134,21 +136,20 @@
 </head>
 <body>
 
-  <!-- ===== TOAST ===== -->
   <div id="toast" class="toast"></div>
 
-  <!-- ===== MODAL ===== -->
   <div id="modal-overlay" class="modal-overlay">
     <div class="modal-box" id="modal-box">
-      <button class="close-btn" id="modal-close">✕</button>
-      <div id="modal-content"></div>
+      <div class="modal-header">
+        <h2 id="modal-title">Editor</h2>
+        <button class="close-btn" id="modal-close">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
     </div>
   </div>
 
-  <!-- ===== ADMIN APP ===== -->
   <div id="admin-app">
 
-    <!-- ===== SIDEBAR ===== -->
     <nav id="sidebar">
       <div class="logo">🎙️ Promptica <span>Admin</span></div>
       <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span><span class="label">Dashboard</span></div>
@@ -161,7 +162,6 @@
       <div class="nav-item bottom" data-page="back" id="back-to-app"><span class="icon">←</span><span class="label">Back to App</span></div>
     </nav>
 
-    <!-- ===== CONTENT ===== -->
     <div id="content">
 
       <header class="admin-header">
@@ -169,7 +169,6 @@
         <div class="actions" id="header-actions"></div>
       </header>
 
-      <!-- ===== DASHBOARD ===== -->
       <div id="page-dashboard" class="page active">
         <div class="stats-row" id="dashboard-stats">
           <div class="stat-card"><div class="label">Total Templates</div><div class="value" id="stat-templates">0</div></div>
@@ -177,7 +176,7 @@
           <div class="stat-card"><div class="label">Total Sessions</div><div class="value" id="stat-sessions">0</div></div>
           <div class="stat-card"><div class="label">Avg. Session Length</div><div class="value" id="stat-avg-duration">0m</div></div>
         </div>
-        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;">
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;backdrop-filter:blur(4px);">
           <h3 style="font-size:16px;font-weight:500;margin-bottom:8px;">⚡ Quick Actions</h3>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
             <button class="btn btn-primary" onclick="navigateTo('templates');openNewTemplate()">+ New Template</button>
@@ -186,13 +185,12 @@
             <button class="btn" onclick="syncToGitHub()">🔄 Sync to GitHub</button>
           </div>
         </div>
-        <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;">
+        <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;backdrop-filter:blur(4px);">
           <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-bottom:4px;">📌 Admin Tip</h3>
           <p style="color:var(--text-secondary);font-size:14px;">This panel controls the teleprompter experience for all users. Changes to settings and templates are stored locally – sync to GitHub to share across deployments.</p>
         </div>
       </div>
 
-      <!-- ===== TEMPLATES ===== -->
       <div id="page-templates" class="page">
         <div class="list-header">
           <h3>📝 Script Templates</h3>
@@ -206,9 +204,8 @@
         </div>
       </div>
 
-      <!-- ===== GLOBAL SETTINGS ===== -->
       <div id="page-settings" class="page">
-        <div style="max-width: 800px;">
+        <div style="max-width:800px;">
           <h3 style="font-size:16px;font-weight:500;color:var(--text-secondary);margin-bottom:16px;">Default App Settings & Branding</h3>
           <form id="settings-form" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div><label style="font-size:13px;color:var(--text-secondary);">Default Font</label><input type="text" id="setting-font" value="Inter" /></div>
@@ -216,74 +213,51 @@
             <div><label style="font-size:13px;color:var(--text-secondary);">Text Color</label><input type="color" id="setting-text-color" value="#f5efe8" /></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Background Color</label><input type="color" id="setting-bg-color" value="#0b0b0b" /></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Background Opacity</label><input type="range" id="setting-bg-opacity" min="0.3" max="1" step="0.05" value="1" /><span id="opacity-label">1.00</span></div>
-            <div><label style="font-size:13px;color:var(--text-secondary);">Default Mirror</label><select id="setting-mirror"><option value="false">Off</option><option value="true">On</option></select></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Default Focus</label><select id="setting-focus"><option value="true">On</option><option value="false">Off</option></select></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Default Speed (1-10)</label><input type="number" id="setting-speed" value="5" min="1" max="10" /></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Line Height</label><select id="setting-line-height"><option value="1.2">1.2</option><option value="1.4">1.4</option><option value="1.6" selected>1.6</option><option value="1.8">1.8</option><option value="2.0">2.0</option></select></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Letter Spacing</label><input type="number" id="setting-letter-spacing" value="0.3" step="0.1" min="0" max="2" /></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Text Shadow (Glow)</label><select id="setting-glow"><option value="true">On</option><option value="false">Off</option></select></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Overlay Opacity</label><input type="number" id="setting-overlay-opacity" value="0.35" step="0.05" min="0" max="0.7" /></div>
-            <div style="grid-column: span 2;"><label style="font-size:13px;color:var(--text-secondary);">Logo URL</label><input type="text" id="setting-logo" placeholder="https://example.com/logo.png" /></div>
-            <div style="grid-column: span 2;"><label style="font-size:13px;color:var(--text-secondary);">Custom CSS</label><textarea id="setting-custom-css" rows="3" placeholder="/* Custom styles */"></textarea></div>
-            <div style="grid-column: span 2;"><label style="font-size:13px;color:var(--text-secondary);">Watermark Text</label><input type="text" id="setting-watermark" placeholder="Promptica" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Auto‑Scroll Delay</label><input type="number" id="setting-auto-delay" value="0" step="0.5" min="0" max="5" /></div>
+            <div style="grid-column:span 2;"><label style="font-size:13px;color:var(--text-secondary);">Logo URL</label><input type="text" id="setting-logo" placeholder="https://example.com/logo.png" /></div>
+            <div style="grid-column:span 2;"><label style="font-size:13px;color:var(--text-secondary);">Custom CSS</label><textarea id="setting-custom-css" rows="3" placeholder="/* Custom styles */"></textarea></div>
+            <div style="grid-column:span 2;"><label style="font-size:13px;color:var(--text-secondary);">Watermark Text</label><input type="text" id="setting-watermark" placeholder="Promptica" /></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Max Script Length (chars)</label><input type="number" id="setting-max-length" value="5000" /></div>
             <div><label style="font-size:13px;color:var(--text-secondary);">Max Saved Scripts per User</label><input type="number" id="setting-max-scripts" value="20" /></div>
-            <div style="grid-column: span 2;margin-top:12px;">
-              <button class="btn btn-primary" id="btn-save-settings">💾 Save Settings</button>
-              <button class="btn" id="btn-preview-settings">👁️ Preview</button>
-            </div>
+            <div style="grid-column:span 2;margin-top:12px;"><button class="btn btn-primary" id="btn-save-settings">💾 Save Settings</button></div>
           </form>
-          <div id="settings-preview" style="display:none;margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px;">
-            <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-bottom:8px;">Preview</h3>
-            <div class="settings-preview">
-              <div class="preview-text" id="preview-text" style="font-family:Inter;font-size:34px;color:#f5efe8;">Sample text</div>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- ===== USER ACCESS ===== -->
       <div id="page-users" class="page">
-        <div class="list-header">
-          <h3>👤 User Access</h3>
-          <button class="btn btn-primary" id="btn-add-user">+ Add User</button>
-        </div>
-        <div class="list-container" id="user-list">
-          <div class="empty-state"><div class="icon">👤</div><div>No users configured.</div></div>
-        </div>
+        <div class="list-header"><h3>👤 User Access</h3><button class="btn btn-primary" id="btn-add-user">+ Add User</button></div>
+        <div class="list-container" id="user-list"><div class="empty-state"><div class="icon">👤</div><div>No users configured.</div></div></div>
       </div>
 
-      <!-- ===== ANALYTICS ===== -->
       <div id="page-analytics" class="page">
         <div class="stats-row" style="margin-bottom:16px;">
           <div class="stat-card"><div class="label">Sessions (Last 7d)</div><div class="value" id="analytics-sessions">0</div></div>
           <div class="stat-card"><div class="label">Most Used Font</div><div class="value" id="analytics-font" style="font-size:20px;">—</div></div>
           <div class="stat-card"><div class="label">Most Used Color</div><div class="value" id="analytics-color" style="font-size:20px;">—</div></div>
         </div>
-        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;">
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;backdrop-filter:blur(4px);">
           <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);">Sessions by Day (Last 7)</h3>
           <div id="sessions-chart" style="height:120px;display:flex;align-items:flex-end;gap:8px;margin-top:8px;"></div>
         </div>
-        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;">
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;backdrop-filter:blur(4px);">
           <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);">Device Breakdown</h3>
           <div id="device-chart" style="height:100px;display:flex;align-items:flex-end;gap:8px;margin-top:8px;"></div>
         </div>
       </div>
 
-      <!-- ===== REMOTE PAIRINGS ===== -->
       <div id="page-pairings" class="page">
-        <div class="list-header">
-          <h3>📱 Remote Pairings</h3>
-          <button class="btn" id="btn-refresh-pairings">🔄 Refresh</button>
-        </div>
-        <div class="list-container" id="pairing-list">
-          <div class="empty-state"><div class="icon">📱</div><div>No active pairings.</div></div>
-        </div>
+        <div class="list-header"><h3>📱 Remote Pairings</h3><button class="btn" id="btn-refresh-pairings">🔄 Refresh</button></div>
+        <div class="list-container" id="pairing-list"><div class="empty-state"><div class="icon">📱</div><div>No active pairings.</div></div></div>
       </div>
 
-      <!-- ===== FEATURE FLAGS ===== -->
       <div id="page-flags" class="page">
-        <div style="max-width: 600px;">
+        <div style="max-width:600px;">
           <h3 style="font-size:16px;font-weight:500;color:var(--text-secondary);margin-bottom:16px;">Feature Flags</h3>
           <div id="flags-container">
             <div class="list-item"><span class="info"><span class="title">Mirror Mode</span><span class="meta">Allow users to mirror text</span></span><div class="actions"><button class="btn flag-toggle" data-flag="enableMirror">✅ On</button></div></div>
@@ -299,14 +273,10 @@
     </div>
   </div>
 
-  <!-- ============================================================= -->
-  <!--  JAVASCRIPT – Admin Application (IndexedDB)                   -->
-  <!-- ============================================================= -->
   <script>
     (function() {
       'use strict';
 
-      // ===== UTILITIES =====
       const $ = s => document.querySelector(s);
       const $$ = s => document.querySelectorAll(s);
       const toast = (msg, dur = 3000) => {
@@ -374,9 +344,42 @@
 
       // ===== STATE =====
       let currentPage = 'dashboard';
-      let quill = null;
-      let quillInitialized = false;
       let editingTemplateId = null;
+
+      // ===== DEFAULT SPEAKEASY CONTENT =====
+      const defaultSpeakEasy = [{
+        name: 'Warm-Up Drills',
+        description: '5‑minute vocal and physical exercises to prepare your voice and body before speaking.',
+        icon: '🎯',
+        articles: [
+          'The 5‑Minute Vocal Warm‑Up – Lip trills, tongue twisters, humming, and diaphragmatic breathing.',
+          'Power Poses for Confidence – Use body language to boost confidence before stepping in front of the camera.'
+        ]
+      }, {
+        name: 'Script Structure',
+        description: 'Templates and frameworks for organising your speech (TED‑style, Storytelling, Sales Pitch).',
+        icon: '📝',
+        articles: [
+          'The TED‑Talk Formula – Hook, main idea, evidence, and a call to action.',
+          'The Hero’s Journey for Presentations – Use the classic narrative arc to captivate your audience.'
+        ]
+      }, {
+        name: 'Delivery Techniques',
+        description: 'Tips on pacing, pausing, emphasis, vocal variety, and non‑verbal communication.',
+        icon: '🎤',
+        articles: [
+          'The Art of the Pause – Why pausing is powerful and how to practice it.',
+          'Vocal Variety – Pitch, Pace, and Volume – Keep your audience engaged by varying your delivery.'
+        ]
+      }, {
+        name: 'Overcoming Nervousness',
+        description: 'Breathing exercises, visualisation techniques, and mindset shifts to calm pre‑speech jitters.',
+        icon: '🧘',
+        articles: [
+          'Box Breathing for Instant Calm – A 4‑4‑4‑4 breathing technique to use right before you speak.',
+          'Reframing Anxiety as Excitement – A psychological shift that changes how your body reacts.'
+        ]
+      }];
 
       // ===== NAVIGATION =====
       function navigateTo(page) {
@@ -398,15 +401,11 @@
         $('#page-title').innerHTML = titles[page] || 'Dashboard';
 
         const actions = $('#header-actions');
-        if (page === 'templates') {
-          actions.innerHTML =
-            `<button class="btn btn-primary" onclick="openNewTemplate()">+ New Template</button>`;
-        } else if (page === 'users') {
-          actions.innerHTML =
-            `<button class="btn btn-primary" onclick="openNewUser()">+ Add User</button>`;
-        } else {
-          actions.innerHTML = '';
-        }
+        if (page === 'templates') actions.innerHTML =
+          `<button class="btn btn-primary" onclick="openNewTemplate()">+ New Template</button>`;
+        else if (page === 'users') actions.innerHTML =
+          `<button class="btn btn-primary" onclick="openNewUser()">+ Add User</button>`;
+        else actions.innerHTML = '';
 
         if (page === 'dashboard') renderDashboard();
         else if (page === 'templates') renderTemplates();
@@ -458,6 +457,7 @@
               <button class="btn" onclick="editTemplate('${t.id}')">✏️ Edit</button>
               <button class="btn btn-success" onclick="duplicateTemplate('${t.id}')">📋 Duplicate</button>
               <button class="btn btn-danger" onclick="deleteTemplate('${t.id}')">🗑 Delete</button>
+              <button class="btn" onclick="exportTemplate('${t.id}')">📤</button>
             </div>
           </div>
         `).join('');
@@ -476,81 +476,28 @@
         toast('Template duplicated');
       };
 
+      window.exportTemplate = async function(id) {
+        const templates = await getStore('templates');
+        const t = templates.find(t => t.id === id);
+        if (!t) { toast('Template not found'); return; }
+        const blob = new Blob([JSON.stringify(t, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `template_${t.title}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('Template exported');
+      };
+
       window.openNewTemplate = function() {
         editingTemplateId = null;
-        showFormModal('New Script Template', `
-          <label>Title</label>
-          <input type="text" id="form-title" placeholder="Template title" />
-          <label>Category</label>
-          <input type="text" id="form-category" placeholder="e.g., Tutorial, Interview" />
-          <label>Content</label>
-          <div class="editor-wrapper" id="quill-editor-wrapper"><div id="quill-editor" style="min-height:150px;background:#fff;color:#000;"></div></div>
-          <label>Public</label>
-          <select id="form-public"><option value="true">Yes</option><option value="false">No</option></select>
-          <label>Tags (comma separated)</label>
-          <input type="text" id="form-tags" placeholder="tutorial, interview" />
-          <div class="btn-row">
-            <button class="btn" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveTemplate()">💾 Save</button>
-          </div>
-        `);
-        initQuill('');
+        showModal('New Script Template', '');
       };
 
       window.editTemplate = function(id) {
         editingTemplateId = id;
-        getStore('templates').then(templates => {
-          const t = templates.find(t => t.id === id);
-          if (!t) { toast('Template not found'); return; }
-          showFormModal('Edit Template', `
-            <label>Title</label>
-            <input type="text" id="form-title" value="${escapeHtml(t.title)}" />
-            <label>Category</label>
-            <input type="text" id="form-category" value="${escapeHtml(t.category || '')}" />
-            <label>Content</label>
-            <div class="editor-wrapper" id="quill-editor-wrapper"><div id="quill-editor" style="min-height:150px;background:#fff;color:#000;">${t.content || ''}</div></div>
-            <label>Public</label>
-            <select id="form-public"><option value="true" ${t.public ? 'selected' : ''}>Yes</option><option value="false" ${!t.public ? 'selected' : ''}>No</option></select>
-            <label>Tags (comma separated)</label>
-            <input type="text" id="form-tags" value="${(t.tags || []).join(', ')}" />
-            <div class="btn-row">
-              <button class="btn" onclick="closeModal()">Cancel</button>
-              <button class="btn btn-primary" onclick="saveTemplate()">💾 Save</button>
-            </div>
-          `);
-          initQuill(t.content || '');
-        });
-      };
-
-      window.saveTemplate = async function() {
-        const title = document.getElementById('form-title').value.trim();
-        const category = document.getElementById('form-category').value.trim();
-        const content = quill ? quill.root.innerHTML : '';
-        const isPublic = document.getElementById('form-public').value === 'true';
-        const tags = document.getElementById('form-tags').value.split(',').map(s => s.trim()).filter(Boolean);
-        if (!title) { toast('Title is required'); return; }
-        const template = {
-          id: editingTemplateId || generateId(),
-          title,
-          content,
-          category,
-          tags,
-          public: isPublic,
-          version: 1,
-          usageCount: 0,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        if (editingTemplateId) {
-          const old = (await getStore('templates')).find(t => t.id === editingTemplateId);
-          if (old) template.version = old.version + 1;
-        }
-        await putRecord('templates', template);
-        closeModal();
-        renderTemplates();
-        renderDashboard();
-        toast(editingTemplateId ? 'Template updated' : 'Template created');
-        editingTemplateId = null;
+        showModal('Edit Template', '');
       };
 
       window.deleteTemplate = async function(id) {
@@ -561,7 +508,86 @@
         toast('Template deleted');
       };
 
-      // ===== QUILL INIT =====
+      // ===== MODAL (Tiptap-like fullscreen editor) =====
+      let quill = null;
+      let quillInitialized = false;
+
+      function showModal(title, html) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-body').innerHTML = `
+          <div class="editor-wrapper" id="editor-wrapper">
+            <div id="quill-editor" style="min-height:300px;background:#fff;color:#000;"></div>
+          </div>
+          <div class="metadata-sidebar">
+            <div><label>Title</label><input type="text" id="meta-title" placeholder="Template title" /></div>
+            <div><label>Slug</label><input type="text" id="meta-slug" placeholder="auto-generated" /></div>
+            <div><label>Category</label><input type="text" id="meta-category" placeholder="e.g., Tutorial" /></div>
+            <div><label>Tags (comma separated)</label><input type="text" id="meta-tags" placeholder="tutorial, tips" /></div>
+            <div><label>Publish Date</label><input type="date" id="meta-date" /></div>
+            <div><label>Visibility</label><select id="meta-visibility"><option value="draft">Draft</option><option value="published">Published</option></select></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div class="preview-toggle">
+              <span>Live Preview</span>
+              <div class="toggle-switch" id="preview-toggle">
+                <div class="knob"></div>
+              </div>
+            </div>
+            <div class="btn-row">
+              <button class="btn" onclick="closeModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="saveTemplateFromModal()">💾 Save</button>
+            </div>
+          </div>
+          <div class="preview-area" id="preview-area"></div>
+        `;
+        document.getElementById('modal-overlay').classList.add('active');
+
+        // Load existing data if editing
+        if (editingTemplateId) {
+          getStore('templates').then(templates => {
+            const t = templates.find(t => t.id === editingTemplateId);
+            if (t) {
+              document.getElementById('meta-title').value = t.title || '';
+              document.getElementById('meta-slug').value = t.slug || '';
+              document.getElementById('meta-category').value = t.category || '';
+              document.getElementById('meta-tags').value = (t.tags || []).join(', ');
+              document.getElementById('meta-date').value = t.publishedAt ? t.publishedAt.split('T')[0] : new Date()
+                .toISOString().split('T')[0];
+              document.getElementById('meta-visibility').value = t.visibility || 'draft';
+              initQuill(t.content || '');
+            } else {
+              initQuill('');
+            }
+          });
+        } else {
+          initQuill('');
+        }
+
+        // Preview toggle
+        const toggle = document.getElementById('preview-toggle');
+        const previewArea = document.getElementById('preview-area');
+        toggle.addEventListener('click', () => {
+          toggle.classList.toggle('active');
+          previewArea.classList.toggle('show');
+          if (previewArea.classList.contains('show')) {
+            const content = quill ? quill.root.innerHTML : '';
+            previewArea.innerHTML = content;
+          }
+        });
+
+        // Auto-save draft every 10s
+        let autoSaveTimer = null;
+        const autoSaveDraft = () => {
+          clearTimeout(autoSaveTimer);
+          autoSaveTimer = setTimeout(() => {
+            toast('💾 Draft saved');
+          }, 10000);
+        };
+        document.getElementById('meta-title').addEventListener('input', autoSaveDraft);
+        document.getElementById('meta-category').addEventListener('input', autoSaveDraft);
+        document.getElementById('meta-tags').addEventListener('input', autoSaveDraft);
+      }
+
       function initQuill(initialContent) {
         if (quillInitialized) {
           if (quill) quill.root.innerHTML = initialContent;
@@ -572,13 +598,14 @@
         setTimeout(() => {
           quill = new Quill('#quill-editor', {
             theme: 'snow',
-            placeholder: 'Write your template content...',
+            placeholder: 'Write your template content here…',
             modules: {
               toolbar: [
                 [{ 'header': [1, 2, 3, false] }],
-                ['bold', 'italic', 'underline', 'strike'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                ['link', 'image', 'code-block'],
+                ['bold', 'italic', 'underline', 'strike', 'code'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'list': 'check' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image', 'video'],
                 ['clean']
               ]
             }
@@ -601,10 +628,67 @@
               reader.readAsDataURL(file);
             };
           });
+          toolbar.addHandler('video', () => {
+            const url = prompt('Enter YouTube or Vimeo URL:');
+            if (url) {
+              const embed = `<iframe width="560" height="315" src="${url.replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen></iframe>`;
+              const range = quill.getSelection();
+              const index = range ? range.index : 0;
+              quill.insertEmbed(index, 'html', embed);
+            }
+          });
           if (initialContent) quill.root.innerHTML = initialContent;
           quillInitialized = true;
         }, 100);
       }
+
+      window.saveTemplateFromModal = async function() {
+        const title = document.getElementById('meta-title').value.trim();
+        const slug = document.getElementById('meta-slug').value.trim() || title.toLowerCase().replace(/\s+/g, '-');
+        const category = document.getElementById('meta-category').value.trim();
+        const tags = document.getElementById('meta-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+        const publishedAt = document.getElementById('meta-date').value || new Date().toISOString().split('T')[0];
+        const visibility = document.getElementById('meta-visibility').value;
+        const content = quill ? quill.root.innerHTML : '';
+        if (!title) { toast('Title is required'); return; }
+        const template = {
+          id: editingTemplateId || generateId(),
+          title,
+          slug,
+          content,
+          category,
+          tags,
+          public: visibility === 'published',
+          visibility,
+          publishedAt: publishedAt + 'T00:00:00.000Z',
+          version: 1,
+          usageCount: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        if (editingTemplateId) {
+          const old = (await getStore('templates')).find(t => t.id === editingTemplateId);
+          if (old) template.version = old.version + 1;
+        }
+        await putRecord('templates', template);
+        closeModal();
+        renderTemplates();
+        renderDashboard();
+        toast(editingTemplateId ? 'Template updated' : 'Template created');
+        editingTemplateId = null;
+      };
+
+      window.closeModal = function() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        editingTemplateId = null;
+        quillInitialized = false;
+        quill = null;
+      };
+
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+      document.getElementById('modal-overlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
 
       // ===== SETTINGS =====
       async function loadSettings() {
@@ -615,13 +699,13 @@
         document.getElementById('setting-bg-color').value = settings.defaultBgColor || '#0b0b0b';
         document.getElementById('setting-bg-opacity').value = settings.defaultBgOpacity || 1;
         document.getElementById('opacity-label').textContent = (settings.defaultBgOpacity || 1).toFixed(2);
-        document.getElementById('setting-mirror').value = settings.defaultMirror ? 'true' : 'false';
         document.getElementById('setting-focus').value = settings.defaultFocus ? 'true' : 'false';
         document.getElementById('setting-speed').value = settings.defaultSpeed || 5;
         document.getElementById('setting-line-height').value = settings.defaultLineHeight || 1.6;
         document.getElementById('setting-letter-spacing').value = settings.defaultLetterSpacing || 0.3;
         document.getElementById('setting-glow').value = settings.defaultGlow ? 'true' : 'false';
         document.getElementById('setting-overlay-opacity').value = settings.defaultOverlayOpacity || 0.35;
+        document.getElementById('setting-auto-delay').value = settings.defaultAutoDelay || 0;
         document.getElementById('setting-logo').value = settings.logoUrl || '';
         document.getElementById('setting-custom-css').value = settings.customCSS || '';
         document.getElementById('setting-watermark').value = settings.watermarkText || '';
@@ -637,13 +721,13 @@
           defaultTextColor: document.getElementById('setting-text-color').value,
           defaultBgColor: document.getElementById('setting-bg-color').value,
           defaultBgOpacity: parseFloat(document.getElementById('setting-bg-opacity').value),
-          defaultMirror: document.getElementById('setting-mirror').value === 'true',
           defaultFocus: document.getElementById('setting-focus').value === 'true',
           defaultSpeed: parseInt(document.getElementById('setting-speed').value) || 5,
           defaultLineHeight: parseFloat(document.getElementById('setting-line-height').value) || 1.6,
           defaultLetterSpacing: parseFloat(document.getElementById('setting-letter-spacing').value) || 0.3,
           defaultGlow: document.getElementById('setting-glow').value === 'true',
           defaultOverlayOpacity: parseFloat(document.getElementById('setting-overlay-opacity').value) || 0.35,
+          defaultAutoDelay: parseFloat(document.getElementById('setting-auto-delay').value) || 0,
           logoUrl: document.getElementById('setting-logo').value,
           customCSS: document.getElementById('setting-custom-css').value,
           watermarkText: document.getElementById('setting-watermark').value,
@@ -653,22 +737,6 @@
         };
         await putRecord('settings', settings);
         toast('Settings saved');
-      });
-
-      document.getElementById('btn-preview-settings').addEventListener('click', () => {
-        const preview = document.getElementById('settings-preview');
-        if (preview.style.display === 'none') {
-          const font = document.getElementById('setting-font').value || 'Inter';
-          const size = document.getElementById('setting-font-size').value || 34;
-          const color = document.getElementById('setting-text-color').value || '#f5efe8';
-          const text = document.getElementById('preview-text');
-          text.style.fontFamily = font;
-          text.style.fontSize = size + 'px';
-          text.style.color = color;
-          preview.style.display = 'block';
-        } else {
-          preview.style.display = 'none';
-        }
       });
 
       // ===== USERS =====
@@ -694,78 +762,30 @@
       }
 
       window.openNewUser = function() {
-        showFormModal('Add User', `
-          <label>User ID (or email)</label>
-          <input type="text" id="form-user-id" placeholder="user@example.com" />
-          <label>Name</label>
-          <input type="text" id="form-user-name" placeholder="Display name" />
-          <label>Can Access</label>
-          <select id="form-user-access"><option value="true">Yes</option><option value="false">No</option></select>
-          <label>Max Scripts (override global)</label>
-          <input type="number" id="form-user-max" placeholder="Leave empty for unlimited" />
-          <div class="btn-row">
-            <button class="btn" onclick="closeModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveUser()">✅ Add</button>
-          </div>
-        `);
-      };
-
-      window.saveUser = async function() {
-        const id = document.getElementById('form-user-id').value.trim();
-        const name = document.getElementById('form-user-name').value.trim();
-        const canAccess = document.getElementById('form-user-access').value === 'true';
-        const maxScripts = document.getElementById('form-user-max').value ? parseInt(document.getElementById('form-user-max')
-          .value) : null;
-        if (!id) { toast('User ID is required'); return; }
-        const user = {
-          id,
-          name: name || id,
-          canAccess,
-          maxScripts,
-          grantedAt: new Date().toISOString(),
-          lastActiveAt: null
-        };
-        await putRecord('users', user);
-        closeModal();
-        renderUsers();
-        renderDashboard();
-        toast('User added');
+        const id = prompt('Enter user ID (email):');
+        if (!id) return;
+        const name = prompt('Display name:') || id;
+        const canAccess = confirm('Grant access?') ? true : false;
+        const maxScripts = prompt('Max scripts (leave empty for unlimited):') || null;
+        putRecord('users', { id, name, canAccess, maxScripts: maxScripts ? parseInt(maxScripts) : null, grantedAt: new Date()
+            .toISOString(), lastActiveAt: null }).then(() => { renderUsers();
+          renderDashboard();
+          toast('User added'); });
       };
 
       window.editUser = function(id) {
         getStore('users').then(users => {
           const u = users.find(u => u.id === id);
           if (!u) { toast('User not found'); return; }
-          showFormModal('Edit User', `
-            <label>Name</label>
-            <input type="text" id="form-user-name" value="${escapeHtml(u.name || '')}" />
-            <label>Can Access</label>
-            <select id="form-user-access"><option value="true" ${u.canAccess ? 'selected' : ''}>Yes</option><option value="false" ${!u.canAccess ? 'selected' : ''}>No</option></select>
-            <label>Max Scripts (override global)</label>
-            <input type="number" id="form-user-max" value="${u.maxScripts || ''}" placeholder="Leave empty for unlimited" />
-            <div class="btn-row">
-              <button class="btn" onclick="closeModal()">Cancel</button>
-              <button class="btn btn-primary" onclick="saveUserEdit('${u.id}')">💾 Save</button>
-            </div>
-          `);
+          const name = prompt('Name:', u.name) || u.id;
+          const canAccess = confirm('Access?') ? true : false;
+          const maxScripts = prompt('Max scripts:', u.maxScripts || '') || null;
+          u.name = name;
+          u.canAccess = canAccess;
+          u.maxScripts = maxScripts ? parseInt(maxScripts) : null;
+          putRecord('users', u).then(() => { renderUsers();
+            toast('User updated'); });
         });
-      };
-
-      window.saveUserEdit = async function(id) {
-        const name = document.getElementById('form-user-name').value.trim();
-        const canAccess = document.getElementById('form-user-access').value === 'true';
-        const maxScripts = document.getElementById('form-user-max').value ? parseInt(document.getElementById('form-user-max')
-          .value) : null;
-        const users = await getStore('users');
-        const user = users.find(u => u.id === id);
-        if (!user) { toast('User not found'); return; }
-        user.name = name || user.id;
-        user.canAccess = canAccess;
-        user.maxScripts = maxScripts;
-        await putRecord('users', user);
-        closeModal();
-        renderUsers();
-        toast('User updated');
       };
 
       window.deleteUser = async function(id) {
@@ -774,6 +794,8 @@
         renderUsers();
         toast('User removed');
       };
+
+      document.getElementById('btn-add-user').addEventListener('click', openNewUser);
 
       // ===== ANALYTICS =====
       async function renderAnalytics() {
@@ -862,18 +884,19 @@
         }
       };
 
+      document.getElementById('btn-refresh-pairings').addEventListener('click', renderPairings);
+
       // ===== FEATURE FLAGS =====
       let flagState = {};
 
       async function loadFlags() {
         const flags = (await getStore('flags'))[0] || {};
         flagState = flags;
-        const container = document.getElementById('flags-container');
-        container.querySelectorAll('.flag-toggle').forEach(btn => {
+        document.querySelectorAll('.flag-toggle').forEach(btn => {
           const flag = btn.dataset.flag;
           const value = flags[flag] !== undefined ? flags[flag] : true;
           btn.textContent = value ? '✅ On' : '⛔ Off';
-          btn.style.borderColor = value ? 'var(--success)' : 'var(--danger)';
+          btn.style.borderColor = value ? '#4caf50' : '#ef5350';
         });
       }
 
@@ -883,38 +906,13 @@
         const flag = btn.dataset.flag;
         const current = btn.textContent.includes('On');
         btn.textContent = current ? '⛔ Off' : '✅ On';
-        btn.style.borderColor = current ? 'var(--danger)' : 'var(--success)';
+        btn.style.borderColor = current ? '#ef5350' : '#4caf50';
         flagState[flag] = !current;
       });
 
       document.getElementById('btn-save-flags').addEventListener('click', async () => {
         await putRecord('flags', { id: 'flags', ...flagState, updatedAt: new Date().toISOString() });
         toast('Feature flags saved');
-      });
-
-      // ===== MODAL =====
-      function showFormModal(title, html) {
-        document.getElementById('modal-content').innerHTML = `<h2>${title}</h2>${html}`;
-        document.getElementById('modal-overlay').classList.add('active');
-        quillInitialized = false;
-        quill = null;
-        setTimeout(() => {
-          if (document.getElementById('quill-editor-wrapper')) {
-            initQuill('');
-          }
-        }, 50);
-      }
-
-      window.closeModal = function() {
-        document.getElementById('modal-overlay').classList.remove('active');
-        editingTemplateId = null;
-        quillInitialized = false;
-        quill = null;
-      };
-
-      document.getElementById('modal-close').addEventListener('click', closeModal);
-      document.getElementById('modal-overlay').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeModal();
       });
 
       // ===== IMPORT / EXPORT =====
@@ -968,21 +966,6 @@
         input.click();
       };
 
-      // ===== SINGLE TEMPLATE EXPORT =====
-      window.exportTemplate = async function(id) {
-        const templates = await getStore('templates');
-        const t = templates.find(t => t.id === id);
-        if (!t) { toast('Template not found'); return; }
-        const blob = new Blob([JSON.stringify(t, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `template_${t.title}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        toast('Template exported');
-      };
-
       // ===== GITHUB SYNC =====
       window.syncToGitHub = async function() {
         const token = prompt('Enter GitHub Personal Access Token (classic, repo scope):');
@@ -1025,6 +1008,36 @@
         }
       };
 
+      // ===== SEED CONTENT =====
+      async function seedContent() {
+        const existing = await getStore('templates');
+        if (!existing.length) {
+          // Seed default SpeakEasy content as templates
+          for (const cat of defaultSpeakEasy) {
+            for (const article of cat.articles) {
+              const [title, ...contentParts] = article.split(' – ');
+              const content = contentParts.join(' – ');
+              await putRecord('templates', {
+                id: generateId(),
+                title: title || article,
+                slug: (title || article).toLowerCase().replace(/\s+/g, '-'),
+                content: `<p>${content || article}</p>`,
+                category: cat.name,
+                tags: ['speakeasy', cat.name.toLowerCase().replace(/\s+/g, '-')],
+                public: true,
+                visibility: 'published',
+                publishedAt: new Date().toISOString(),
+                version: 1,
+                usageCount: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              });
+            }
+          }
+          toast('📚 SpeakEasy content seeded');
+        }
+      }
+
       // ===== EVENT BINDINGS =====
       sidebar.querySelectorAll('.nav-item[data-page]').forEach(el => {
         el.addEventListener('click', () => {
@@ -1051,7 +1064,6 @@
               renderTemplates();
             } catch (err) { toast('Invalid JSON'); }
           } else {
-            // Simple CSV: title,content,category,tags
             const lines = text.split('\n').filter(l => l.trim());
             const headers = lines[0].split(',').map(h => h.trim());
             for (let i = 1; i < lines.length; i++) {
@@ -1080,12 +1092,11 @@
         input.click();
       });
 
-      document.getElementById('btn-refresh-pairings').addEventListener('click', renderPairings);
-      document.getElementById('btn-add-user').addEventListener('click', openNewUser);
-
       // ===== INIT =====
       async function init() {
         await openDB();
+        await seedContent();
+
         const settings = await getStore('settings');
         if (!settings.length) {
           await putRecord('settings', {
@@ -1095,23 +1106,24 @@
             defaultTextColor: '#f5efe8',
             defaultBgColor: '#0b0b0b',
             defaultBgOpacity: 1,
-            defaultMirror: false,
             defaultFocus: true,
             defaultSpeed: 5,
             defaultLineHeight: 1.6,
             defaultLetterSpacing: 0.3,
             defaultGlow: true,
             defaultOverlayOpacity: 0.35,
+            defaultAutoDelay: 0,
             maxScriptLength: 5000,
             maxSavedScripts: 20,
             updatedAt: new Date().toISOString()
           });
         }
+
         const flags = await getStore('flags');
         if (!flags.length) {
           await putRecord('flags', {
             id: 'flags',
-            enableMirror: true,
+            enableMirror: false,
             enableVoiceControl: false,
             enableFocus: true,
             enableAutoPause: false,
@@ -1119,27 +1131,7 @@
             updatedAt: new Date().toISOString()
           });
         }
-        const logs = await getStore('logs');
-        if (!logs.length) {
-          const now = Date.now();
-          for (let i = 0; i < 20; i++) {
-            const d = new Date(now - Math.random() * 7 * 24 * 60 * 60 * 1000);
-            await putRecord('logs', {
-              id: generateId(),
-              userId: 'user-' + Math.floor(Math.random() * 5),
-              sessionId: 'sess-' + Math.random().toString(36).slice(2, 8),
-              startedAt: d.toISOString(),
-              endedAt: new Date(d.getTime() + 60 * 1000 + Math.random() * 300 * 1000).toISOString(),
-              duration: Math.floor(30 + Math.random() * 300),
-              fontUsed: ['Inter', 'Roboto', 'SF Pro'][Math.floor(Math.random() * 3)],
-              fontSize: 34,
-              mirrorUsed: Math.random() > 0.5,
-              focusUsed: Math.random() > 0.5,
-              speedSetting: Math.floor(3 + Math.random() * 5),
-              deviceType: ['desktop', 'mobile', 'tablet'][Math.floor(Math.random() * 3)]
-            });
-          }
-        }
+
         navigateTo('dashboard');
         toast('🎙️ Admin Panel ready');
       }
@@ -1147,11 +1139,10 @@
       init();
 
       window.openNewTemplate = openNewTemplate;
-      window.openNewUser = openNewUser;
       window.exportData = exportData;
       window.importData = importData;
       window.syncToGitHub = syncToGitHub;
-      window.exportTemplate = exportTemplate;
+
     })();
   </script>
 </body>
