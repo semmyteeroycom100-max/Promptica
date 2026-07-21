@@ -1,853 +1,1096 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Promptica · Admin Panel</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promptica · Admin Panel</title>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
 
-    <!-- Quill.js (WYSIWYG Editor) -->
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
-    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <!-- Quill.js (WYSIWYG Editor) -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
-    <style>
-        /* ===== RESET & BASE ===== */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        :root {
-            --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
-            --bg-card: #1a1a1a; --bg-sidebar: #111111; --border-color: #2c2c2c;
-            --text-primary: #f0ece6; --text-secondary: #a8a29e;
-            --accent: #8b7a6b; --accent-hover: #a89484;
-            --success: #4caf50; --danger: #ef5350; --warning: #ffb74d;
-            --shadow: 0 20px 60px rgba(0,0,0,0.8); --radius: 12px;
-            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            --sidebar-width: 220px;
-        }
-        html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow: hidden; }
-        #admin-app { display: flex; height: 100vh; overflow: hidden; }
+  <style>
+    /* ===== RESET & BASE ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
+      --bg-card: #1a1a1a; --bg-sidebar: #111111; --border-color: #2c2c2c;
+      --text-primary: #f0ece6; --text-secondary: #a8a29e;
+      --accent: #8b7a6b; --accent-hover: #a89484;
+      --success: #4caf50; --danger: #ef5350; --warning: #ffb74d;
+      --shadow: 0 20px 60px rgba(0,0,0,0.8); --radius: 12px;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --sidebar-width: 220px;
+    }
+    html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow: hidden; }
+    #admin-app { display: flex; height: 100vh; overflow: hidden; }
 
-        /* ===== SIDEBAR ===== */
-        #sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; padding: 24px 0; }
-        #sidebar .logo { padding: 0 20px 30px 20px; font-size: 20px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-        #sidebar .logo span { background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 10px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .nav-item { padding: 10px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; color: var(--text-secondary); border-left: 2px solid transparent; font-size: 14px; }
-        .nav-item:hover { background: var(--bg-panel); color: var(--text-primary); }
-        .nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: var(--bg-panel); }
-        .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
-        .nav-item .badge { margin-left: auto; background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 8px; border-radius: 20px; }
-        #sidebar .bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+    /* ===== SIDEBAR ===== */
+    #sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; padding: 24px 0; }
+    #sidebar .logo { padding: 0 20px 30px 20px; font-size: 20px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    #sidebar .logo span { background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 10px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-item { padding: 10px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; color: var(--text-secondary); border-left: 2px solid transparent; font-size: 14px; }
+    .nav-item:hover { background: var(--bg-panel); color: var(--text-primary); }
+    .nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: var(--bg-panel); }
+    .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+    .nav-item .badge { margin-left: auto; background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 8px; border-radius: 20px; }
+    #sidebar .bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
 
-        /* ===== CONTENT ===== */
-        #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-primary); padding: 24px 32px 32px 32px; }
+    /* ===== CONTENT ===== */
+    #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-primary); padding: 24px 32px 32px 32px; }
 
-        /* ===== HEADER ===== */
-        .admin-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 24px; }
-        .admin-header h1 { font-size: 24px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
-        .admin-header h1 small { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
-        .admin-header .actions { display: flex; gap: 10px; }
-        .admin-header .btn { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
-        .admin-header .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
-        .admin-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
-        .admin-header .btn-primary:hover { background: var(--accent-hover); }
-        .admin-header .btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
-        .admin-header .btn-danger:hover { background: var(--danger); color: #fff; }
+    /* ===== HEADER ===== */
+    .admin-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 24px; }
+    .admin-header h1 { font-size: 24px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+    .admin-header h1 small { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
+    .admin-header .actions { display: flex; gap: 10px; }
+    .admin-header .btn { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .admin-header .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
+    .admin-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+    .admin-header .btn-primary:hover { background: var(--accent-hover); }
 
-        /* ===== PAGES ===== */
-        .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding-right: 4px; }
-        .page.active { display: flex; }
+    /* ===== PAGES ===== */
+    .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding-right: 4px; }
+    .page.active { display: flex; }
 
-        /* ===== STATS ROW ===== */
-        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; }
-        .stat-card .label { font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
-        .stat-card .value { font-size: 28px; font-weight: 600; margin-top: 4px; }
+    /* ===== STATS ROW ===== */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; }
+    .stat-card .label { font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
+    .stat-card .value { font-size: 28px; font-weight: 600; margin-top: 4px; }
 
-        /* ===== LIST ===== */
-        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
-        .list-header h3 { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
-        .list-header .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
-        .list-header .btn:hover { border-color: var(--accent); }
-        .list-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
-        .list-header .btn-primary:hover { background: var(--accent-hover); }
+    /* ===== LISTS ===== */
+    .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
+    .list-header h3 { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
+    .list-header .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .list-header .btn:hover { border-color: var(--accent); }
+    .list-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
 
-        .list-container { flex: 1; overflow-y: auto; min-height: 0; }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; flex-wrap: wrap; gap: 8px; }
-        .list-item:hover { border-color: var(--accent); }
-        .list-item .info { flex: 1; min-width: 0; }
-        .list-item .info .title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .list-item .info .meta { font-size: 12px; color: var(--text-secondary); }
-        .list-item .info .meta .tag { background: var(--bg-panel); padding: 1px 8px; border-radius: 12px; margin-left: 6px; font-size: 10px; }
-        .list-item .actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
-        .list-item .actions .btn { padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-family: var(--font-sans); font-size: 12px; cursor: pointer; transition: all 0.2s; }
-        .list-item .actions .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
-        .list-item .actions .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
-        .list-item .image-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); flex-shrink: 0; }
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
-        .empty-state .icon { font-size: 40px; opacity: 0.3; margin-bottom: 8px; }
+    .list-container { flex: 1; overflow-y: auto; min-height: 0; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; flex-wrap: wrap; gap: 8px; }
+    .list-item:hover { border-color: var(--accent); }
+    .list-item .info { flex: 1; min-width: 0; }
+    .list-item .info .title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .list-item .info .meta { font-size: 12px; color: var(--text-secondary); }
+    .list-item .actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
+    .list-item .actions .btn { padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-family: var(--font-sans); font-size: 12px; cursor: pointer; transition: all 0.2s; }
+    .list-item .actions .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
+    .list-item .actions .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+    .list-item .image-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); flex-shrink: 0; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
+    .empty-state .icon { font-size: 40px; opacity: 0.3; margin-bottom: 8px; }
 
-        /* ===== MODAL (Fullscreen for editor) ===== */
-        .modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-overlay.active { display: flex; }
-        .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 28px 32px; box-shadow: var(--shadow); }
-        .modal-box .close-btn { float: right; background: none; border: none; color: var(--text-secondary); font-size: 28px; cursor: pointer; }
-        .modal-box h2 { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
-        .modal-box label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; margin-top: 14px; }
-        .modal-box label:first-of-type { margin-top: 0; }
-        .modal-box input, .modal-box textarea, .modal-box select { width: 100%; padding: 10px 12px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-sans); font-size: 14px; outline: none; transition: border-color 0.2s; }
-        .modal-box input:focus, .modal-box textarea:focus, .modal-box select:focus { border-color: var(--accent); }
-        .modal-box textarea { min-height: 80px; resize: vertical; }
-        .modal-box .btn-row { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-        .modal-box .btn-row .btn { padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; cursor: pointer; transition: all 0.2s; }
-        .modal-box .btn-row .btn:hover { background: var(--bg-secondary); }
-        .modal-box .btn-row .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
-        .modal-box .btn-row .btn-primary:hover { background: var(--accent-hover); }
-        .modal-box .editor-wrapper { background: #fff; border-radius: 6px; overflow: hidden; margin: 8px 0; }
-        .modal-box .editor-wrapper .ql-container { min-height: 250px; font-family: var(--font-sans); }
-        .modal-box .image-preview-small { max-width: 100%; max-height: 150px; margin-top: 8px; border-radius: 6px; border: 1px solid var(--border-color); }
-        .modal-box .file-input-wrapper { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    /* ===== MODAL (fullscreen for editor) ===== */
+    .modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 28px 32px; box-shadow: var(--shadow); }
+    .modal-box .close-btn { float: right; background: none; border: none; color: var(--text-secondary); font-size: 28px; cursor: pointer; }
+    .modal-box h2 { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+    .modal-box label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; margin-top: 14px; }
+    .modal-box label:first-of-type { margin-top: 0; }
+    .modal-box input, .modal-box textarea, .modal-box select { width: 100%; padding: 10px 12px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-sans); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .modal-box input:focus, .modal-box textarea:focus, .modal-box select:focus { border-color: var(--accent); }
+    .modal-box textarea { min-height: 80px; resize: vertical; }
+    .modal-box .btn-row { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+    .modal-box .btn-row .btn { padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .modal-box .btn-row .btn:hover { background: var(--bg-secondary); }
+    .modal-box .btn-row .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+    .modal-box .btn-row .btn-primary:hover { background: var(--accent-hover); }
+    .modal-box .editor-wrapper { background: #fff; border-radius: 6px; overflow: hidden; margin: 8px 0; }
+    .modal-box .editor-wrapper .ql-container { min-height: 200px; font-family: var(--font-sans); }
+    .modal-box .image-preview-small { max-width: 100%; max-height: 150px; margin-top: 8px; border-radius: 6px; border: 1px solid var(--border-color); }
+    .modal-box .file-input-wrapper { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
-        /* ===== TOAST ===== */
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); color: var(--text-primary); padding: 12px 24px; border-radius: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow); z-index: 9999; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(12px); }
-        .toast.show { opacity: 1; }
+    /* ===== TOAST ===== */
+    .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); color: var(--text-primary); padding: 12px 24px; border-radius: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow); z-index: 9999; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(12px); }
+    .toast.show { opacity: 1; }
 
-        /* ===== GITHUB SECTION ===== */
-        .github-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 24px; margin-top: 16px; }
-        .github-section h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
-        .github-section p { color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; }
-        .github-section .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+    /* ===== CHARTS (simple CSS) ===== */
+    .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; margin-top: 12px; }
+    .bar { flex: 1; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 0.4s; min-height: 4px; }
+    .bar-label { font-size: 10px; text-align: center; color: var(--text-secondary); margin-top: 4px; }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 768px) {
-            :root { --sidebar-width: 60px; }
-            #sidebar .logo span, #sidebar .nav-item .label { display: none; }
-            #sidebar .nav-item { padding: 12px; justify-content: center; }
-            #sidebar .nav-item .badge { display: none; }
-            #content { padding: 16px; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
-            .admin-header { flex-direction: column; align-items: stretch; gap: 12px; }
-            .admin-header .actions { flex-wrap: wrap; }
-            .list-item { flex-wrap: wrap; gap: 8px; }
-            .list-item .actions { margin-left: 0; width: 100%; justify-content: flex-end; }
-            .modal-box { padding: 20px; }
-        }
-        @media (max-width: 480px) {
-            .stats-row { grid-template-columns: 1fr; }
-        }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-    </style>
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      :root { --sidebar-width: 60px; }
+      #sidebar .logo span, #sidebar .nav-item .label { display: none; }
+      #sidebar .nav-item { padding: 12px; justify-content: center; }
+      #sidebar .nav-item .badge { display: none; }
+      #content { padding: 16px; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .admin-header { flex-direction: column; align-items: stretch; gap: 12px; }
+      .admin-header .actions { flex-wrap: wrap; }
+      .list-item { flex-wrap: wrap; gap: 8px; }
+      .list-item .actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+      .modal-box { padding: 20px; }
+    }
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: 1fr; }
+    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+  </style>
 </head>
 <body>
 
-    <!-- ===== TOAST ===== -->
-    <div id="toast" class="toast"></div>
+  <!-- ===== TOAST ===== -->
+  <div id="toast" class="toast"></div>
 
-    <!-- ===== MODAL ===== -->
-    <div id="modal-overlay" class="modal-overlay">
-        <div class="modal-box" id="modal-box">
-            <button class="close-btn" id="modal-close">✕</button>
-            <div id="modal-content"></div>
-        </div>
+  <!-- ===== MODAL ===== -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-box" id="modal-box">
+      <button class="close-btn" id="modal-close">✕</button>
+      <div id="modal-content"></div>
     </div>
+  </div>
 
-    <!-- ===== ADMIN APP ===== -->
-    <div id="admin-app">
+  <!-- ===== ADMIN APP ===== -->
+  <div id="admin-app">
 
-        <!-- ===== SIDEBAR ===== -->
-        <nav id="sidebar">
-            <div class="logo">🎙️ Promptica <span>Admin</span></div>
-            <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span><span class="label">Dashboard</span></div>
-            <div class="nav-item" data-page="articles"><span class="icon">📝</span><span class="label">Articles</span><span class="badge" id="article-count">0</span></div>
-            <div class="nav-item" data-page="speakeasy"><span class="icon">🎤</span><span class="label">SpeakEasy</span><span class="badge" id="category-count">0</span></div>
-            <div class="nav-item" data-page="sync"><span class="icon">🔄</span><span class="label">Sync</span></div>
-            <div class="nav-item bottom" data-page="back" id="back-to-app"><span class="icon">←</span><span class="label">Back to App</span></div>
-        </nav>
+    <!-- ===== SIDEBAR ===== -->
+    <nav id="sidebar">
+      <div class="logo">🎙️ Promptica <span>Admin</span></div>
+      <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span><span class="label">Dashboard</span></div>
+      <div class="nav-item" data-page="templates"><span class="icon">📝</span><span class="label">Script Library</span><span class="badge" id="template-count">0</span></div>
+      <div class="nav-item" data-page="settings"><span class="icon">⚙️</span><span class="label">Global Settings</span></div>
+      <div class="nav-item" data-page="users"><span class="icon">👤</span><span class="label">User Access</span></div>
+      <div class="nav-item" data-page="analytics"><span class="icon">📈</span><span class="label">Analytics</span></div>
+      <div class="nav-item" data-page="pairings"><span class="icon">📱</span><span class="label">Remote Pairings</span></div>
+      <div class="nav-item" data-page="flags"><span class="icon">🚩</span><span class="label">Feature Flags</span></div>
+      <div class="nav-item bottom" data-page="back" id="back-to-app"><span class="icon">←</span><span class="label">Back to App</span></div>
+    </nav>
 
-        <!-- ===== CONTENT ===== -->
-        <div id="content">
+    <!-- ===== CONTENT ===== -->
+    <div id="content">
 
-            <!-- Header -->
-            <header class="admin-header">
-                <h1 id="page-title">📊 Dashboard <small>Content Management</small></h1>
-                <div class="actions" id="header-actions"></div>
-            </header>
+      <!-- Header -->
+      <header class="admin-header">
+        <h1 id="page-title">📊 Dashboard <small>Teleprompter Admin</small></h1>
+        <div class="actions" id="header-actions"></div>
+      </header>
 
-            <!-- ===== DASHBOARD ===== -->
-            <div id="page-dashboard" class="page active">
-                <div class="stats-row" id="dashboard-stats">
-                    <div class="stat-card"><div class="label">Total Articles</div><div class="value" id="stat-articles">0</div></div>
-                    <div class="stat-card"><div class="label">SpeakEasy Categories</div><div class="value" id="stat-categories">0</div></div>
-                    <div class="stat-card"><div class="label">Total Tips</div><div class="value" id="stat-tips">20</div></div>
-                    <div class="stat-card"><div class="label">Last Sync</div><div class="value" style="font-size:16px;" id="stat-last-sync">Never</div></div>
-                </div>
-                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;">
-                    <h3 style="font-size:16px;font-weight:500;margin-bottom:8px;">⚡ Quick Actions</h3>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button class="btn btn-primary" onclick="navigateTo('articles');openNewArticle()">+ New Article</button>
-                        <button class="btn btn-primary" onclick="navigateTo('speakeasy');openNewCategory()">+ New Category</button>
-                        <button class="btn" onclick="exportContent()">📥 Export Content</button>
-                        <button class="btn" onclick="importContent()">📤 Import Content</button>
-                        <button class="btn" onclick="syncToGitHub()">🔄 Sync to GitHub</button>
-                    </div>
-                </div>
-                <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;">
-                    <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-bottom:4px;">📌 Admin Tip</h3>
-                    <p style="color:var(--text-secondary);font-size:14px;">Use this panel to manage articles, SpeakEasy categories, and sync content to GitHub. All changes are stored locally in IndexedDB.</p>
-                </div>
-            </div>
-
-            <!-- ===== ARTICLES PAGE ===== -->
-            <div id="page-articles" class="page">
-                <div class="list-header">
-                    <h3>📝 All Articles</h3>
-                    <button class="btn btn-primary" id="btn-new-article">+ New Article</button>
-                </div>
-                <div class="list-container" id="article-list">
-                    <div class="empty-state"><div class="icon">📄</div><div>No articles yet. Click "New Article" to create one.</div></div>
-                </div>
-            </div>
-
-            <!-- ===== SPEAKEASY PAGE ===== -->
-            <div id="page-speakeasy" class="page">
-                <div class="list-header">
-                    <h3>🎤 SpeakEasy Categories</h3>
-                    <button class="btn btn-primary" id="btn-new-category">+ New Category</button>
-                </div>
-                <div class="list-container" id="category-list">
-                    <div class="empty-state"><div class="icon">🎤</div><div>No categories yet. Click "New Category" to create one.</div></div>
-                </div>
-            </div>
-
-            <!-- ===== SYNC PAGE ===== -->
-            <div id="page-sync" class="page">
-                <div class="github-section">
-                    <h3>🔄 GitHub Sync</h3>
-                    <p>Sync your content (articles, SpeakEasy categories, tips) to a <code>content.json</code> file in your GitHub repository. This triggers Vercel redeployment so your changes go live instantly.</p>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" id="btn-sync-github">🔄 Sync to GitHub</button>
-                        <button class="btn" id="btn-export-content">📥 Export JSON</button>
-                        <button class="btn" id="btn-import-content">📤 Import JSON</button>
-                        <button class="btn" id="btn-reset-content" style="border-color:var(--danger);color:var(--danger);">⚠️ Reset Content</button>
-                    </div>
-                </div>
-                <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;">
-                    <h3 style="font-size:16px;font-weight:500;margin-bottom:8px;">📦 Content Backup</h3>
-                    <p style="color:var(--text-secondary);font-size:14px;">Download a JSON backup of all content, or upload a previously exported file to restore your content.</p>
-                    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
-                        <button class="btn" onclick="exportContent()">📥 Export Backup</button>
-                        <button class="btn" onclick="importContent()">📤 Import Backup</button>
-                    </div>
-                </div>
-            </div>
-
+      <!-- ===== DASHBOARD ===== -->
+      <div id="page-dashboard" class="page active">
+        <div class="stats-row" id="dashboard-stats">
+          <div class="stat-card"><div class="label">Total Templates</div><div class="value" id="stat-templates">0</div></div>
+          <div class="stat-card"><div class="label">Active Users (7d)</div><div class="value" id="stat-users">0</div></div>
+          <div class="stat-card"><div class="label">Total Sessions</div><div class="value" id="stat-sessions">0</div></div>
+          <div class="stat-card"><div class="label">Avg. Session Length</div><div class="value" id="stat-avg-duration">0m</div></div>
         </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;">
+          <h3 style="font-size:16px;font-weight:500;margin-bottom:8px;">⚡ Quick Actions</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="navigateTo('templates');openNewTemplate()">+ New Template</button>
+            <button class="btn" onclick="exportData()">📥 Export All Data</button>
+            <button class="btn" onclick="importData()">📤 Import Data</button>
+            <button class="btn" onclick="syncToGitHub()">🔄 Sync to GitHub</button>
+          </div>
+        </div>
+        <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;">
+          <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-bottom:4px;">📌 Admin Tip</h3>
+          <p style="color:var(--text-secondary);font-size:14px;">This panel controls the teleprompter experience for all users. Changes to settings and templates are pushed to active prompter sessions via polling.</p>
+        </div>
+      </div>
+
+      <!-- ===== TEMPLATES ===== -->
+      <div id="page-templates" class="page">
+        <div class="list-header">
+          <h3>📝 Script Templates</h3>
+          <div>
+            <button class="btn btn-primary" id="btn-new-template">+ New Template</button>
+            <button class="btn" id="btn-import-templates">📤 Import</button>
+          </div>
+        </div>
+        <div class="list-container" id="template-list">
+          <div class="empty-state"><div class="icon">📄</div><div>No templates yet. Click "New Template" to create one.</div></div>
+        </div>
+      </div>
+
+      <!-- ===== GLOBAL SETTINGS ===== -->
+      <div id="page-settings" class="page">
+        <div style="max-width: 800px;">
+          <h3 style="font-size:16px;font-weight:500;color:var(--text-secondary);margin-bottom:16px;">Default App Settings & Branding</h3>
+          <form id="settings-form" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div><label style="font-size:13px;color:var(--text-secondary);">Default Font</label><input type="text" id="setting-font" value="Inter" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Font Size (px)</label><input type="number" id="setting-font-size" value="34" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Text Color</label><input type="color" id="setting-text-color" value="#f5efe8" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Background Color</label><input type="color" id="setting-bg-color" value="#0b0b0b" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Background Opacity</label><input type="range" id="setting-bg-opacity" min="0.3" max="1" step="0.05" value="1" /><span id="opacity-label">1.00</span></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Default Mirror</label><select id="setting-mirror"><option value="false">Off</option><option value="true">On</option></select></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Default Focus</label><select id="setting-focus"><option value="true">On</option><option value="false">Off</option></select></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Default Speed (1-10)</label><input type="number" id="setting-speed" value="5" min="1" max="10" /></div>
+            <div style="grid-column: span 2;"><label style="font-size:13px;color:var(--text-secondary);">Logo URL</label><input type="text" id="setting-logo" placeholder="https://example.com/logo.png" /></div>
+            <div style="grid-column: span 2;"><label style="font-size:13px;color:var(--text-secondary);">Custom CSS</label><textarea id="setting-custom-css" rows="3" placeholder="/* Custom styles */"></textarea></div>
+            <div style="grid-column: span 2;"><label style="font-size:13px;color:var(--text-secondary);">Watermark Text</label><input type="text" id="setting-watermark" placeholder="Promptica" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Max Script Length (chars)</label><input type="number" id="setting-max-length" value="5000" /></div>
+            <div><label style="font-size:13px;color:var(--text-secondary);">Max Saved Scripts per User</label><input type="number" id="setting-max-scripts" value="20" /></div>
+            <div style="grid-column: span 2;margin-top:12px;"><button class="btn btn-primary" id="btn-save-settings">💾 Save Settings</button></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===== USER ACCESS ===== -->
+      <div id="page-users" class="page">
+        <div class="list-header">
+          <h3>👤 User Access</h3>
+          <button class="btn btn-primary" id="btn-add-user">+ Add User</button>
+        </div>
+        <div class="list-container" id="user-list">
+          <div class="empty-state"><div class="icon">👤</div><div>No users configured.</div></div>
+        </div>
+      </div>
+
+      <!-- ===== ANALYTICS ===== -->
+      <div id="page-analytics" class="page">
+        <div class="stats-row" style="margin-bottom:16px;">
+          <div class="stat-card"><div class="label">Sessions (Last 7d)</div><div class="value" id="analytics-sessions">0</div></div>
+          <div class="stat-card"><div class="label">Most Used Font</div><div class="value" id="analytics-font" style="font-size:20px;">—</div></div>
+          <div class="stat-card"><div class="label">Most Used Color</div><div class="value" id="analytics-color" style="font-size:20px;">—</div></div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;margin-bottom:16px;">
+          <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);">Sessions by Day (Last 7)</h3>
+          <div id="sessions-chart" style="height:120px;display:flex;align-items:flex-end;gap:8px;margin-top:8px;"></div>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;">
+          <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);">Device Breakdown</h3>
+          <div id="device-chart" style="height:100px;display:flex;align-items:flex-end;gap:8px;margin-top:8px;"></div>
+        </div>
+      </div>
+
+      <!-- ===== REMOTE PAIRINGS ===== -->
+      <div id="page-pairings" class="page">
+        <div class="list-header">
+          <h3>📱 Remote Pairings</h3>
+          <button class="btn" id="btn-refresh-pairings">🔄 Refresh</button>
+        </div>
+        <div class="list-container" id="pairing-list">
+          <div class="empty-state"><div class="icon">📱</div><div>No active pairings.</div></div>
+        </div>
+      </div>
+
+      <!-- ===== FEATURE FLAGS ===== -->
+      <div id="page-flags" class="page">
+        <div style="max-width: 600px;">
+          <h3 style="font-size:16px;font-weight:500;color:var(--text-secondary);margin-bottom:16px;">Feature Flags</h3>
+          <div id="flags-container">
+            <div class="list-item"><span class="info"><span class="title">Mirror Mode</span><span class="meta">Allow users to mirror text</span></span><div class="actions"><button class="btn flag-toggle" data-flag="enableMirror">✅ On</button></div></div>
+            <div class="list-item"><span class="info"><span class="title">Voice Control (Beta)</span><span class="meta">Enable voice‑driven playback</span></span><div class="actions"><button class="btn flag-toggle" data-flag="enableVoiceControl">⛔ Off</button></div></div>
+            <div class="list-item"><span class="info"><span class="title">Focus Mode</span><span class="meta">Fade top/bottom edges</span></span><div class="actions"><button class="btn flag-toggle" data-flag="enableFocus">✅ On</button></div></div>
+            <div class="list-item"><span class="info"><span class="title">Auto‑Pause (on stumble)</span><span class="meta">Pause scroll on hesitation</span></span><div class="actions"><button class="btn flag-toggle" data-flag="enableAutoPause">⛔ Off</button></div></div>
+            <div class="list-item"><span class="info"><span class="title">File Upload</span><span class="meta">Allow importing .txt files</span></span><div class="actions"><button class="btn flag-toggle" data-flag="enableUpload">✅ On</button></div></div>
+          </div>
+          <div style="margin-top:20px;"><button class="btn btn-primary" id="btn-save-flags">💾 Save Flags</button></div>
+        </div>
+      </div>
+
     </div>
+  </div>
 
-    <!-- ============================================================= -->
-    <!--  JAVASCRIPT – Full Admin (WYSIWYG + Image Uploads)            -->
-    <!-- ============================================================= -->
-    <script>
-        (function() {
-            'use strict';
+  <!-- ============================================================= -->
+  <!--  JAVASCRIPT – Admin Application (IndexedDB)                   -->
+  <!-- ============================================================= -->
+  <script>
+    (function() {
+      'use strict';
 
-            // ===== UTILITIES =====
-            const $ = s => document.querySelector(s);
-            const $$ = s => document.querySelectorAll(s);
-            const toast = (msg, dur = 3000) => {
-                const el = $('#toast');
-                el.textContent = msg;
-                el.classList.add('show');
-                clearTimeout(el._timer);
-                el._timer = setTimeout(() => el.classList.remove('show'), dur);
+      // ===== UTILITIES =====
+      const $ = s => document.querySelector(s);
+      const $$ = s => document.querySelectorAll(s);
+      const toast = (msg, dur = 3000) => {
+        const el = $('#toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(el._timer);
+        el._timer = setTimeout(() => el.classList.remove('show'), dur);
+      };
+      const escapeHtml = str => { const d = document.createElement('div');
+        d.textContent = str; return d.innerHTML; };
+      const generateId = () => Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+
+      // ===== INDEXEDDB =====
+      const DB_NAME = 'PrompticaAdminDB';
+      let db = null;
+
+      function openDB() {
+        return new Promise((res, rej) => {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = e => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains('templates')) db.createObjectStore('templates', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('settings')) db.createObjectStore('settings', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('users')) db.createObjectStore('users', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('logs')) db.createObjectStore('logs', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('pairings')) db.createObjectStore('pairings', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('flags')) db.createObjectStore('flags', { keyPath: 'id' });
+          };
+          req.onsuccess = () => { db = req.result;
+            res(db); };
+          req.onerror = () => rej(req.error);
+        });
+      }
+
+      // Generic CRUD helpers
+      async function getStore(storeName) {
+        if (!db) await openDB();
+        return new Promise((res, rej) => {
+          const tx = db.transaction(storeName, 'readonly');
+          const req = tx.objectStore(storeName).getAll();
+          req.onsuccess = () => res(req.result);
+          req.onerror = () => rej(req.error);
+        });
+      }
+
+      async function putRecord(storeName, record) {
+        if (!db) await openDB();
+        return new Promise((res, rej) => {
+          const tx = db.transaction(storeName, 'readwrite');
+          const req = tx.objectStore(storeName).put(record);
+          req.onsuccess = () => res(req.result);
+          req.onerror = () => rej(req.error);
+        });
+      }
+
+      async function deleteRecord(storeName, id) {
+        if (!db) await openDB();
+        return new Promise((res, rej) => {
+          const tx = db.transaction(storeName, 'readwrite');
+          const req = tx.objectStore(storeName).delete(id);
+          req.onsuccess = () => res();
+          req.onerror = () => rej(req.error);
+        });
+      }
+
+      // ===== STATE =====
+      let currentPage = 'dashboard';
+      let quill = null;
+      let quillInitialized = false;
+      let editingTemplateId = null;
+
+      // ===== NAVIGATION =====
+      function navigateTo(page) {
+        currentPage = page;
+        $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+        $$('.page').forEach(el => el.classList.remove('active'));
+        const target = document.getElementById('page-' + page);
+        if (target) target.classList.add('active');
+
+        const titles = {
+          dashboard: '📊 Dashboard',
+          templates: '📝 Script Library',
+          settings: '⚙️ Global Settings',
+          users: '👤 User Access',
+          analytics: '📈 Analytics',
+          pairings: '📱 Remote Pairings',
+          flags: '🚩 Feature Flags'
+        };
+        $('#page-title').innerHTML = titles[page] || 'Dashboard';
+
+        const actions = $('#header-actions');
+        if (page === 'templates') {
+          actions.innerHTML =
+            `<button class="btn btn-primary" onclick="openNewTemplate()">+ New Template</button>`;
+        } else if (page === 'users') {
+          actions.innerHTML =
+            `<button class="btn btn-primary" onclick="openNewUser()">+ Add User</button>`;
+        } else {
+          actions.innerHTML = '';
+        }
+
+        // Render content
+        if (page === 'dashboard') renderDashboard();
+        else if (page === 'templates') renderTemplates();
+        else if (page === 'settings') loadSettings();
+        else if (page === 'users') renderUsers();
+        else if (page === 'analytics') renderAnalytics();
+        else if (page === 'pairings') renderPairings();
+        else if (page === 'flags') loadFlags();
+      }
+      window.navigateTo = navigateTo;
+
+      // ===== DASHBOARD =====
+      async function renderDashboard() {
+        const templates = await getStore('templates');
+        const users = await getStore('users');
+        const logs = await getStore('logs');
+        const activeUsers = new Set(logs.filter(l => {
+          const d = new Date(l.startedAt);
+          const now = new Date();
+          const diff = (now - d) / (1000 * 60 * 60 * 24);
+          return diff <= 7;
+        }).map(l => l.userId)).size;
+        const totalSessions = logs.length;
+        const durations = logs.map(l => l.duration || 0);
+        const avg = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
+        document.getElementById('stat-templates').textContent = templates.length;
+        document.getElementById('stat-users').textContent = activeUsers;
+        document.getElementById('stat-sessions').textContent = totalSessions;
+        document.getElementById('stat-avg-duration').textContent = avg > 60 ? Math.round(avg / 60) + 'm' : avg + 's';
+        document.getElementById('template-count').textContent = templates.length;
+      }
+
+      // ===== TEMPLATES =====
+      async function renderTemplates() {
+        const templates = await getStore('templates');
+        const list = document.getElementById('template-list');
+        if (!templates.length) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No templates yet. Click "New Template" to create one.</div></div>`;
+          return;
+        }
+        list.innerHTML = templates.map(t => `
+          <div class="list-item">
+            <div class="info">
+              <div class="title">${escapeHtml(t.title)}</div>
+              <div class="meta">${t.category || 'Uncategorized'} · v${t.version || 1} · ${t.public ? 'Public' : 'Private'} · ${t.usageCount || 0} uses</div>
+            </div>
+            <div class="actions">
+              <button class="btn" onclick="editTemplate('${t.id}')">✏️ Edit</button>
+              <button class="btn btn-danger" onclick="deleteTemplate('${t.id}')">🗑 Delete</button>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('template-count').textContent = templates.length;
+      }
+
+      window.openNewTemplate = function() {
+        editingTemplateId = null;
+        showFormModal('New Script Template', `
+          <label>Title</label>
+          <input type="text" id="form-title" placeholder="Template title" />
+          <label>Category</label>
+          <input type="text" id="form-category" placeholder="e.g., Tutorial, Interview" />
+          <label>Content</label>
+          <div class="editor-wrapper" id="quill-editor-wrapper"><div id="quill-editor" style="min-height:150px;background:#fff;color:#000;"></div></div>
+          <label>Public</label>
+          <select id="form-public"><option value="true">Yes</option><option value="false">No</option></select>
+          <label>Tags (comma separated)</label>
+          <input type="text" id="form-tags" placeholder="tutorial, interview" />
+          <div class="btn-row">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveTemplate()">💾 Save</button>
+          </div>
+        `);
+        initQuill('');
+      };
+
+      window.editTemplate = function(id) {
+        editingTemplateId = id;
+        getStore('templates').then(templates => {
+          const t = templates.find(t => t.id === id);
+          if (!t) { toast('Template not found'); return; }
+          showFormModal('Edit Template', `
+            <label>Title</label>
+            <input type="text" id="form-title" value="${escapeHtml(t.title)}" />
+            <label>Category</label>
+            <input type="text" id="form-category" value="${escapeHtml(t.category || '')}" />
+            <label>Content</label>
+            <div class="editor-wrapper" id="quill-editor-wrapper"><div id="quill-editor" style="min-height:150px;background:#fff;color:#000;">${t.content || ''}</div></div>
+            <label>Public</label>
+            <select id="form-public"><option value="true" ${t.public ? 'selected' : ''}>Yes</option><option value="false" ${!t.public ? 'selected' : ''}>No</option></select>
+            <label>Tags (comma separated)</label>
+            <input type="text" id="form-tags" value="${(t.tags || []).join(', ')}" />
+            <div class="btn-row">
+              <button class="btn" onclick="closeModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="saveTemplate()">💾 Save</button>
+            </div>
+          `);
+          initQuill(t.content || '');
+        });
+      };
+
+      window.saveTemplate = async function() {
+        const title = document.getElementById('form-title').value.trim();
+        const category = document.getElementById('form-category').value.trim();
+        const content = quill ? quill.root.innerHTML : '';
+        const isPublic = document.getElementById('form-public').value === 'true';
+        const tags = document.getElementById('form-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+        if (!title) { toast('Title is required'); return; }
+        const template = {
+          id: editingTemplateId || generateId(),
+          title,
+          content,
+          category,
+          tags,
+          public: isPublic,
+          version: 1,
+          usageCount: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        if (editingTemplateId) {
+          const old = (await getStore('templates')).find(t => t.id === editingTemplateId);
+          if (old) template.version = old.version + 1;
+        }
+        await putRecord('templates', template);
+        closeModal();
+        renderTemplates();
+        renderDashboard();
+        toast(editingTemplateId ? 'Template updated' : 'Template created');
+        editingTemplateId = null;
+      };
+
+      window.deleteTemplate = async function(id) {
+        if (!confirm('Delete this template?')) return;
+        await deleteRecord('templates', id);
+        renderTemplates();
+        renderDashboard();
+        toast('Template deleted');
+      };
+
+      // ===== QUILL INIT =====
+      function initQuill(initialContent) {
+        if (quillInitialized) {
+          if (quill) quill.root.innerHTML = initialContent;
+          return;
+        }
+        const container = document.getElementById('quill-editor');
+        if (!container) return;
+        setTimeout(() => {
+          quill = new Quill('#quill-editor', {
+            theme: 'snow',
+            placeholder: 'Write your template content...',
+            modules: {
+              toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link', 'image', 'code-block'],
+                ['clean']
+              ]
+            }
+          });
+          const toolbar = quill.getModule('toolbar');
+          toolbar.addHandler('image', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
+            input.onchange = () => {
+              const file = input.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const range = quill.getSelection();
+                const index = range ? range.index : 0;
+                quill.insertEmbed(index, 'image', e.target.result);
+              };
+              reader.readAsDataURL(file);
             };
-            const escapeHtml = str => { const d = document.createElement('div');
-                d.textContent = str; return d.innerHTML; };
+          });
+          if (initialContent) quill.root.innerHTML = initialContent;
+          quillInitialized = true;
+        }, 100);
+      }
 
-            // ===== INDEXEDDB =====
-            const DB_NAME = 'PrompticaDB';
-            let db = null;
+      // ===== SETTINGS =====
+      async function loadSettings() {
+        const settings = (await getStore('settings'))[0] || {};
+        document.getElementById('setting-font').value = settings.defaultFont || 'Inter';
+        document.getElementById('setting-font-size').value = settings.defaultFontSize || 34;
+        document.getElementById('setting-text-color').value = settings.defaultTextColor || '#f5efe8';
+        document.getElementById('setting-bg-color').value = settings.defaultBgColor || '#0b0b0b';
+        document.getElementById('setting-bg-opacity').value = settings.defaultBgOpacity || 1;
+        document.getElementById('opacity-label').textContent = (settings.defaultBgOpacity || 1).toFixed(2);
+        document.getElementById('setting-mirror').value = settings.defaultMirror ? 'true' : 'false';
+        document.getElementById('setting-focus').value = settings.defaultFocus ? 'true' : 'false';
+        document.getElementById('setting-speed').value = settings.defaultSpeed || 5;
+        document.getElementById('setting-logo').value = settings.logoUrl || '';
+        document.getElementById('setting-custom-css').value = settings.customCSS || '';
+        document.getElementById('setting-watermark').value = settings.watermarkText || '';
+        document.getElementById('setting-max-length').value = settings.maxScriptLength || 5000;
+        document.getElementById('setting-max-scripts').value = settings.maxSavedScripts || 20;
+      }
 
-            function openDB() {
-                return new Promise((res, rej) => {
-                    const req = indexedDB.open(DB_NAME, 1);
-                    req.onupgradeneeded = e => {
-                        const db = e.target.result;
-                        if (!db.objectStoreNames.contains('content')) db.createObjectStore('content', { keyPath: 'id' });
-                        if (!db.objectStoreNames.contains('scripts')) db.createObjectStore('scripts', { keyPath: 'id',
-                            autoIncrement: true });
-                        if (!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions', { keyPath: 'id',
-                            autoIncrement: true });
-                    };
-                    req.onsuccess = () => { db = req.result;
-                        res(db); };
-                    req.onerror = () => rej(req.error);
-                });
-            }
+      document.getElementById('btn-save-settings').addEventListener('click', async () => {
+        const settings = {
+          id: 'global',
+          defaultFont: document.getElementById('setting-font').value,
+          defaultFontSize: parseInt(document.getElementById('setting-font-size').value) || 34,
+          defaultTextColor: document.getElementById('setting-text-color').value,
+          defaultBgColor: document.getElementById('setting-bg-color').value,
+          defaultBgOpacity: parseFloat(document.getElementById('setting-bg-opacity').value),
+          defaultMirror: document.getElementById('setting-mirror').value === 'true',
+          defaultFocus: document.getElementById('setting-focus').value === 'true',
+          defaultSpeed: parseInt(document.getElementById('setting-speed').value) || 5,
+          logoUrl: document.getElementById('setting-logo').value,
+          customCSS: document.getElementById('setting-custom-css').value,
+          watermarkText: document.getElementById('setting-watermark').value,
+          maxScriptLength: parseInt(document.getElementById('setting-max-length').value) || 5000,
+          maxSavedScripts: parseInt(document.getElementById('setting-max-scripts').value) || 20,
+          updatedAt: new Date().toISOString()
+        };
+        await putRecord('settings', settings);
+        toast('Settings saved');
+      });
 
-            async function getContent() {
-                if (!db) await openDB();
-                return new Promise((res, rej) => {
-                    const tx = db.transaction('content', 'readonly');
-                    const req = tx.objectStore('content').get('main');
-                    req.onsuccess = () => res(req.result || { id: 'main', articles: [], speakEasy: [], tips: [] });
-                    req.onerror = () => rej(req.error);
-                });
-            }
+      // ===== USERS =====
+      async function renderUsers() {
+        const users = await getStore('users');
+        const list = document.getElementById('user-list');
+        if (!users.length) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">👤</div><div>No users configured.</div></div>`;
+          return;
+        }
+        list.innerHTML = users.map(u => `
+          <div class="list-item">
+            <div class="info">
+              <div class="title">${escapeHtml(u.name || u.email || u.id)}</div>
+              <div class="meta">${u.canAccess ? '✅ Active' : '⛔ Revoked'} · Max Scripts: ${u.maxScripts || 'Unlimited'} · Last Active: ${u.lastActiveAt ? new Date(u.lastActiveAt).toLocaleDateString() : 'Never'}</div>
+            </div>
+            <div class="actions">
+              <button class="btn" onclick="editUser('${u.id}')">✏️ Edit</button>
+              <button class="btn btn-danger" onclick="deleteUser('${u.id}')">🗑 Remove</button>
+            </div>
+          </div>
+        `).join('');
+      }
 
-            async function saveContent(content) {
-                if (!db) await openDB();
-                return new Promise((res, rej) => {
-                    const tx = db.transaction('content', 'readwrite');
-                    const req = tx.objectStore('content').put({ ...content, id: 'main' });
-                    req.onsuccess = () => res();
-                    req.onerror = () => rej(req.error);
-                });
-            }
+      window.openNewUser = function() {
+        showFormModal('Add User', `
+          <label>User ID (or email)</label>
+          <input type="text" id="form-user-id" placeholder="user@example.com" />
+          <label>Name</label>
+          <input type="text" id="form-user-name" placeholder="Display name" />
+          <label>Can Access</label>
+          <select id="form-user-access"><option value="true">Yes</option><option value="false">No</option></select>
+          <label>Max Scripts (override global)</label>
+          <input type="number" id="form-user-max" placeholder="Leave empty for unlimited" />
+          <div class="btn-row">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveUser()">✅ Add</button>
+          </div>
+        `);
+      };
 
-            // ===== STATE =====
-            let content = { articles: [], speakEasy: [], tips: [] };
-            let currentPage = 'dashboard';
-            let editingItem = null; // { type: 'article'|'category', index: number }
-            let quill = null;
-            let quillInitialized = false;
+      window.saveUser = async function() {
+        const id = document.getElementById('form-user-id').value.trim();
+        const name = document.getElementById('form-user-name').value.trim();
+        const canAccess = document.getElementById('form-user-access').value === 'true';
+        const maxScripts = document.getElementById('form-user-max').value ? parseInt(document.getElementById('form-user-max')
+          .value) : null;
+        if (!id) { toast('User ID is required'); return; }
+        const user = {
+          id,
+          name: name || id,
+          canAccess,
+          maxScripts,
+          grantedAt: new Date().toISOString(),
+          lastActiveAt: null
+        };
+        await putRecord('users', user);
+        closeModal();
+        renderUsers();
+        renderDashboard();
+        toast('User added');
+      };
 
-            // ===== DEFAULT TIPS =====
-            const defaultTips = [
-                "Pause for 3 seconds after every key point.",
-                "Vary your pitch to keep the audience engaged.",
-                "Practice your opening line until it feels natural.",
-                "Use hand gestures to emphasise important ideas.",
-                "Don't rush – breathe between sentences.",
-                "Make eye contact with the camera lens.",
-                "Record yourself and watch it back to improve.",
-                "Use short sentences for easier delivery.",
-                "Highlight keywords in your script to stress them.",
-                "Smile while speaking – it changes your tone.",
-                "Take a deep breath before starting.",
-                "Stand up straight – it improves your voice.",
-                "Use rhetorical questions to engage your audience.",
-                "Slow down during your most important points.",
-                "Practice your closing line to make it memorable.",
-                "Use silence as a tool – don't fill every gap.",
-                "Know your first and last lines perfectly.",
-                "Imagine you're talking to a friend.",
-                "Use the mirror mode to practise eye contact.",
-                "Break long paragraphs into shorter ones."
-            ];
+      window.editUser = function(id) {
+        getStore('users').then(users => {
+          const u = users.find(u => u.id === id);
+          if (!u) { toast('User not found'); return; }
+          showFormModal('Edit User', `
+            <label>Name</label>
+            <input type="text" id="form-user-name" value="${escapeHtml(u.name || '')}" />
+            <label>Can Access</label>
+            <select id="form-user-access"><option value="true" ${u.canAccess ? 'selected' : ''}>Yes</option><option value="false" ${!u.canAccess ? 'selected' : ''}>No</option></select>
+            <label>Max Scripts (override global)</label>
+            <input type="number" id="form-user-max" value="${u.maxScripts || ''}" placeholder="Leave empty for unlimited" />
+            <div class="btn-row">
+              <button class="btn" onclick="closeModal()">Cancel</button>
+              <button class="btn btn-primary" onclick="saveUserEdit('${u.id}')">💾 Save</button>
+            </div>
+          `);
+        });
+      };
 
-            // ===== NAVIGATION =====
-            function navigateTo(page) {
-                currentPage = page;
-                $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
-                $$('.page').forEach(el => el.classList.remove('active'));
-                const target = document.getElementById('page-' + page);
-                if (target) target.classList.add('active');
+      window.saveUserEdit = async function(id) {
+        const name = document.getElementById('form-user-name').value.trim();
+        const canAccess = document.getElementById('form-user-access').value === 'true';
+        const maxScripts = document.getElementById('form-user-max').value ? parseInt(document.getElementById('form-user-max')
+          .value) : null;
+        const users = await getStore('users');
+        const user = users.find(u => u.id === id);
+        if (!user) { toast('User not found'); return; }
+        user.name = name || user.id;
+        user.canAccess = canAccess;
+        user.maxScripts = maxScripts;
+        await putRecord('users', user);
+        closeModal();
+        renderUsers();
+        toast('User updated');
+      };
 
-                const titles = {
-                    dashboard: '📊 Dashboard',
-                    articles: '📝 Articles',
-                    speakeasy: '🎤 SpeakEasy',
-                    sync: '🔄 Sync'
-                };
-                $('#page-title').innerHTML = titles[page] || 'Dashboard';
+      window.deleteUser = async function(id) {
+        if (!confirm('Remove this user?')) return;
+        await deleteRecord('users', id);
+        renderUsers();
+        toast('User removed');
+      };
 
-                const actions = $('#header-actions');
-                if (page === 'articles') {
-                    actions.innerHTML = `<button class="btn btn-primary" onclick="openNewArticle()">+ New Article</button>`;
-                } else if (page === 'speakeasy') {
-                    actions.innerHTML = `<button class="btn btn-primary" onclick="openNewCategory()">+ New Category</button>`;
-                } else {
-                    actions.innerHTML = '';
+      // ===== ANALYTICS =====
+      async function renderAnalytics() {
+        const logs = await getStore('logs');
+        const sessions = logs.filter(l => l.duration > 0);
+        const last7 = sessions.filter(l => {
+          const d = new Date(l.startedAt);
+          const now = new Date();
+          const diff = (now - d) / (1000 * 60 * 60 * 24);
+          return diff <= 7;
+        });
+        document.getElementById('analytics-sessions').textContent = last7.length;
+
+        // Most used font
+        const fontCount = {};
+        sessions.forEach(l => { if (l.fontUsed) fontCount[l.fontUsed] = (fontCount[l.fontUsed] || 0) + 1; });
+        const topFont = Object.entries(fontCount).sort((a, b) => b[1] - a[1])[0];
+        document.getElementById('analytics-font').textContent = topFont ? topFont[0] : '—';
+
+        // Most used color
+        const colorCount = {};
+        sessions.forEach(l => { if (l.textColor) colorCount[l.textColor] = (colorCount[l.textColor] || 0) + 1; });
+        const topColor = Object.entries(colorCount).sort((a, b) => b[1] - a[1])[0];
+        document.getElementById('analytics-color').textContent = topColor ? topColor[0] : '—';
+
+        // Sessions by day (last 7)
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dayStr = d.toISOString().split('T')[0];
+          const count = sessions.filter(l => l.startedAt.startsWith(dayStr)).length;
+          days.push({ label: d.toLocaleDateString('en', { weekday: 'short' }), count });
+        }
+        const max = Math.max(1, ...days.map(d => d.count));
+        const chart = document.getElementById('sessions-chart');
+        chart.innerHTML = days.map(d => `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <div class="bar" style="height:${(d.count / max) * 80}%;background:var(--accent);width:80%;border-radius:4px 4px 0 0;"></div>
+            <div class="bar-label">${d.label}</div>
+          </div>
+        `).join('');
+
+        // Device breakdown
+        const deviceCount = {};
+        sessions.forEach(l => { if (l.deviceType) deviceCount[l.deviceType] = (deviceCount[l.deviceType] || 0) + 1; });
+        const totalDevices = Object.values(deviceCount).reduce((a, b) => a + b, 0) || 1;
+        const deviceChart = document.getElementById('device-chart');
+        deviceChart.innerHTML = Object.entries(deviceCount).map(([device, count]) => `
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
+            <div class="bar" style="height:${(count / totalDevices) * 80}%;background:var(--accent);width:80%;border-radius:4px 4px 0 0;"></div>
+            <div class="bar-label">${device}</div>
+          </div>
+        `).join('');
+        if (!Object.keys(deviceCount).length) deviceChart.innerHTML =
+        '<p style="color:var(--text-secondary);font-size:14px;">No device data yet.</p>';
+      }
+
+      // ===== PAIRINGS =====
+      async function renderPairings() {
+        const pairings = await getStore('pairings');
+        const list = document.getElementById('pairing-list');
+        if (!pairings.length) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">📱</div><div>No active pairings.</div></div>`;
+          return;
+        }
+        list.innerHTML = pairings.map(p => `
+          <div class="list-item">
+            <div class="info">
+              <div class="title">${escapeHtml(p.deviceName)}</div>
+              <div class="meta">${p.deviceType} · Last seen: ${p.lastSeenAt ? new Date(p.lastSeenAt).toLocaleString() : 'Never'} · ${p.isActive ? '✅ Active' : '⛔ Revoked'}</div>
+            </div>
+            <div class="actions">
+              ${p.isActive ? `<button class="btn btn-danger" onclick="revokePairing('${p.id}')">Revoke</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      window.revokePairing = async function(id) {
+        if (!confirm('Revoke this pairing?')) return;
+        const pairings = await getStore('pairings');
+        const pairing = pairings.find(p => p.id === id);
+        if (pairing) {
+          pairing.isActive = false;
+          pairing.revokedAt = new Date().toISOString();
+          await putRecord('pairings', pairing);
+          renderPairings();
+          toast('Pairing revoked');
+        }
+      };
+
+      // ===== FEATURE FLAGS =====
+      let flagState = {};
+
+      async function loadFlags() {
+        const flags = (await getStore('flags'))[0] || {};
+        flagState = flags;
+        const container = document.getElementById('flags-container');
+        container.querySelectorAll('.flag-toggle').forEach(btn => {
+          const flag = btn.dataset.flag;
+          const value = flags[flag] !== undefined ? flags[flag] : true; // default true
+          btn.textContent = value ? '✅ On' : '⛔ Off';
+          btn.style.borderColor = value ? 'var(--success)' : 'var(--danger)';
+        });
+      }
+
+      document.getElementById('flags-container').addEventListener('click', (e) => {
+        const btn = e.target.closest('.flag-toggle');
+        if (!btn) return;
+        const flag = btn.dataset.flag;
+        const current = btn.textContent.includes('On');
+        btn.textContent = current ? '⛔ Off' : '✅ On';
+        btn.style.borderColor = current ? 'var(--danger)' : 'var(--success)';
+        flagState[flag] = !current;
+      });
+
+      document.getElementById('btn-save-flags').addEventListener('click', async () => {
+        await putRecord('flags', { id: 'flags', ...flagState, updatedAt: new Date().toISOString() });
+        toast('Feature flags saved');
+      });
+
+      // ===== MODAL =====
+      function showFormModal(title, html) {
+        document.getElementById('modal-content').innerHTML = `<h2>${title}</h2>${html}`;
+        document.getElementById('modal-overlay').classList.add('active');
+        quillInitialized = false;
+        quill = null;
+        // Re-init quill if editor wrapper exists after DOM render
+        setTimeout(() => {
+          if (document.getElementById('quill-editor-wrapper')) {
+            initQuill('');
+          }
+        }, 50);
+      }
+
+      window.closeModal = function() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        editingTemplateId = null;
+        quillInitialized = false;
+        quill = null;
+      };
+
+      document.getElementById('modal-close').addEventListener('click', closeModal);
+      document.getElementById('modal-overlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
+
+      // ===== IMPORT / EXPORT =====
+      window.exportData = async function() {
+        const data = {
+          templates: await getStore('templates'),
+          settings: await getStore('settings'),
+          users: await getStore('users'),
+          logs: await getStore('logs'),
+          pairings: await getStore('pairings'),
+          flags: await getStore('flags')
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `promptica_admin_data_${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('Data exported');
+      };
+
+      window.importData = function() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const text = await file.text();
+          try {
+            const data = JSON.parse(text);
+            for (const [store, records] of Object.entries(data)) {
+              if (Array.isArray(records)) {
+                for (const rec of records) {
+                  await putRecord(store, rec);
                 }
-
-                if (page === 'dashboard') renderDashboard();
-                else if (page === 'articles') renderArticles();
-                else if (page === 'speakeasy') renderCategories();
+              }
             }
-            window.navigateTo = navigateTo;
+            toast('Data imported successfully');
+            renderDashboard();
+            renderTemplates();
+            renderUsers();
+            renderPairings();
+            loadSettings();
+            loadFlags();
+          } catch (err) {
+            toast('Invalid JSON file');
+          }
+        };
+        input.click();
+      };
 
-            // ===== DASHBOARD =====
-            async function renderDashboard() {
-                const data = await getContent();
-                content = data;
-                document.getElementById('stat-articles').textContent = content.articles.length;
-                document.getElementById('stat-categories').textContent = content.speakEasy.length;
-                document.getElementById('stat-tips').textContent = content.tips.length || defaultTips.length;
-                const lastSync = localStorage.getItem('promptica_last_sync');
-                document.getElementById('stat-last-sync').textContent = lastSync ? new Date(parseInt(lastSync))
-                    .toLocaleString() : 'Never';
-                document.getElementById('article-count').textContent = content.articles.length;
-                document.getElementById('category-count').textContent = content.speakEasy.length;
+      // ===== GITHUB SYNC =====
+      window.syncToGitHub = async function() {
+        const token = prompt('Enter GitHub Personal Access Token (classic, repo scope):');
+        if (!token) return;
+        const repo = prompt('Enter repo in format "username/repo":');
+        if (!repo) return;
+        try {
+          const data = {
+            templates: await getStore('templates'),
+            settings: await getStore('settings'),
+            users: await getStore('users'),
+            logs: await getStore('logs'),
+            pairings: await getStore('pairings'),
+            flags: await getStore('flags')
+          };
+          const payload = {
+            message: 'Update admin data from Promptica Admin',
+            content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
+            branch: 'main'
+          };
+          const exists = await fetch(`https://api.github.com/repos/${repo}/contents/admin_data.json`, {
+            headers: { Authorization: `token ${token}` }
+          });
+          let sha = null;
+          if (exists.ok) { const d = await exists.json();
+            sha = d.sha; }
+          const res = await fetch(`https://api.github.com/repos/${repo}/contents/admin_data.json`, {
+            method: 'PUT',
+            headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload, sha })
+          });
+          if (res.ok) {
+            toast('Synced to GitHub! Vercel will redeploy.');
+          } else {
+            const err = await res.json();
+            toast('GitHub error: ' + err.message);
+          }
+        } catch (e) {
+          toast('Sync failed: ' + e.message);
+        }
+      };
+
+      // ===== EVENT BINDINGS =====
+      sidebar.querySelectorAll('.nav-item[data-page]').forEach(el => {
+        el.addEventListener('click', () => {
+          const page = el.dataset.page;
+          if (page === 'back') { window.location.href = 'index.html'; return; }
+          navigateTo(page);
+        });
+      });
+
+      document.getElementById('btn-new-template').addEventListener('click', openNewTemplate);
+      document.getElementById('btn-import-templates').addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,.csv,.txt';
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const text = await file.text();
+          // Simple CSV parse: title,content,category,tags
+          const lines = text.split('\n').filter(l => l.trim());
+          const headers = lines[0].split(',').map(h => h.trim());
+          for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',').map(v => v.trim());
+            const obj = {};
+            headers.forEach((h, idx) => obj[h] = values[idx] || '');
+            if (obj.title) {
+              await putRecord('templates', {
+                id: generateId(),
+                title: obj.title,
+                content: obj.content || '',
+                category: obj.category || '',
+                tags: obj.tags ? obj.tags.split('|') : [],
+                public: true,
+                version: 1,
+                usageCount: 0,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              });
             }
+          }
+          toast('Templates imported');
+          renderTemplates();
+        };
+        input.click();
+      });
 
-            // ===== ARTICLES =====
-            async function renderArticles() {
-                const data = await getContent();
-                content = data;
-                const list = document.getElementById('article-list');
-                if (!content.articles.length) {
-                    list.innerHTML =
-                    `<div class="empty-state"><div class="icon">📄</div><div>No articles yet. Click "New Article" to create one.</div></div>`;
-                    return;
-                }
-                list.innerHTML = content.articles.map((a, i) => `
-                    <div class="list-item">
-                        <div class="info">
-                            <div class="title">${escapeHtml(a.title)}</div>
-                            <div class="meta">
-                                ${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString() : 'Draft'}
-                                ${a.tags ? a.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : ''}
-                            </div>
-                        </div>
-                        <div class="actions">
-                            <button class="btn" onclick="editArticle(${i})">✏️ Edit</button>
-                            <button class="btn btn-danger" onclick="deleteArticle(${i})">🗑 Delete</button>
-                        </div>
-                    </div>
-                `).join('');
-                document.getElementById('article-count').textContent = content.articles.length;
-            }
+      document.getElementById('btn-refresh-pairings').addEventListener('click', renderPairings);
 
-            window.editArticle = function(index) {
-                editingItem = { type: 'article', index: index };
-                const a = content.articles[index];
-                const html = `
-                    <label>Title</label>
-                    <input type="text" id="form-title" value="${escapeHtml(a.title)}" />
-                    <label>Content</label>
-                    <div class="editor-wrapper" id="quill-editor-wrapper">
-                        <div id="quill-editor" style="min-height:200px;background:#fff;color:#000;">${a.content || ''}</div>
-                    </div>
-                    <label>Tags (comma separated)</label>
-                    <input type="text" id="form-tags" value="${a.tags || ''}" />
-                    <label>Published At</label>
-                    <input type="date" id="form-date" value="${a.publishedAt ? a.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0]}" />
-                    <div class="btn-row">
-                        <button class="btn" onclick="closeModal()">Cancel</button>
-                        <button class="btn btn-primary" onclick="saveArticleForm()">💾 Save</button>
-                    </div>
-                `;
-                showFormModal('Edit Article', html);
-                initQuill(a.content || '');
-            };
-
-            window.deleteArticle = async function(index) {
-                if (!confirm(`Delete "${content.articles[index].title}"?`)) return;
-                content.articles.splice(index, 1);
-                await saveContent(content);
-                renderArticles();
-                renderDashboard();
-                toast('Article deleted');
-            };
-
-            window.openNewArticle = function() {
-                editingItem = null;
-                const html = `
-                    <label>Title</label>
-                    <input type="text" id="form-title" placeholder="Enter article title..." />
-                    <label>Content</label>
-                    <div class="editor-wrapper" id="quill-editor-wrapper">
-                        <div id="quill-editor" style="min-height:200px;background:#fff;color:#000;"></div>
-                    </div>
-                    <label>Tags (comma separated)</label>
-                    <input type="text" id="form-tags" placeholder="tutorial, tips" />
-                    <label>Published At</label>
-                    <input type="date" id="form-date" value="${new Date().toISOString().split('T')[0]}" />
-                    <div class="btn-row">
-                        <button class="btn" onclick="closeModal()">Cancel</button>
-                        <button class="btn btn-primary" onclick="saveArticleForm()">✅ Create</button>
-                    </div>
-                `;
-                showFormModal('New Article', html);
-                initQuill('');
-            };
-
-            window.saveArticleForm = async function() {
-                const title = document.getElementById('form-title').value.trim();
-                const contentHtml = quill ? quill.root.innerHTML : '';
-                const tags = document.getElementById('form-tags').value.trim();
-                const date = document.getElementById('form-date').value;
-                if (!title) { toast('Title is required'); return; }
-                const article = {
-                    id: 'art-' + Date.now(),
-                    title,
-                    content: contentHtml,
-                    tags: tags,
-                    publishedAt: date || new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                if (editingItem && editingItem.type === 'article') {
-                    content.articles[editingItem.index] = { ...content.articles[editingItem.index], ...article };
-                } else {
-                    content.articles.push(article);
-                }
-                await saveContent(content);
-                closeModal();
-                renderArticles();
-                renderDashboard();
-                toast(editingItem ? 'Article updated' : 'Article created');
-                editingItem = null;
-            };
-
-            // ===== QUILL INIT =====
-            function initQuill(initialContent) {
-                if (quillInitialized) {
-                    quill.root.innerHTML = initialContent;
-                    return;
-                }
-                const container = document.getElementById('quill-editor');
-                if (!container) return;
-                // Wait for the DOM to render
-                setTimeout(() => {
-                    quill = new Quill('#quill-editor', {
-                        theme: 'snow',
-                        placeholder: 'Write your article here...',
-                        modules: {
-                            toolbar: [
-                                [{ 'header': [1, 2, 3, false] }],
-                                ['bold', 'italic', 'underline', 'strike'],
-                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                ['link', 'image', 'code-block'],
-                                ['clean']
-                            ]
-                        }
-                    });
-                    // Custom image handler
-                    const toolbar = quill.getModule('toolbar');
-                    toolbar.addHandler('image', () => {
-                        const input = document.createElement('input');
-                        input.setAttribute('type', 'file');
-                        input.setAttribute('accept', 'image/*');
-                        input.click();
-                        input.onchange = () => {
-                            const file = input.files[0];
-                            if (!file) return;
-                            const reader = new FileReader();
-                            reader.onload = (e) => {
-                                const range = quill.getSelection();
-                                const index = range ? range.index : 0;
-                                quill.insertEmbed(index, 'image', e.target.result);
-                            };
-                            reader.readAsDataURL(file);
-                        };
-                    });
-                    if (initialContent) quill.root.innerHTML = initialContent;
-                    quillInitialized = true;
-                }, 100);
-            }
-
-            // ===== CATEGORIES (SpeakEasy) with Image Upload =====
-            async function renderCategories() {
-                const data = await getContent();
-                content = data;
-                const list = document.getElementById('category-list');
-                if (!content.speakEasy.length) {
-                    list.innerHTML =
-                        `<div class="empty-state"><div class="icon">🎤</div><div>No categories yet. Click "New Category" to create one.</div></div>`;
-                    return;
-                }
-                list.innerHTML = content.speakEasy.map((c, i) => `
-                    <div class="list-item">
-                        <div class="info">
-                            <div class="title">${c.icon || '🎤'} ${escapeHtml(c.name)}</div>
-                            <div class="meta">${c.description || 'No description'} · ${c.articles ? c.articles.length : 0} articles</div>
-                        </div>
-                        ${c.image ? `<img src="${c.image}" class="image-preview" alt="${escapeHtml(c.name)}" />` : ''}
-                        <div class="actions">
-                            <button class="btn" onclick="editCategory(${i})">✏️ Edit</button>
-                            <button class="btn btn-danger" onclick="deleteCategory(${i})">🗑 Delete</button>
-                        </div>
-                    </div>
-                `).join('');
-                document.getElementById('category-count').textContent = content.speakEasy.length;
-            }
-
-            window.editCategory = function(index) {
-                editingItem = { type: 'category', index: index };
-                const c = content.speakEasy[index];
-                const html = `
-                    <label>Category Name</label>
-                    <input type="text" id="form-cat-name" value="${escapeHtml(c.name)}" />
-                    <label>Description</label>
-                    <input type="text" id="form-cat-desc" value="${escapeHtml(c.description || '')}" />
-                    <label>Icon (emoji)</label>
-                    <input type="text" id="form-cat-icon" value="${c.icon || '🎤'}" maxlength="2" style="width:60px;" />
-                    <label>Category Image (upload)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="form-cat-image" accept="image/*" />
-                        <button class="btn" onclick="document.getElementById('form-cat-image').click()">Choose Image</button>
-                        ${c.image ? `<img src="${c.image}" class="image-preview-small" />` : ''}
-                    </div>
-                    <div id="cat-image-preview"></div>
-                    <label>Article IDs (comma separated)</label>
-                    <input type="text" id="form-cat-articles" value="${(c.articles || []).join(', ')}" />
-                    <div class="btn-row">
-                        <button class="btn" onclick="closeModal()">Cancel</button>
-                        <button class="btn btn-primary" onclick="saveCategoryForm()">💾 Save</button>
-                    </div>
-                `;
-                showFormModal('Edit Category', html);
-                // Image preview handler
-                document.getElementById('form-cat-image')?.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        const preview = document.getElementById('cat-image-preview');
-                        preview.innerHTML = `<img src="${ev.target.result}" class="image-preview-small" />`;
-                        // Store base64 for saving
-                        document.getElementById('form-cat-image-data')?.remove();
-                        const hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.id = 'form-cat-image-data';
-                        hidden.value = ev.target.result;
-                        document.getElementById('modal-content').appendChild(hidden);
-                    };
-                    reader.readAsDataURL(file);
-                });
-                // If there's an existing image, display it in preview
-                if (c.image) {
-                    const preview = document.getElementById('cat-image-preview');
-                    if (preview) preview.innerHTML = `<img src="${c.image}" class="image-preview-small" />`;
-                }
-            };
-
-            window.deleteCategory = async function(index) {
-                if (!confirm(`Delete "${content.speakEasy[index].name}" category?`)) return;
-                content.speakEasy.splice(index, 1);
-                await saveContent(content);
-                renderCategories();
-                renderDashboard();
-                toast('Category deleted');
-            };
-
-            window.openNewCategory = function() {
-                editingItem = null;
-                const html = `
-                    <label>Category Name</label>
-                    <input type="text" id="form-cat-name" placeholder="e.g., Warm-Up Drills" />
-                    <label>Description</label>
-                    <input type="text" id="form-cat-desc" placeholder="Brief description..." />
-                    <label>Icon (emoji)</label>
-                    <input type="text" id="form-cat-icon" value="🎤" maxlength="2" style="width:60px;" />
-                    <label>Category Image (upload)</label>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="form-cat-image" accept="image/*" />
-                        <button class="btn" onclick="document.getElementById('form-cat-image').click()">Choose Image</button>
-                    </div>
-                    <div id="cat-image-preview"></div>
-                    <label>Article IDs (comma separated)</label>
-                    <input type="text" id="form-cat-articles" placeholder="art-123, art-456" />
-                    <div class="btn-row">
-                        <button class="btn" onclick="closeModal()">Cancel</button>
-                        <button class="btn btn-primary" onclick="saveCategoryForm()">✅ Create</button>
-                    </div>
-                `;
-                showFormModal('New Category', html);
-                document.getElementById('form-cat-image')?.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        const preview = document.getElementById('cat-image-preview');
-                        preview.innerHTML = `<img src="${ev.target.result}" class="image-preview-small" />`;
-                        const hidden = document.createElement('input');
-                        hidden.type = 'hidden';
-                        hidden.id = 'form-cat-image-data';
-                        hidden.value = ev.target.result;
-                        document.getElementById('modal-content').appendChild(hidden);
-                    };
-                    reader.readAsDataURL(file);
-                });
-            };
-
-            window.saveCategoryForm = async function() {
-                const name = document.getElementById('form-cat-name').value.trim();
-                const description = document.getElementById('form-cat-desc').value.trim();
-                const icon = document.getElementById('form-cat-icon').value || '🎤';
-                const articlesStr = document.getElementById('form-cat-articles').value.trim();
-                const articles = articlesStr ? articlesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
-                // Get image data from hidden field if exists
-                const imageData = document.getElementById('form-cat-image-data')?.value || null;
-                if (!name) { toast('Category name is required'); return; }
-                const category = { name, description, icon, articles, image: imageData };
-                if (editingItem && editingItem.type === 'category') {
-                    content.speakEasy[editingItem.index] = { ...content.speakEasy[editingItem.index], ...category };
-                } else {
-                    content.speakEasy.push(category);
-                }
-                await saveContent(content);
-                closeModal();
-                renderCategories();
-                renderDashboard();
-                toast(editingItem ? 'Category updated' : 'Category created');
-                editingItem = null;
-            };
-
-            // ===== MODAL =====
-            function showFormModal(title, html) {
-                // Clean up Quill if any
-                quillInitialized = false;
-                quill = null;
-                document.getElementById('modal-content').innerHTML = `<h2>${title}</h2>${html}`;
-                document.getElementById('modal-overlay').classList.add('active');
-                // Re‑attach Quill if editor wrapper exists
-                if (document.getElementById('quill-editor-wrapper')) {
-                    initQuill('');
-                }
-            }
-
-            window.closeModal = function() {
-                document.getElementById('modal-overlay').classList.remove('active');
-                editingItem = null;
-                quillInitialized = false;
-                quill = null;
-            };
-
-            document.getElementById('modal-close').addEventListener('click', closeModal);
-            document.getElementById('modal-overlay').addEventListener('click', (e) => {
-                if (e.target === e.currentTarget) closeModal();
+      // ===== INIT =====
+      async function init() {
+        await openDB();
+        // Seed default settings if empty
+        const settings = await getStore('settings');
+        if (!settings.length) {
+          await putRecord('settings', {
+            id: 'global',
+            defaultFont: 'Inter',
+            defaultFontSize: 34,
+            defaultTextColor: '#f5efe8',
+            defaultBgColor: '#0b0b0b',
+            defaultBgOpacity: 1,
+            defaultMirror: false,
+            defaultFocus: true,
+            defaultSpeed: 5,
+            maxScriptLength: 5000,
+            maxSavedScripts: 20,
+            updatedAt: new Date().toISOString()
+          });
+        }
+        // Seed default flags
+        const flags = await getStore('flags');
+        if (!flags.length) {
+          await putRecord('flags', {
+            id: 'flags',
+            enableMirror: true,
+            enableVoiceControl: false,
+            enableFocus: true,
+            enableAutoPause: false,
+            enableUpload: true,
+            updatedAt: new Date().toISOString()
+          });
+        }
+        // Seed mock logs if empty (for demo)
+        const logs = await getStore('logs');
+        if (!logs.length) {
+          const now = Date.now();
+          for (let i = 0; i < 20; i++) {
+            const d = new Date(now - Math.random() * 7 * 24 * 60 * 60 * 1000);
+            await putRecord('logs', {
+              id: generateId(),
+              userId: 'user-' + Math.floor(Math.random() * 5),
+              sessionId: 'sess-' + Math.random().toString(36).slice(2, 8),
+              startedAt: d.toISOString(),
+              endedAt: new Date(d.getTime() + 60 * 1000 + Math.random() * 300 * 1000).toISOString(),
+              duration: Math.floor(30 + Math.random() * 300),
+              fontUsed: ['Inter', 'Roboto', 'SF Pro'][Math.floor(Math.random() * 3)],
+              fontSize: 34,
+              mirrorUsed: Math.random() > 0.5,
+              focusUsed: Math.random() > 0.5,
+              speedSetting: Math.floor(3 + Math.random() * 5),
+              deviceType: ['desktop', 'mobile', 'tablet'][Math.floor(Math.random() * 3)]
             });
+          }
+        }
+        navigateTo('dashboard');
+        toast('🎙️ Admin Panel ready');
+      }
 
-            // ===== SYNC & EXPORT =====
-            window.exportContent = async function() {
-                const data = await getContent();
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `promptica_content_${Date.now()}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-                toast('Content exported');
-            };
+      init();
 
-            window.importContent = function() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    const text = await file.text();
-                    try {
-                        const data = JSON.parse(text);
-                        await saveContent(data);
-                        content = data;
-                        toast('Content imported successfully');
-                        renderDashboard();
-                        renderArticles();
-                        renderCategories();
-                    } catch (err) {
-                        toast('Invalid JSON file');
-                    }
-                };
-                input.click();
-            };
+      // Expose functions for inline onclick
+      window.openNewTemplate = openNewTemplate;
+      window.openNewUser = openNewUser;
+      window.exportData = exportData;
+      window.importData = importData;
+      window.syncToGitHub = syncToGitHub;
 
-            window.syncToGitHub = async function() {
-                const token = prompt('Enter GitHub Personal Access Token (classic, repo scope):');
-                if (!token) return;
-                const repo = prompt('Enter repo in format "username/repo":');
-                if (!repo) return;
-                try {
-                    const data = await getContent();
-                    const payload = {
-                        message: 'Update content from Promptica Admin',
-                        content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
-                        branch: 'main'
-                    };
-                    const exists = await fetch(`https://api.github.com/repos/${repo}/contents/content.json`, {
-                        headers: { Authorization: `token ${token}` }
-                    });
-                    let sha = null;
-                    if (exists.ok) { const d = await exists.json();
-                        sha = d.sha; }
-                    const res = await fetch(`https://api.github.com/repos/${repo}/contents/content.json`, {
-                        method: 'PUT',
-                        headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ...payload, sha })
-                    });
-                    if (res.ok) {
-                        localStorage.setItem('promptica_last_sync', Date.now().toString());
-                        toast('Synced to GitHub! Vercel will redeploy.');
-                        renderDashboard();
-                    } else {
-                        const err = await res.json();
-                        toast('GitHub error: ' + err.message);
-                    }
-                } catch (e) {
-                    toast('Sync failed: ' + e.message);
-                }
-            };
-
-            // ===== RESET =====
-            document.getElementById('btn-reset-content')?.addEventListener('click', async () => {
-                if (!confirm('⚠️ This will reset all content (articles, categories, tips) to default. Are you sure?'))
-                    return;
-                if (!confirm('⚠️ This is permanent. Continue?')) return;
-                const defaultContent = {
-                    articles: [],
-                    speakEasy: [],
-                    tips: defaultTips
-                };
-                await saveContent(defaultContent);
-                content = defaultContent;
-                toast('Content reset to default');
-                renderDashboard();
-                renderArticles();
-                renderCategories();
-            });
-
-            // ===== EVENT BINDINGS =====
-            $$('.nav-item[data-page]').forEach(el => {
-                el.addEventListener('click', () => {
-                    const page = el.dataset.page;
-                    if (page === 'back') {
-                        window.location.href = 'index.html';
-                        return;
-                    }
-                    navigateTo(page);
-                });
-            });
-
-            document.getElementById('btn-new-article')?.addEventListener('click', openNewArticle);
-            document.getElementById('btn-new-category')?.addEventListener('click', openNewCategory);
-            document.getElementById('btn-sync-github')?.addEventListener('click', syncToGitHub);
-            document.getElementById('btn-export-content')?.addEventListener('click', exportContent);
-            document.getElementById('btn-import-content')?.addEventListener('click', importContent);
-
-            // ===== INIT =====
-            async function init() {
-                await openDB();
-                const data = await getContent();
-                content = data;
-                if (!content.tips || !content.tips.length) {
-                    content.tips = defaultTips;
-                    await saveContent(content);
-                }
-                renderDashboard();
-                renderArticles();
-                renderCategories();
-                toast('🎙️ Admin Panel ready');
-            }
-
-            init();
-
-            // Expose functions for inline onclick
-            window.openNewArticle = openNewArticle;
-            window.openNewCategory = openNewCategory;
-            window.exportContent = exportContent;
-            window.importContent = importContent;
-            window.syncToGitHub = syncToGitHub;
-
-        })();
-    </script>
+    })();
+  </script>
 </body>
 </html>
