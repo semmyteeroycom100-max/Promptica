@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Promptica · Admin Panel</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
+
+    <!-- Quill.js (WYSIWYG Editor) -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+    <style>
+        /* ===== RESET & BASE ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
+            --bg-card: #1a1a1a; --bg-sidebar: #111111; --border-color: #2c2c2c;
+            --text-primary: #f0ece6; --text-secondary: #a8a29e;
+            --accent: #8b7a6b; --accent-hover: #a89484;
+            --success: #4caf50; --danger: #ef5350; --warning: #ffb74d;
+            --shadow: 0 20px 60px rgba(0,0,0,0.8); --radius: 12px;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --transition: 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --sidebar-width: 220px;
+        }
+        html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow: hidden; }
+        #admin-app { display: flex; height: 100vh; overflow: hidden; }
+
+        /* ===== SIDEBAR ===== */
+        #sidebar { width: var(--sidebar-width); background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; padding: 24px 0; }
+        #sidebar .logo { padding: 0 20px 30px 20px; font-size: 20px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        #sidebar .logo span { background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 10px; border-radius: 30px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav-item { padding: 10px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; color: var(--text-secondary); border-left: 2px solid transparent; font-size: 14px; }
+        .nav-item:hover { background: var(--bg-panel); color: var(--text-primary); }
+        .nav-item.active { color: var(--text-primary); border-left-color: var(--accent); background: var(--bg-panel); }
+        .nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+        .nav-item .badge { margin-left: auto; background: var(--accent); color: #0b0b0b; font-size: 10px; padding: 1px 8px; border-radius: 20px; }
+        #sidebar .bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color); }
+
+        /* ===== CONTENT ===== */
+        #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-primary); padding: 24px 32px 32px 32px; }
+
+        /* ===== HEADER ===== */
+        .admin-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 24px; }
+        .admin-header h1 { font-size: 24px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        .admin-header h1 small { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
+        .admin-header .actions { display: flex; gap: 10px; }
+        .admin-header .btn { padding: 8px 18px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .admin-header .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
+        .admin-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+        .admin-header .btn-primary:hover { background: var(--accent-hover); }
+        .admin-header .btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+        .admin-header .btn-danger:hover { background: var(--danger); color: #fff; }
+
+        /* ===== PAGES ===== */
+        .page { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding-right: 4px; }
+        .page.active { display: flex; }
+
+        /* ===== STATS ROW ===== */
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; }
+        .stat-card .label { font-size: 12px; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px; }
+        .stat-card .value { font-size: 28px; font-weight: 600; margin-top: 4px; }
+
+        /* ===== LIST ===== */
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-shrink: 0; }
+        .list-header h3 { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
+        .list-header .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+        .list-header .btn:hover { border-color: var(--accent); }
+        .list-header .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+        .list-header .btn-primary:hover { background: var(--accent-hover); }
+
+        .list-container { flex: 1; overflow-y: auto; min-height: 0; }
+        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; flex-wrap: wrap; gap: 8px; }
+        .list-item:hover { border-color: var(--accent); }
+        .list-item .info { flex: 1; min-width: 0; }
+        .list-item .info .title { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .list-item .info .meta { font-size: 12px; color: var(--text-secondary); }
+        .list-item .info .meta .tag { background: var(--bg-panel); padding: 1px 8px; border-radius: 12px; margin-left: 6px; font-size: 10px; }
+        .list-item .actions { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
+        .list-item .actions .btn { padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-family: var(--font-sans); font-size: 12px; cursor: pointer; transition: all 0.2s; }
+        .list-item .actions .btn:hover { background: var(--bg-secondary); border-color: var(--accent); }
+        .list-item .actions .btn-danger:hover { border-color: var(--danger); color: var(--danger); }
+        .list-item .image-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); flex-shrink: 0; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
+        .empty-state .icon { font-size: 40px; opacity: 0.3; margin-bottom: 8px; }
+
+        /* ===== MODAL (Fullscreen for editor) ===== */
+        .modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 28px 32px; box-shadow: var(--shadow); }
+        .modal-box .close-btn { float: right; background: none; border: none; color: var(--text-secondary); font-size: 28px; cursor: pointer; }
+        .modal-box h2 { font-size: 22px; font-weight: 600; margin-bottom: 20px; }
+        .modal-box label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 4px; margin-top: 14px; }
+        .modal-box label:first-of-type { margin-top: 0; }
+        .modal-box input, .modal-box textarea, .modal-box select { width: 100%; padding: 10px 12px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-sans); font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .modal-box input:focus, .modal-box textarea:focus, .modal-box select:focus { border-color: var(--accent); }
+        .modal-box textarea { min-height: 80px; resize: vertical; }
+        .modal-box .btn-row { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+        .modal-box .btn-row .btn { padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; cursor: pointer; transition: all 0.2s; }
+        .modal-box .btn-row .btn:hover { background: var(--bg-secondary); }
+        .modal-box .btn-row .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+        .modal-box .btn-row .btn-primary:hover { background: var(--accent-hover); }
+        .modal-box .editor-wrapper { background: #fff; border-radius: 6px; overflow: hidden; margin: 8px 0; }
+        .modal-box .editor-wrapper .ql-container { min-height: 250px; font-family: var(--font-sans); }
+        .modal-box .image-preview-small { max-width: 100%; max-height: 150px; margin-top: 8px; border-radius: 6px; border: 1px solid var(--border-color); }
+        .modal-box .file-input-wrapper { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+        /* ===== TOAST ===== */
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); color: var(--text-primary); padding: 12px 24px; border-radius: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow); z-index: 9999; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(12px); }
+        .toast.show { opacity: 1; }
+
+        /* ===== GITHUB SECTION ===== */
+        .github-section { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 20px 24px; margin-top: 16px; }
+        .github-section h3 { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+        .github-section p { color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; }
+        .github-section .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            :root { --sidebar-width: 60px; }
+            #sidebar .logo span, #sidebar .nav-item .label { display: none; }
+            #sidebar .nav-item { padding: 12px; justify-content: center; }
+            #sidebar .nav-item .badge { display: none; }
+            #content { padding: 16px; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+            .admin-header { flex-direction: column; align-items: stretch; gap: 12px; }
+            .admin-header .actions { flex-wrap: wrap; }
+            .list-item { flex-wrap: wrap; gap: 8px; }
+            .list-item .actions { margin-left: 0; width: 100%; justify-content: flex-end; }
+            .modal-box { padding: 20px; }
+        }
+        @media (max-width: 480px) {
+            .stats-row { grid-template-columns: 1fr; }
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast"></div>
+
+    <!-- ===== MODAL ===== -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal-box" id="modal-box">
+            <button class="close-btn" id="modal-close">✕</button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN APP ===== -->
+    <div id="admin-app">
+
+        <!-- ===== SIDEBAR ===== -->
+        <nav id="sidebar">
+            <div class="logo">🎙️ Promptica <span>Admin</span></div>
+            <div class="nav-item active" data-page="dashboard"><span class="icon">📊</span><span class="label">Dashboard</span></div>
+            <div class="nav-item" data-page="articles"><span class="icon">📝</span><span class="label">Articles</span><span class="badge" id="article-count">0</span></div>
+            <div class="nav-item" data-page="speakeasy"><span class="icon">🎤</span><span class="label">SpeakEasy</span><span class="badge" id="category-count">0</span></div>
+            <div class="nav-item" data-page="sync"><span class="icon">🔄</span><span class="label">Sync</span></div>
+            <div class="nav-item bottom" data-page="back" id="back-to-app"><span class="icon">←</span><span class="label">Back to App</span></div>
+        </nav>
+
+        <!-- ===== CONTENT ===== -->
+        <div id="content">
+
+            <!-- Header -->
+            <header class="admin-header">
+                <h1 id="page-title">📊 Dashboard <small>Content Management</small></h1>
+                <div class="actions" id="header-actions"></div>
+            </header>
+
+            <!-- ===== DASHBOARD ===== -->
+            <div id="page-dashboard" class="page active">
+                <div class="stats-row" id="dashboard-stats">
+                    <div class="stat-card"><div class="label">Total Articles</div><div class="value" id="stat-articles">0</div></div>
+                    <div class="stat-card"><div class="label">SpeakEasy Categories</div><div class="value" id="stat-categories">0</div></div>
+                    <div class="stat-card"><div class="label">Total Tips</div><div class="value" id="stat-tips">20</div></div>
+                    <div class="stat-card"><div class="label">Last Sync</div><div class="value" style="font-size:16px;" id="stat-last-sync">Never</div></div>
+                </div>
+                <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;">
+                    <h3 style="font-size:16px;font-weight:500;margin-bottom:8px;">⚡ Quick Actions</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="navigateTo('articles');openNewArticle()">+ New Article</button>
+                        <button class="btn btn-primary" onclick="navigateTo('speakeasy');openNewCategory()">+ New Category</button>
+                        <button class="btn" onclick="exportContent()">📥 Export Content</button>
+                        <button class="btn" onclick="importContent()">📤 Import Content</button>
+                        <button class="btn" onclick="syncToGitHub()">🔄 Sync to GitHub</button>
+                    </div>
+                </div>
+                <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;">
+                    <h3 style="font-size:14px;font-weight:500;color:var(--text-secondary);margin-bottom:4px;">📌 Admin Tip</h3>
+                    <p style="color:var(--text-secondary);font-size:14px;">Use this panel to manage articles, SpeakEasy categories, and sync content to GitHub. All changes are stored locally in IndexedDB.</p>
+                </div>
+            </div>
+
+            <!-- ===== ARTICLES PAGE ===== -->
+            <div id="page-articles" class="page">
+                <div class="list-header">
+                    <h3>📝 All Articles</h3>
+                    <button class="btn btn-primary" id="btn-new-article">+ New Article</button>
+                </div>
+                <div class="list-container" id="article-list">
+                    <div class="empty-state"><div class="icon">📄</div><div>No articles yet. Click "New Article" to create one.</div></div>
+                </div>
+            </div>
+
+            <!-- ===== SPEAKEASY PAGE ===== -->
+            <div id="page-speakeasy" class="page">
+                <div class="list-header">
+                    <h3>🎤 SpeakEasy Categories</h3>
+                    <button class="btn btn-primary" id="btn-new-category">+ New Category</button>
+                </div>
+                <div class="list-container" id="category-list">
+                    <div class="empty-state"><div class="icon">🎤</div><div>No categories yet. Click "New Category" to create one.</div></div>
+                </div>
+            </div>
+
+            <!-- ===== SYNC PAGE ===== -->
+            <div id="page-sync" class="page">
+                <div class="github-section">
+                    <h3>🔄 GitHub Sync</h3>
+                    <p>Sync your content (articles, SpeakEasy categories, tips) to a <code>content.json</code> file in your GitHub repository. This triggers Vercel redeployment so your changes go live instantly.</p>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="btn-sync-github">🔄 Sync to GitHub</button>
+                        <button class="btn" id="btn-export-content">📥 Export JSON</button>
+                        <button class="btn" id="btn-import-content">📤 Import JSON</button>
+                        <button class="btn" id="btn-reset-content" style="border-color:var(--danger);color:var(--danger);">⚠️ Reset Content</button>
+                    </div>
+                </div>
+                <div style="margin-top:20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:20px 24px;">
+                    <h3 style="font-size:16px;font-weight:500;margin-bottom:8px;">📦 Content Backup</h3>
+                    <p style="color:var(--text-secondary);font-size:14px;">Download a JSON backup of all content, or upload a previously exported file to restore your content.</p>
+                    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+                        <button class="btn" onclick="exportContent()">📥 Export Backup</button>
+                        <button class="btn" onclick="importContent()">📤 Import Backup</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!--  JAVASCRIPT – Full Admin (WYSIWYG + Image Uploads)            -->
+    <!-- ============================================================= -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== UTILITIES =====
+            const $ = s => document.querySelector(s);
+            const $$ = s => document.querySelectorAll(s);
+            const toast = (msg, dur = 3000) => {
+                const el = $('#toast');
+                el.textContent = msg;
+                el.classList.add('show');
+                clearTimeout(el._timer);
+                el._timer = setTimeout(() => el.classList.remove('show'), dur);
+            };
+            const escapeHtml = str => { const d = document.createElement('div');
+                d.textContent = str; return d.innerHTML; };
+
+            // ===== INDEXEDDB =====
+            const DB_NAME = 'PrompticaDB';
+            let db = null;
+
+            function openDB() {
+                return new Promise((res, rej) => {
+                    const req = indexedDB.open(DB_NAME, 1);
+                    req.onupgradeneeded = e => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('content')) db.createObjectStore('content', { keyPath: 'id' });
+                        if (!db.objectStoreNames.contains('scripts')) db.createObjectStore('scripts', { keyPath: 'id',
+                            autoIncrement: true });
+                        if (!db.objectStoreNames.contains('sessions')) db.createObjectStore('sessions', { keyPath: 'id',
+                            autoIncrement: true });
+                    };
+                    req.onsuccess = () => { db = req.result;
+                        res(db); };
+                    req.onerror = () => rej(req.error);
+                });
+            }
+
+            async function getContent() {
+                if (!db) await openDB();
+                return new Promise((res, rej) => {
+                    const tx = db.transaction('content', 'readonly');
+                    const req = tx.objectStore('content').get('main');
+                    req.onsuccess = () => res(req.result || { id: 'main', articles: [], speakEasy: [], tips: [] });
+                    req.onerror = () => rej(req.error);
+                });
+            }
+
+            async function saveContent(content) {
+                if (!db) await openDB();
+                return new Promise((res, rej) => {
+                    const tx = db.transaction('content', 'readwrite');
+                    const req = tx.objectStore('content').put({ ...content, id: 'main' });
+                    req.onsuccess = () => res();
+                    req.onerror = () => rej(req.error);
+                });
+            }
+
+            // ===== STATE =====
+            let content = { articles: [], speakEasy: [], tips: [] };
+            let currentPage = 'dashboard';
+            let editingItem = null; // { type: 'article'|'category', index: number }
+            let quill = null;
+            let quillInitialized = false;
+
+            // ===== DEFAULT TIPS =====
+            const defaultTips = [
+                "Pause for 3 seconds after every key point.",
+                "Vary your pitch to keep the audience engaged.",
+                "Practice your opening line until it feels natural.",
+                "Use hand gestures to emphasise important ideas.",
+                "Don't rush – breathe between sentences.",
+                "Make eye contact with the camera lens.",
+                "Record yourself and watch it back to improve.",
+                "Use short sentences for easier delivery.",
+                "Highlight keywords in your script to stress them.",
+                "Smile while speaking – it changes your tone.",
+                "Take a deep breath before starting.",
+                "Stand up straight – it improves your voice.",
+                "Use rhetorical questions to engage your audience.",
+                "Slow down during your most important points.",
+                "Practice your closing line to make it memorable.",
+                "Use silence as a tool – don't fill every gap.",
+                "Know your first and last lines perfectly.",
+                "Imagine you're talking to a friend.",
+                "Use the mirror mode to practise eye contact.",
+                "Break long paragraphs into shorter ones."
+            ];
+
+            // ===== NAVIGATION =====
+            function navigateTo(page) {
+                currentPage = page;
+                $$('.nav-item').forEach(el => el.classList.toggle('active', el.dataset.page === page));
+                $$('.page').forEach(el => el.classList.remove('active'));
+                const target = document.getElementById('page-' + page);
+                if (target) target.classList.add('active');
+
+                const titles = {
+                    dashboard: '📊 Dashboard',
+                    articles: '📝 Articles',
+                    speakeasy: '🎤 SpeakEasy',
+                    sync: '🔄 Sync'
+                };
+                $('#page-title').innerHTML = titles[page] || 'Dashboard';
+
+                const actions = $('#header-actions');
+                if (page === 'articles') {
+                    actions.innerHTML = `<button class="btn btn-primary" onclick="openNewArticle()">+ New Article</button>`;
+                } else if (page === 'speakeasy') {
+                    actions.innerHTML = `<button class="btn btn-primary" onclick="openNewCategory()">+ New Category</button>`;
+                } else {
+                    actions.innerHTML = '';
+                }
+
+                if (page === 'dashboard') renderDashboard();
+                else if (page === 'articles') renderArticles();
+                else if (page === 'speakeasy') renderCategories();
+            }
+            window.navigateTo = navigateTo;
+
+            // ===== DASHBOARD =====
+            async function renderDashboard() {
+                const data = await getContent();
+                content = data;
+                document.getElementById('stat-articles').textContent = content.articles.length;
+                document.getElementById('stat-categories').textContent = content.speakEasy.length;
+                document.getElementById('stat-tips').textContent = content.tips.length || defaultTips.length;
+                const lastSync = localStorage.getItem('promptica_last_sync');
+                document.getElementById('stat-last-sync').textContent = lastSync ? new Date(parseInt(lastSync))
+                    .toLocaleString() : 'Never';
+                document.getElementById('article-count').textContent = content.articles.length;
+                document.getElementById('category-count').textContent = content.speakEasy.length;
+            }
+
+            // ===== ARTICLES =====
+            async function renderArticles() {
+                const data = await getContent();
+                content = data;
+                const list = document.getElementById('article-list');
+                if (!content.articles.length) {
+                    list.innerHTML =
+                    `<div class="empty-state"><div class="icon">📄</div><div>No articles yet. Click "New Article" to create one.</div></div>`;
+                    return;
+                }
+                list.innerHTML = content.articles.map((a, i) => `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${escapeHtml(a.title)}</div>
+                            <div class="meta">
+                                ${a.publishedAt ? new Date(a.publishedAt).toLocaleDateString() : 'Draft'}
+                                ${a.tags ? a.tags.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('') : ''}
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn" onclick="editArticle(${i})">✏️ Edit</button>
+                            <button class="btn btn-danger" onclick="deleteArticle(${i})">🗑 Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('article-count').textContent = content.articles.length;
+            }
+
+            window.editArticle = function(index) {
+                editingItem = { type: 'article', index: index };
+                const a = content.articles[index];
+                const html = `
+                    <label>Title</label>
+                    <input type="text" id="form-title" value="${escapeHtml(a.title)}" />
+                    <label>Content</label>
+                    <div class="editor-wrapper" id="quill-editor-wrapper">
+                        <div id="quill-editor" style="min-height:200px;background:#fff;color:#000;">${a.content || ''}</div>
+                    </div>
+                    <label>Tags (comma separated)</label>
+                    <input type="text" id="form-tags" value="${a.tags || ''}" />
+                    <label>Published At</label>
+                    <input type="date" id="form-date" value="${a.publishedAt ? a.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0]}" />
+                    <div class="btn-row">
+                        <button class="btn" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveArticleForm()">💾 Save</button>
+                    </div>
+                `;
+                showFormModal('Edit Article', html);
+                initQuill(a.content || '');
+            };
+
+            window.deleteArticle = async function(index) {
+                if (!confirm(`Delete "${content.articles[index].title}"?`)) return;
+                content.articles.splice(index, 1);
+                await saveContent(content);
+                renderArticles();
+                renderDashboard();
+                toast('Article deleted');
+            };
+
+            window.openNewArticle = function() {
+                editingItem = null;
+                const html = `
+                    <label>Title</label>
+                    <input type="text" id="form-title" placeholder="Enter article title..." />
+                    <label>Content</label>
+                    <div class="editor-wrapper" id="quill-editor-wrapper">
+                        <div id="quill-editor" style="min-height:200px;background:#fff;color:#000;"></div>
+                    </div>
+                    <label>Tags (comma separated)</label>
+                    <input type="text" id="form-tags" placeholder="tutorial, tips" />
+                    <label>Published At</label>
+                    <input type="date" id="form-date" value="${new Date().toISOString().split('T')[0]}" />
+                    <div class="btn-row">
+                        <button class="btn" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveArticleForm()">✅ Create</button>
+                    </div>
+                `;
+                showFormModal('New Article', html);
+                initQuill('');
+            };
+
+            window.saveArticleForm = async function() {
+                const title = document.getElementById('form-title').value.trim();
+                const contentHtml = quill ? quill.root.innerHTML : '';
+                const tags = document.getElementById('form-tags').value.trim();
+                const date = document.getElementById('form-date').value;
+                if (!title) { toast('Title is required'); return; }
+                const article = {
+                    id: 'art-' + Date.now(),
+                    title,
+                    content: contentHtml,
+                    tags: tags,
+                    publishedAt: date || new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                if (editingItem && editingItem.type === 'article') {
+                    content.articles[editingItem.index] = { ...content.articles[editingItem.index], ...article };
+                } else {
+                    content.articles.push(article);
+                }
+                await saveContent(content);
+                closeModal();
+                renderArticles();
+                renderDashboard();
+                toast(editingItem ? 'Article updated' : 'Article created');
+                editingItem = null;
+            };
+
+            // ===== QUILL INIT =====
+            function initQuill(initialContent) {
+                if (quillInitialized) {
+                    quill.root.innerHTML = initialContent;
+                    return;
+                }
+                const container = document.getElementById('quill-editor');
+                if (!container) return;
+                // Wait for the DOM to render
+                setTimeout(() => {
+                    quill = new Quill('#quill-editor', {
+                        theme: 'snow',
+                        placeholder: 'Write your article here...',
+                        modules: {
+                            toolbar: [
+                                [{ 'header': [1, 2, 3, false] }],
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                ['link', 'image', 'code-block'],
+                                ['clean']
+                            ]
+                        }
+                    });
+                    // Custom image handler
+                    const toolbar = quill.getModule('toolbar');
+                    toolbar.addHandler('image', () => {
+                        const input = document.createElement('input');
+                        input.setAttribute('type', 'file');
+                        input.setAttribute('accept', 'image/*');
+                        input.click();
+                        input.onchange = () => {
+                            const file = input.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const range = quill.getSelection();
+                                const index = range ? range.index : 0;
+                                quill.insertEmbed(index, 'image', e.target.result);
+                            };
+                            reader.readAsDataURL(file);
+                        };
+                    });
+                    if (initialContent) quill.root.innerHTML = initialContent;
+                    quillInitialized = true;
+                }, 100);
+            }
+
+            // ===== CATEGORIES (SpeakEasy) with Image Upload =====
+            async function renderCategories() {
+                const data = await getContent();
+                content = data;
+                const list = document.getElementById('category-list');
+                if (!content.speakEasy.length) {
+                    list.innerHTML =
+                        `<div class="empty-state"><div class="icon">🎤</div><div>No categories yet. Click "New Category" to create one.</div></div>`;
+                    return;
+                }
+                list.innerHTML = content.speakEasy.map((c, i) => `
+                    <div class="list-item">
+                        <div class="info">
+                            <div class="title">${c.icon || '🎤'} ${escapeHtml(c.name)}</div>
+                            <div class="meta">${c.description || 'No description'} · ${c.articles ? c.articles.length : 0} articles</div>
+                        </div>
+                        ${c.image ? `<img src="${c.image}" class="image-preview" alt="${escapeHtml(c.name)}" />` : ''}
+                        <div class="actions">
+                            <button class="btn" onclick="editCategory(${i})">✏️ Edit</button>
+                            <button class="btn btn-danger" onclick="deleteCategory(${i})">🗑 Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('category-count').textContent = content.speakEasy.length;
+            }
+
+            window.editCategory = function(index) {
+                editingItem = { type: 'category', index: index };
+                const c = content.speakEasy[index];
+                const html = `
+                    <label>Category Name</label>
+                    <input type="text" id="form-cat-name" value="${escapeHtml(c.name)}" />
+                    <label>Description</label>
+                    <input type="text" id="form-cat-desc" value="${escapeHtml(c.description || '')}" />
+                    <label>Icon (emoji)</label>
+                    <input type="text" id="form-cat-icon" value="${c.icon || '🎤'}" maxlength="2" style="width:60px;" />
+                    <label>Category Image (upload)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="form-cat-image" accept="image/*" />
+                        <button class="btn" onclick="document.getElementById('form-cat-image').click()">Choose Image</button>
+                        ${c.image ? `<img src="${c.image}" class="image-preview-small" />` : ''}
+                    </div>
+                    <div id="cat-image-preview"></div>
+                    <label>Article IDs (comma separated)</label>
+                    <input type="text" id="form-cat-articles" value="${(c.articles || []).join(', ')}" />
+                    <div class="btn-row">
+                        <button class="btn" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveCategoryForm()">💾 Save</button>
+                    </div>
+                `;
+                showFormModal('Edit Category', html);
+                // Image preview handler
+                document.getElementById('form-cat-image')?.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const preview = document.getElementById('cat-image-preview');
+                        preview.innerHTML = `<img src="${ev.target.result}" class="image-preview-small" />`;
+                        // Store base64 for saving
+                        document.getElementById('form-cat-image-data')?.remove();
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.id = 'form-cat-image-data';
+                        hidden.value = ev.target.result;
+                        document.getElementById('modal-content').appendChild(hidden);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                // If there's an existing image, display it in preview
+                if (c.image) {
+                    const preview = document.getElementById('cat-image-preview');
+                    if (preview) preview.innerHTML = `<img src="${c.image}" class="image-preview-small" />`;
+                }
+            };
+
+            window.deleteCategory = async function(index) {
+                if (!confirm(`Delete "${content.speakEasy[index].name}" category?`)) return;
+                content.speakEasy.splice(index, 1);
+                await saveContent(content);
+                renderCategories();
+                renderDashboard();
+                toast('Category deleted');
+            };
+
+            window.openNewCategory = function() {
+                editingItem = null;
+                const html = `
+                    <label>Category Name</label>
+                    <input type="text" id="form-cat-name" placeholder="e.g., Warm-Up Drills" />
+                    <label>Description</label>
+                    <input type="text" id="form-cat-desc" placeholder="Brief description..." />
+                    <label>Icon (emoji)</label>
+                    <input type="text" id="form-cat-icon" value="🎤" maxlength="2" style="width:60px;" />
+                    <label>Category Image (upload)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="form-cat-image" accept="image/*" />
+                        <button class="btn" onclick="document.getElementById('form-cat-image').click()">Choose Image</button>
+                    </div>
+                    <div id="cat-image-preview"></div>
+                    <label>Article IDs (comma separated)</label>
+                    <input type="text" id="form-cat-articles" placeholder="art-123, art-456" />
+                    <div class="btn-row">
+                        <button class="btn" onclick="closeModal()">Cancel</button>
+                        <button class="btn btn-primary" onclick="saveCategoryForm()">✅ Create</button>
+                    </div>
+                `;
+                showFormModal('New Category', html);
+                document.getElementById('form-cat-image')?.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const preview = document.getElementById('cat-image-preview');
+                        preview.innerHTML = `<img src="${ev.target.result}" class="image-preview-small" />`;
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.id = 'form-cat-image-data';
+                        hidden.value = ev.target.result;
+                        document.getElementById('modal-content').appendChild(hidden);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            window.saveCategoryForm = async function() {
+                const name = document.getElementById('form-cat-name').value.trim();
+                const description = document.getElementById('form-cat-desc').value.trim();
+                const icon = document.getElementById('form-cat-icon').value || '🎤';
+                const articlesStr = document.getElementById('form-cat-articles').value.trim();
+                const articles = articlesStr ? articlesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+                // Get image data from hidden field if exists
+                const imageData = document.getElementById('form-cat-image-data')?.value || null;
+                if (!name) { toast('Category name is required'); return; }
+                const category = { name, description, icon, articles, image: imageData };
+                if (editingItem && editingItem.type === 'category') {
+                    content.speakEasy[editingItem.index] = { ...content.speakEasy[editingItem.index], ...category };
+                } else {
+                    content.speakEasy.push(category);
+                }
+                await saveContent(content);
+                closeModal();
+                renderCategories();
+                renderDashboard();
+                toast(editingItem ? 'Category updated' : 'Category created');
+                editingItem = null;
+            };
+
+            // ===== MODAL =====
+            function showFormModal(title, html) {
+                // Clean up Quill if any
+                quillInitialized = false;
+                quill = null;
+                document.getElementById('modal-content').innerHTML = `<h2>${title}</h2>${html}`;
+                document.getElementById('modal-overlay').classList.add('active');
+                // Re‑attach Quill if editor wrapper exists
+                if (document.getElementById('quill-editor-wrapper')) {
+                    initQuill('');
+                }
+            }
+
+            window.closeModal = function() {
+                document.getElementById('modal-overlay').classList.remove('active');
+                editingItem = null;
+                quillInitialized = false;
+                quill = null;
+            };
+
+            document.getElementById('modal-close').addEventListener('click', closeModal);
+            document.getElementById('modal-overlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeModal();
+            });
+
+            // ===== SYNC & EXPORT =====
+            window.exportContent = async function() {
+                const data = await getContent();
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `promptica_content_${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                toast('Content exported');
+            };
+
+            window.importContent = function() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const text = await file.text();
+                    try {
+                        const data = JSON.parse(text);
+                        await saveContent(data);
+                        content = data;
+                        toast('Content imported successfully');
+                        renderDashboard();
+                        renderArticles();
+                        renderCategories();
+                    } catch (err) {
+                        toast('Invalid JSON file');
+                    }
+                };
+                input.click();
+            };
+
+            window.syncToGitHub = async function() {
+                const token = prompt('Enter GitHub Personal Access Token (classic, repo scope):');
+                if (!token) return;
+                const repo = prompt('Enter repo in format "username/repo":');
+                if (!repo) return;
+                try {
+                    const data = await getContent();
+                    const payload = {
+                        message: 'Update content from Promptica Admin',
+                        content: btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2)))),
+                        branch: 'main'
+                    };
+                    const exists = await fetch(`https://api.github.com/repos/${repo}/contents/content.json`, {
+                        headers: { Authorization: `token ${token}` }
+                    });
+                    let sha = null;
+                    if (exists.ok) { const d = await exists.json();
+                        sha = d.sha; }
+                    const res = await fetch(`https://api.github.com/repos/${repo}/contents/content.json`, {
+                        method: 'PUT',
+                        headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...payload, sha })
+                    });
+                    if (res.ok) {
+                        localStorage.setItem('promptica_last_sync', Date.now().toString());
+                        toast('Synced to GitHub! Vercel will redeploy.');
+                        renderDashboard();
+                    } else {
+                        const err = await res.json();
+                        toast('GitHub error: ' + err.message);
+                    }
+                } catch (e) {
+                    toast('Sync failed: ' + e.message);
+                }
+            };
+
+            // ===== RESET =====
+            document.getElementById('btn-reset-content')?.addEventListener('click', async () => {
+                if (!confirm('⚠️ This will reset all content (articles, categories, tips) to default. Are you sure?'))
+                    return;
+                if (!confirm('⚠️ This is permanent. Continue?')) return;
+                const defaultContent = {
+                    articles: [],
+                    speakEasy: [],
+                    tips: defaultTips
+                };
+                await saveContent(defaultContent);
+                content = defaultContent;
+                toast('Content reset to default');
+                renderDashboard();
+                renderArticles();
+                renderCategories();
+            });
+
+            // ===== EVENT BINDINGS =====
+            $$('.nav-item[data-page]').forEach(el => {
+                el.addEventListener('click', () => {
+                    const page = el.dataset.page;
+                    if (page === 'back') {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    navigateTo(page);
+                });
+            });
+
+            document.getElementById('btn-new-article')?.addEventListener('click', openNewArticle);
+            document.getElementById('btn-new-category')?.addEventListener('click', openNewCategory);
+            document.getElementById('btn-sync-github')?.addEventListener('click', syncToGitHub);
+            document.getElementById('btn-export-content')?.addEventListener('click', exportContent);
+            document.getElementById('btn-import-content')?.addEventListener('click', importContent);
+
+            // ===== INIT =====
+            async function init() {
+                await openDB();
+                const data = await getContent();
+                content = data;
+                if (!content.tips || !content.tips.length) {
+                    content.tips = defaultTips;
+                    await saveContent(content);
+                }
+                renderDashboard();
+                renderArticles();
+                renderCategories();
+                toast('🎙️ Admin Panel ready');
+            }
+
+            init();
+
+            // Expose functions for inline onclick
+            window.openNewArticle = openNewArticle;
+            window.openNewCategory = openNewCategory;
+            window.exportContent = exportContent;
+            window.importContent = importContent;
+            window.syncToGitHub = syncToGitHub;
+
+        })();
+    </script>
+</body>
+</html>
