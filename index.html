@@ -5,17 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Promptica · Studio Prompter</title>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
 
-  <!-- driver.js for onboarding tour -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.min.js"></script>
-
   <style>
-    /* ===== RESET & BASE ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
@@ -37,7 +31,7 @@
     html, body { height: 100%; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow: hidden; }
     #app { display: flex; height: 100vh; overflow: hidden; background: var(--bg-primary); }
 
-    /* ===== SIDEBAR (Classic Glass) ===== */
+    /* ===== SIDEBAR ===== */
     #sidebar {
       width: var(--sidebar-width);
       background: var(--bg-sidebar);
@@ -96,11 +90,7 @@
       background: rgba(255,255,255,0.04);
       color: var(--text-primary);
     }
-    .separator {
-      height: 1px;
-      background: rgba(255,255,255,0.06);
-      margin: 4px 0;
-    }
+    .separator { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
 
     /* Help & Support */
     .help-section { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
@@ -157,7 +147,29 @@
       font-weight: 500;
       text-transform: uppercase;
     }
-    .shortcut-hint { font-size: 10px; color: var(--text-secondary); opacity: 0.4; padding: 4px 12px; text-align: center; margin-top: 4px; }
+
+    .floating-help {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100;
+      background: rgba(10,10,10,0.6);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      pointer-events: auto;
+    }
+    .floating-help:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
 
     /* ===== CONTENT ===== */
     #content { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-primary); }
@@ -233,7 +245,7 @@
     }
     .hero-bar .right .btn:hover { background: var(--accent-hover); }
 
-    /* ===== NEON ACTION GRID ===== */
+    /* ===== ACTION GRID ===== */
     .action-grid {
       max-width: 560px;
       width: 100%;
@@ -243,13 +255,13 @@
       grid-template-rows: repeat(3, 1fr);
       gap: 14px;
       padding: 18px;
-      background: rgba(22, 22, 22, 0.4);
+      background: rgba(22,22,22,0.4);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255,255,255,0.06);
       border-radius: 28px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-      margin: 0 auto 20px auto;
+      margin: 0 auto 12px auto;
     }
     .grid-item {
       background: rgba(255,255,255,0.04);
@@ -284,7 +296,6 @@
     }
     .grid-item.primary .label { color: #0b0b0b; opacity: 0.7; }
     .grid-item.primary:hover { background: #f5edb0; border-color: #f5edb0; }
-
     .centre-cell {
       grid-column: 2;
       grid-row: 2;
@@ -312,6 +323,70 @@
       font-weight: 600;
       text-transform: uppercase;
     }
+
+    /* More button (outside grid) */
+    .more-wrapper {
+      display: flex;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+      max-width: 560px;
+      width: 100%;
+    }
+    .more-btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 40px;
+      padding: 6px 20px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-sans);
+      background: rgba(22,22,22,0.4);
+      backdrop-filter: blur(8px);
+    }
+    .more-btn:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+    .more-btn .arrow { font-size: 12px; transition: 0.2s; }
+    .more-btn.open .arrow { transform: rotate(180deg); }
+
+    .more-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .more-dropdown .dropdown-content {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      min-width: 160px;
+      box-shadow: var(--shadow);
+      z-index: 50;
+      padding: 6px 0;
+      backdrop-filter: blur(12px);
+    }
+    .more-dropdown .dropdown-content .item {
+      padding: 6px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: 0.2s;
+    }
+    .more-dropdown .dropdown-content .item:hover {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+    }
+    .more-dropdown.open .dropdown-content { display: block; }
 
     /* ===== ACTIVITY & SPARK ===== */
     .activity-timeline { margin-bottom: 16px; }
@@ -345,46 +420,6 @@
       margin-left: 12px;
     }
     .offline-badge.show { display: inline-block; }
-
-    /* ===== EDITOR ===== */
-    #editor-page .editor-topbar { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; flex-wrap: wrap; }
-    #editor-page .editor-topbar .back-btn { background: none; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; }
-    #editor-page .editor-topbar .script-title-input { background: transparent; border: none; color: var(--text-primary); font-size: 18px; font-weight: 500; flex: 1; outline: none; min-width: 120px; border-bottom: 1px solid transparent; }
-    #editor-page .editor-topbar .script-title-input:focus { border-bottom-color: var(--accent); }
-    #editor-page .editor-topbar .editor-actions { display: flex; gap: 8px; align-items: center; }
-    #editor-page .editor-topbar .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: 0.2s; }
-    #editor-page .editor-topbar .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
-    #editor-page .editor-topbar .btn-primary:hover { background: var(--accent-hover); }
-    #editor-page .editor-topbar .save-indicator { font-size: 12px; color: var(--text-secondary); min-width: 60px; text-align: right; }
-
-    .editor-textarea-wrapper { flex: 1; min-height: 0; position: relative; }
-    .editor-textarea-wrapper textarea { width: 100%; height: 100%; padding: 16px; background: #111; color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius); font-family: var(--font-sans); font-size: 16px; line-height: 1.8; resize: none; outline: none; }
-    .editor-textarea-wrapper textarea:focus { border-color: var(--accent); }
-    .editor-textarea-wrapper textarea.fullscreen { position: fixed; inset: 0; z-index: 100; border-radius: 0; padding: 40px; font-size: 20px; background: var(--bg-primary); }
-
-    .editor-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--border-color); margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
-    .editor-footer .word-count { }
-    .editor-footer .settings-gear { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
-    .editor-footer .settings-gear:hover { background: var(--bg-panel); color: var(--text-primary); }
-    .editor-footer .fullscreen-btn { background: none; border: none; color: var(--text-secondary); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
-    .editor-footer .fullscreen-btn:hover { background: var(--bg-panel); color: var(--text-primary); }
-
-    /* ===== SETTINGS POPOVER ===== */
-    .settings-popover { position: relative; display: inline-block; }
-    .settings-popover .popover-content { display: none; position: absolute; bottom: 40px; right: 0; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; width: 340px; max-height: 400px; overflow-y: auto; box-shadow: var(--shadow); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 50; }
-    .settings-popover .popover-content.show { display: block; }
-    .settings-popover .popover-content .group { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 6px 0; border-bottom: 1px solid var(--border-color); }
-    .settings-popover .popover-content .group:last-child { border-bottom: none; }
-    .settings-popover .popover-content .group .item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-secondary); }
-    .settings-popover .popover-content .group .item .label { font-size: 9px; text-transform: uppercase; opacity: 0.6; }
-    .settings-popover .popover-content .group .item input[type="range"] { width: 50px; accent-color: var(--accent); background: transparent; }
-    .settings-popover .popover-content .group .item select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 6px; font-size: 11px; }
-    .settings-popover .popover-content .group .item input[type="color"] { width: 22px; height: 22px; border: 1px solid var(--border-color); border-radius: 4px; padding: 0; background: none; }
-    .settings-popover .popover-content .group .item .toggle { position: relative; width: 28px; height: 16px; background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); cursor: pointer; transition: 0.25s; }
-    .settings-popover .popover-content .group .item .toggle.active { background: var(--accent); }
-    .settings-popover .popover-content .group .item .toggle .knob { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: #fff; border-radius: 50%; transition: transform 0.25s; }
-    .settings-popover .popover-content .group .item .toggle.active .knob { transform: translateX(12px); }
-    .settings-popover .popover-content .group .item .tooltip-trigger { cursor: help; border-bottom: 1px dotted var(--text-secondary); }
 
     /* ===== SCRIPT LIBRARY ===== */
     .library-header {
@@ -455,6 +490,46 @@
 
     .empty-state { text-align: center; padding: 40px 0; color: var(--text-secondary); grid-column: 1/-1; }
 
+    /* ===== EDITOR ===== */
+    #editor-page .editor-topbar { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px; flex-wrap: wrap; }
+    #editor-page .editor-topbar .back-btn { background: none; border: none; color: var(--text-secondary); font-size: 22px; cursor: pointer; }
+    #editor-page .editor-topbar .script-title-input { background: transparent; border: none; color: var(--text-primary); font-size: 18px; font-weight: 500; flex: 1; outline: none; min-width: 120px; border-bottom: 1px solid transparent; }
+    #editor-page .editor-topbar .script-title-input:focus { border-bottom-color: var(--accent); }
+    #editor-page .editor-topbar .editor-actions { display: flex; gap: 8px; align-items: center; }
+    #editor-page .editor-topbar .btn { padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); cursor: pointer; font-size: 13px; transition: 0.2s; }
+    #editor-page .editor-topbar .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+    #editor-page .editor-topbar .btn-primary:hover { background: var(--accent-hover); }
+    #editor-page .editor-topbar .save-indicator { font-size: 12px; color: var(--text-secondary); min-width: 60px; text-align: right; }
+
+    .editor-textarea-wrapper { flex: 1; min-height: 0; position: relative; }
+    .editor-textarea-wrapper textarea { width: 100%; height: 100%; padding: 16px; background: #111; color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius); font-family: var(--font-sans); font-size: 16px; line-height: 1.8; resize: none; outline: none; }
+    .editor-textarea-wrapper textarea:focus { border-color: var(--accent); }
+    .editor-textarea-wrapper textarea.fullscreen { position: fixed; inset: 0; z-index: 100; border-radius: 0; padding: 40px; font-size: 20px; background: var(--bg-primary); }
+
+    .editor-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-top: 1px solid var(--border-color); margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+    .editor-footer .word-count { }
+    .editor-footer .settings-gear { background: none; border: none; color: var(--text-secondary); font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; z-index: 10; }
+    .editor-footer .settings-gear:hover { background: var(--bg-panel); color: var(--text-primary); }
+    .editor-footer .fullscreen-btn { background: none; border: none; color: var(--text-secondary); font-size: 16px; cursor: pointer; padding: 4px 8px; border-radius: 6px; transition: 0.2s; }
+    .editor-footer .fullscreen-btn:hover { background: var(--bg-panel); color: var(--text-primary); }
+
+    /* ===== SETTINGS POPOVER (editor) ===== */
+    .settings-popover { position: relative; display: inline-block; }
+    .settings-popover .popover-content { display: none; position: absolute; bottom: 40px; right: 0; background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 16px 20px; width: 340px; max-height: 400px; overflow-y: auto; box-shadow: var(--shadow); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 50; }
+    .settings-popover .popover-content.show { display: block; }
+    .settings-popover .popover-content .group { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 6px 0; border-bottom: 1px solid var(--border-color); }
+    .settings-popover .popover-content .group:last-child { border-bottom: none; }
+    .settings-popover .popover-content .group .item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+    .settings-popover .popover-content .group .item .label { font-size: 9px; text-transform: uppercase; opacity: 0.6; }
+    .settings-popover .popover-content .group .item input[type="range"] { width: 50px; accent-color: var(--accent); background: transparent; }
+    .settings-popover .popover-content .group .item select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 6px; font-size: 11px; }
+    .settings-popover .popover-content .group .item input[type="color"] { width: 22px; height: 22px; border: 1px solid var(--border-color); border-radius: 4px; padding: 0; background: none; }
+    .settings-popover .popover-content .group .item .toggle { position: relative; width: 28px; height: 16px; background: var(--bg-primary); border-radius: 10px; border: 1px solid var(--border-color); cursor: pointer; transition: 0.25s; }
+    .settings-popover .popover-content .group .item .toggle.active { background: var(--accent); }
+    .settings-popover .popover-content .group .item .toggle .knob { position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; background: #fff; border-radius: 50%; transition: transform 0.25s; }
+    .settings-popover .popover-content .group .item .toggle.active .knob { transform: translateX(12px); }
+    .settings-popover .popover-content .group .item .tooltip-trigger { cursor: help; border-bottom: 1px dotted var(--text-secondary); }
+
     /* ===== PROMPTER ===== */
     #prompter-page { position: fixed; inset: 0; z-index: 2000; background: var(--bg-primary); display: none; flex-direction: column; overflow: hidden; }
     #prompter-page.active { display: flex; }
@@ -493,20 +568,164 @@
     .prompter-back { position: absolute; top: 16px; left: 16px; z-index: 35; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 30px; padding: 6px 14px; font-size: 14px; cursor: pointer; backdrop-filter: blur(4px); transition: 0.2s; }
     .prompter-back:hover { background: rgba(255,255,255,0.1); }
 
-    .prompter-controls { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 30; display: flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(10,10,10,0.45); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 60px; border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 12px 40px rgba(0,0,0,0.6); opacity: 0; transition: opacity 0.4s ease; pointer-events: none; flex-wrap: wrap; justify-content: center; }
-    .prompter-controls.visible { opacity: 1; pointer-events: auto; }
-    .prompter-controls .ctrl-btn { background: none; border: none; color: var(--text-primary); font-size: 17px; cursor: pointer; padding: 4px 6px; opacity: 0.7; transition: 0.2s; font-family: var(--font-sans); }
-    .prompter-controls .ctrl-btn:hover { opacity: 1; }
-    .prompter-controls .ctrl-btn.active { opacity: 1; color: var(--accent); }
-    .prompter-controls .ctrl-separator { width: 1px; height: 22px; background: rgba(255,255,255,0.08); }
-    .prompter-controls .speed-group { display: flex; align-items: center; gap: 4px; }
-    .prompter-controls .speed-group label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); opacity: 0.6; }
-    .prompter-controls .speed-group input[type="range"] { width: 50px; accent-color: var(--accent); background: transparent; cursor: pointer; }
-    .prompter-controls .speed-value { min-width: 20px; text-align: center; font-size: 12px; font-weight: 500; }
-    .prompter-controls .scroll-manual { display: flex; gap: 3px; align-items: center; }
-    .prompter-controls .scroll-manual .btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.06); color: var(--text-primary); border-radius: 4px; padding: 1px 6px; cursor: pointer; font-size: 13px; transition: 0.2s; font-family: var(--font-sans); }
-    .prompter-controls .scroll-manual .btn:hover { background: rgba(255,255,255,0.12); }
-    .prompter-controls .flash-btn { font-size: 16px; }
+    /* ===== CONTROLS BAR ===== */
+    .controls-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      background: rgba(10,10,10,0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 60px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      transition: border-radius 0.3s;
+      pointer-events: auto;
+      min-width: 280px;
+    }
+    .controls-bar .ctrl-btn {
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 17px;
+      cursor: pointer;
+      padding: 4px 6px;
+      opacity: 0.8;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+    .controls-bar .ctrl-btn:hover { opacity: 1; }
+    .controls-bar .ctrl-btn.primary { color: #c9b29a; }
+    .controls-bar .ctrl-btn.recording { color: #ef4444; }
+    .controls-bar .speed-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #a8a29e;
+    }
+    .controls-bar .speed-group input[type="range"] {
+      width: 60px;
+      accent-color: #c9b29a;
+      background: transparent;
+    }
+    .controls-bar .speed-value { min-width: 20px; text-align: center; font-weight: 500; }
+    .controls-bar .separator {
+      width: 1px;
+      height: 22px;
+      background: rgba(255,255,255,0.08);
+    }
+    .controls-bar .gear-btn {
+      background: none;
+      border: none;
+      color: #a8a29e;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px 6px;
+      transition: 0.2s;
+    }
+    .controls-bar .gear-btn:hover { color: #f0ece6; }
+    .controls-bar .gear-btn.active { color: #c9b29a; }
+
+    /* ===== SETTINGS PANEL (swipe-up) ===== */
+    .settings-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 25;
+      background: rgba(10,10,10,0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-top: none;
+      border-radius: 0 0 24px 24px;
+      padding: 12px 18px 18px 18px;
+      transform: translateY(calc(100% - 10px));
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-height: 250px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+      margin-top: 0;
+    }
+    .settings-panel.open {
+      transform: translateY(0);
+      border-radius: 0 0 24px 24px;
+    }
+    .settings-panel .handle {
+      width: 40px;
+      height: 4px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      margin: 0 auto 10px auto;
+      cursor: grab;
+    }
+    .settings-panel .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #a8a29e;
+    }
+    .settings-panel .row label { min-width: 70px; }
+    .settings-panel .row input[type="range"] {
+      flex: 1;
+      accent-color: #c9b29a;
+      background: transparent;
+    }
+    .settings-panel .row input[type="color"] {
+      width: 24px;
+      height: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 50%;
+      padding: 0;
+      background: none;
+    }
+    .settings-panel .row select {
+      background: rgba(255,255,255,0.05);
+      color: #f0ece6;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 12px;
+    }
+    .settings-panel .row .toggle {
+      position: relative;
+      width: 30px;
+      height: 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+      transition: 0.25s;
+    }
+    .settings-panel .row .toggle.active { background: #c9b29a; }
+    .settings-panel .row .toggle .knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s;
+    }
+    .settings-panel .row .toggle.active .knob { transform: translateX(14px); }
+    .settings-panel .divider { height: 1px; background: rgba(255,255,255,0.06); margin: 2px 0; }
 
     /* ===== COACH OVERLAY ===== */
     .coach-indicators { position: absolute; inset: 0; pointer-events: none; z-index: 15; display: flex; flex-direction: column; justify-content: flex-end; padding: 20px; }
@@ -549,6 +768,27 @@
     .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); color: var(--text-primary); padding: 12px 24px; border-radius: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow); z-index: 9999; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(12px); }
     .toast.show { opacity: 1; }
 
+    /* ===== GENERAL SETTINGS MODAL ===== */
+    .settings-modal-content .section { margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 14px; }
+    .settings-modal-content .section h3 { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .settings-modal-content .row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; margin-bottom: 6px; }
+    .settings-modal-content .row label { font-size: 13px; color: var(--text-secondary); min-width: 80px; }
+    .settings-modal-content .row input[type="range"] { flex: 1; min-width: 80px; accent-color: var(--accent); background: transparent; }
+    .settings-modal-content .row input[type="color"] { width: 30px; height: 30px; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 0; background: none; }
+    .settings-modal-content .row select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 4px 8px; font-size: 13px; }
+    .settings-modal-content .row .toggle { position: relative; width: 34px; height: 18px; background: var(--bg-primary); border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.25s; }
+    .settings-modal-content .row .toggle.active { background: var(--accent); border-color: var(--accent); }
+    .settings-modal-content .row .toggle .knob { position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: transform 0.25s; }
+    .settings-modal-content .row .toggle.active .knob { transform: translateX(16px); }
+    .settings-modal-content .row .value { font-size: 13px; font-weight: 500; min-width: 28px; }
+    .settings-modal-content .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; margin-top: 16px; }
+    .settings-modal-content .actions .btn { padding: 6px 16px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.04); color: var(--text-primary); font-size: 13px; cursor: pointer; transition: 0.2s; }
+    .settings-modal-content .actions .btn:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+    .settings-modal-content .actions .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
+    .settings-modal-content .actions .btn-primary:hover { background: var(--accent-hover); }
+    .settings-modal-content .actions .btn-danger { border-color: #ef5350; color: #ef5350; }
+    .settings-modal-content .actions .btn-danger:hover { background: rgba(239,83,80,0.1); }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       :root { --sidebar-width: 56px; }
@@ -567,13 +807,19 @@
       .centre-cell .brand-name { font-size: 15px; }
       .library-grid { grid-template-columns: 1fr 1fr; }
       .page { padding: 16px; }
-      .prompter-controls { padding: 6px 12px; gap: 5px; bottom: 16px; flex-wrap: wrap; justify-content: center; border-radius: 40px; }
-      .prompter-controls .ctrl-btn { font-size: 15px; padding: 2px 4px; }
-      .prompter-controls .speed-group input[type="range"] { width: 40px; }
+      .controls-bar { padding: 6px 10px; gap: 4px; border-radius: 40px; min-width: auto; width: 95%; }
+      .controls-bar .ctrl-btn { font-size: 15px; padding: 2px 4px; }
+      .controls-bar .speed-group input[type="range"] { width: 40px; }
+      .settings-panel { max-height: 200px; padding: 10px 14px; }
+      .settings-panel .row { font-size: 12px; }
+      .settings-panel .row label { min-width: 60px; }
       .prompter-text { font-size: var(--prompter-size-mobile, 26px); }
       .prompter-text-wrap { padding: 0 16px; }
       .cam-compact { width: 80px; height: 142px; }
       .coach-grid { max-width: 100%; grid-template-columns: 1fr 1fr; }
+      .floating-help { top: 12px; right: 12px; width: 34px; height: 34px; font-size: 16px; }
+      .settings-modal-content .row { flex-direction: column; align-items: stretch; gap: 4px; }
+      .settings-modal-content .row label { min-width: 0; }
     }
     @media (max-width: 480px) {
       .action-grid { gap: 8px; padding: 10px; }
@@ -584,9 +830,11 @@
       .centre-cell .brand-name { font-size: 13px; }
       .library-grid { grid-template-columns: 1fr; }
       .coach-grid { grid-template-columns: 1fr; }
-      .prompter-controls .ctrl-btn { font-size: 13px; }
-      .prompter-controls .speed-group input[type="range"] { width: 30px; }
+      .controls-bar .ctrl-btn { font-size: 13px; }
+      .controls-bar .speed-group input[type="range"] { width: 30px; }
       .cam-compact { width: 60px; height: 107px; }
+      .settings-panel { max-height: 160px; }
+      .settings-modal-content .actions { flex-direction: column; }
     }
     .hidden { display: none !important; }
   </style>
@@ -602,6 +850,9 @@
     <div class="clap" id="countdown-clap"></div>
   </div>
 
+  <!-- ===== FLOATING HELP ICON ===== -->
+  <div class="floating-help" id="floating-help" title="Help & Support">?</div>
+
   <!-- ===== GENERIC MODAL ===== -->
   <div id="modal-overlay" class="modal-overlay">
     <div class="modal-box" id="modal-box">
@@ -613,7 +864,7 @@
   <!-- ===== APP ===== -->
   <div id="app">
 
-    <!-- ===== SIDEBAR (Classic Glass) ===== -->
+    <!-- ===== SIDEBAR ===== -->
     <nav id="sidebar">
       <div class="logo">
         <span class="icon">🎙️</span>
@@ -638,9 +889,9 @@
           <div class="item" data-action="tutorials"><span class="ico">🎬</span><span class="label">Video Tutorials</span><span class="badge">New</span></div>
           <div class="item" data-action="contact"><span class="ico">💬</span><span class="label">Contact Support</span></div>
           <div class="item" data-action="issue"><span class="ico">🐛</span><span class="label">Report an Issue</span></div>
-          <div class="item" style="border-top:1px solid rgba(255,255,255,0.04);margin-top:4px;padding-top:6px;" data-action="shortcuts"><span class="ico">⌨️</span><span class="label">Keyboard Shortcuts</span><span class="badge">⌘+Shift+K</span></div>
+          <div class="item" data-action="shortcuts"><span class="ico">⌨️</span><span class="label">Keyboard Shortcuts</span><span class="badge">⌘+Shift+K</span></div>
         </div>
-        <div class="shortcut-hint">Press <kbd style="background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:4px;font-size:9px;">?</kbd> to open help</div>
+        <div class="shortcut-hint" style="font-size:10px;color:var(--text-secondary);opacity:0.4;padding:4px 12px;text-align:center;margin-top:4px;">Press <kbd style="background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:4px;font-size:9px;">?</kbd> to open help</div>
       </div>
     </nav>
 
@@ -668,7 +919,7 @@
           </div>
         </div>
 
-        <!-- Neon Action Grid -->
+        <!-- Action Grid (3x3) -->
         <div class="action-grid" id="action-grid">
           <div class="grid-item primary" data-action="start"><span class="icon">🎙️</span><span class="label">New Script</span></div>
           <div class="grid-item" data-action="continue"><span class="icon">⏯️</span><span class="label">Open Last</span></div>
@@ -679,6 +930,24 @@
           <div class="grid-item" data-action="calibrate"><span class="icon">🎯</span><span class="label">Calibrate</span></div>
           <div class="grid-item" data-action="import"><span class="icon">📤</span><span class="label">Import</span></div>
           <div class="grid-item" data-action="export"><span class="icon">💾</span><span class="label">Export</span></div>
+        </div>
+
+        <!-- More button (outside grid) -->
+        <div class="more-wrapper">
+          <div class="more-dropdown" id="more-dropdown">
+            <button class="more-btn" id="more-btn">
+              <span>⋯</span> More
+              <span class="arrow">▾</span>
+            </button>
+            <div class="dropdown-content">
+              <div class="item" data-action="theme">🎨 Theme</div>
+              <div class="item" data-action="shortcuts">⌨️ Shortcuts</div>
+              <div class="item" data-action="share">🔗 Share Script</div>
+              <div class="item" data-action="trash">🗑️ Trash</div>
+              <div class="item" data-action="stats">📊 Stats</div>
+              <div class="item" data-action="activity">⏳ Activity</div>
+            </div>
+          </div>
         </div>
 
         <!-- Activity & Spark -->
@@ -707,9 +976,7 @@
           <span class="tab" data-tab="templates">Templates</span>
         </div>
         <div id="library-content">
-          <!-- User scripts grid -->
           <div class="library-grid" id="library-grid"></div>
-          <!-- Templates grid (hidden by default) -->
           <div class="library-grid" id="template-grid" style="display:none;"></div>
         </div>
       </div>
@@ -735,13 +1002,11 @@
             <div class="settings-popover">
               <button class="settings-gear" id="settings-gear">⚙️</button>
               <div class="popover-content" id="popover-content">
-                <!-- Speed & Timing -->
                 <div class="group">
                   <div class="item"><span class="label">Speed</span><input type="range" id="setting-speed" min="1" max="10" step="0.5" value="5" /><span id="speed-label">5</span></div>
                   <div class="item"><span class="label tooltip-trigger" title="Wait before scrolling starts">Delay</span><input type="range" id="setting-auto-delay" min="0" max="5" step="0.5" value="0" /><span id="auto-delay-label">0s</span></div>
                   <div class="item"><span class="label">VAD</span><div class="toggle" id="toggle-vad"><div class="knob"></div></div></div>
                 </div>
-                <!-- Typography -->
                 <div class="group">
                   <div class="item"><span class="label">Font</span><select id="setting-font"><option value="'Inter', sans-serif">Inter</option><option value="'Roboto', sans-serif">Roboto</option><option value="'SF Pro Display', sans-serif">SF Pro</option></select></div>
                   <div class="item"><span class="label">Size</span><select id="setting-size"><option value="24">24</option><option value="28">28</option><option value="34" selected>34</option><option value="42">42</option><option value="50">50</option></select></div>
@@ -749,14 +1014,12 @@
                   <div class="item"><span class="label">Spacing</span><input type="range" id="setting-letter-spacing" min="0" max="2" step="0.1" value="0.3" /><span id="letter-spacing-label">0.3</span></div>
                   <div class="item"><span class="label tooltip-trigger" title="Soft glow behind text">Glow</span><div class="toggle active" id="toggle-glow"><div class="knob"></div></div></div>
                 </div>
-                <!-- Visuals -->
                 <div class="group">
                   <div class="item"><span class="label">Text</span><input type="color" id="setting-text-color" value="#f5efe8" /></div>
                   <div class="item"><span class="label">Bg</span><input type="color" id="setting-bg-color" value="#0b0b0b" /></div>
                   <div class="item"><span class="label">Opacity</span><input type="range" id="setting-bg-opacity" min="0.3" max="1" step="0.05" value="1" /><span id="opacity-label">1.0</span></div>
                   <div class="item"><span class="label tooltip-trigger" title="Darkness behind text for readability">Overlay</span><input type="range" id="setting-overlay-opacity" min="0" max="0.7" step="0.05" value="0.35" /><span id="overlay-opacity-label">0.35</span></div>
                 </div>
-                <!-- Focus & Display -->
                 <div class="group">
                   <div class="item"><span class="label">Focus</span><div class="toggle active" id="toggle-focus"><div class="knob"></div></div></div>
                   <div class="item"><button class="btn" id="btn-calibrate" style="font-size:11px;padding:2px 10px;">📊 Calibrate</button></div>
@@ -836,31 +1099,59 @@
             </div>
           </div>
 
-          <!-- Controls -->
-          <div class="prompter-controls" id="prompter-controls">
-            <button class="ctrl-btn" id="ctrl-play"><span id="ctrl-play-icon">⏸</span></button>
-            <div class="ctrl-separator"></div>
+          <!-- ===== CONTROLS BAR ===== -->
+          <div class="controls-bar" id="controlsBar">
+            <button class="ctrl-btn" id="playBtn" title="Play/Pause scroll">
+              <span id="playIcon">▶</span>
+            </button>
+            <div class="separator"></div>
             <div class="speed-group">
-              <label>Speed</label>
+              <label style="font-size:10px;text-transform:uppercase;opacity:0.6;">Speed</label>
               <input type="range" id="ctrl-speed" min="1" max="10" step="0.5" value="5" />
               <span class="speed-value" id="ctrl-speed-label">5</span>
             </div>
-            <div class="ctrl-separator"></div>
-            <div class="scroll-manual">
-              <button class="btn" id="scroll-up" title="Scroll up">↑</button>
-              <button class="btn" id="scroll-down" title="Scroll down">↓</button>
-            </div>
-            <div class="ctrl-separator"></div>
-            <button class="ctrl-btn" id="ctrl-record" style="display:flex;align-items:center;gap:4px;">
-              <span id="record-icon">●</span>
-              <span id="record-label">Record</span>
+            <div class="separator"></div>
+            <button class="ctrl-btn" id="recordBtn">
+              <span id="recordIcon">●</span>
+              <span id="recordLabel">Start</span>
             </button>
-            <button class="ctrl-btn flash-btn" id="ctrl-flash" title="Toggle flashlight (torch)">🔦</button>
-            <div class="ctrl-separator"></div>
-            <button class="ctrl-btn ctrl-toggle" id="ctrl-focus"><span>⊞</span></button>
+            <div class="separator"></div>
+            <button class="ctrl-btn" id="flashBtn" title="Flashlight">💡</button>
+            <div class="separator"></div>
+            <button class="ctrl-btn" id="ctrl-focus" title="Focus mode">⊞</button>
+            <div class="separator"></div>
             <button class="ctrl-btn" id="ctrl-coach" title="Coach feedback">🎓</button>
-            <button class="ctrl-btn" id="ctrl-exit"><span>✕</span></button>
+            <div class="separator"></div>
+            <button class="gear-btn" id="gearBtn" title="Settings">⚙️</button>
           </div>
+
+          <!-- ===== SETTINGS PANEL (swipe-up) ===== -->
+          <div class="settings-panel" id="settingsPanel">
+            <div class="handle" id="handle"></div>
+            <div class="row"><label>Font Size</label><input type="range" min="24" max="50" value="34" /><span>34</span></div>
+            <div class="row"><label>Text Color</label><input type="color" value="#f5efe8" /></div>
+            <div class="row"><label>Bg Color</label><input type="color" value="#0b0b0b" /></div>
+            <div class="row"><label>Overlay Dim</label><input type="range" min="0" max="0.7" step="0.05" value="0.35" /><span>0.35</span></div>
+            <div class="row"><label>Layout</label>
+              <select id="layoutSelect">
+                <option value="blur">Blur</option>
+                <option value="side">Side‑by‑Side</option>
+                <option value="compact">Compact</option>
+              </select>
+            </div>
+            <div class="row" id="compactSizeRow" style="display:none;">
+              <label>Compact Size</label>
+              <select id="compactSize">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+              </select>
+            </div>
+            <div class="row"><label>Text Opacity</label><input type="range" min="0" max="1" step="0.05" value="1" /><span>1.0</span></div>
+            <div class="row"><label>Brightness</label><input type="range" min="0.5" max="1.5" step="0.05" value="1" /><span>1.0</span></div>
+            <div class="row"><label>Focus</label><div class="toggle active" id="focusToggle"><div class="knob"></div></div></div>
+          </div>
+
         </div>
       </div>
 
@@ -943,6 +1234,7 @@
       const state = {
         scripts: [],
         currentScriptId: null,
+        isLoading: false,
         settings: {
           speed: 5,
           fontFamily: "'Inter', sans-serif",
@@ -1048,22 +1340,32 @@
       const offlineBadge = $('#offline-badge');
       const helpTrigger = $('#help-trigger');
       const helpDropdown = $('#help-dropdown');
+      const floatingHelp = $('#floating-help');
+      const moreDropdown = $('#more-dropdown');
+      const moreBtn = $('#more-btn');
 
       const prompterViewport = $('#prompter-viewport');
       const prompterTextWrap = $('#prompter-text-wrap');
       const prompterText = $('#prompter-text');
       const progressFill = $('#progress-fill');
       const prompterProgress = $('#prompter-progress');
-      const ctrlPlay = $('#ctrl-play');
-      const ctrlPlayIcon = $('#ctrl-play-icon');
       const ctrlSpeed = $('#ctrl-speed');
       const ctrlSpeedLabel = $('#ctrl-speed-label');
+      const recordBtn = $('#recordBtn');
+      const recordIcon = $('#record-icon');
+      const recordLabel = $('#record-label');
+      const flashBtn = $('#flash-btn');
+      const gearBtn = $('#gear-btn');
+      const settingsPanel = $('#settingsPanel');
+      const handle = $('#handle');
+      const layoutSelect = $('#layoutSelect');
+      const compactSizeRow = $('#compactSizeRow');
+      const compactSize = $('#compactSize');
+      const focusToggle = $('#focusToggle');
+      const playBtn = $('#playBtn');
+      const playIcon = $('#play-icon');
       const ctrlFocus = $('#ctrl-focus');
-      const ctrlRecord = $('#ctrl-record');
-      const ctrlExit = $('#ctrl-exit');
       const ctrlCoach = $('#ctrl-coach');
-      const ctrlFlash = $('#ctrl-flash');
-      const prompterControls = $('#prompter-controls');
       const prompterBack = $('#prompter-back');
       const camBg = $('#cam-bg');
       const camBgVideo = $('#cam-bg-video');
@@ -1080,8 +1382,6 @@
       const breathCircle = $('#breath-circle');
       const breathState = $('#breath-state');
       const waveformCanvas = $('#waveform-canvas');
-      const recordIcon = $('#record-icon');
-      const recordLabel = $('#record-label');
       const recordTimer = $('#record-timer');
       const recordingDot = $('#recording-dot');
       const remainingTimer = $('#remaining-timer');
@@ -1129,6 +1429,14 @@
         helpDropdown.classList.toggle('open');
       });
 
+      floatingHelp.addEventListener('click', () => {
+        helpTrigger.click();
+        if (!helpDropdown.classList.contains('open')) {
+          helpTrigger.classList.add('open');
+          helpDropdown.classList.add('open');
+        }
+      });
+
       // ===== HELP ACTIONS =====
       helpDropdown.querySelectorAll('.item[data-action]').forEach(item => {
         item.addEventListener('click', () => {
@@ -1143,7 +1451,7 @@
         });
       });
 
-      // ===== DOCUMENTATION MODAL =====
+      // ===== DOCUMENTATION / TUTORIALS / CONTACT =====
       async function showDocumentation() {
         const content = await getContent();
         const docs = content.documentation || [];
@@ -1156,7 +1464,6 @@
         showModal('📘 Documentation', html);
       }
 
-      // ===== TUTORIALS MODAL =====
       async function showTutorials() {
         const content = await getContent();
         const tutorials = content.tutorials || [];
@@ -1170,7 +1477,6 @@
         showModal('🎬 Video Tutorials', html);
       }
 
-      // ===== CONTACT MODAL =====
       async function showContact() {
         const content = await getContent();
         const c = content.contact || {};
@@ -1240,12 +1546,46 @@
         prompterText.style.textShadow = s.textShadow ? '0 1px 20px rgba(245, 239, 232, 0.12)' : 'none';
         prompterViewport.style.setProperty('--overlay-opacity', s.overlayOpacity);
         prompterViewport.classList.toggle('no-focus', !s.focus);
-        ctrlFocus.classList.toggle('active', s.focus);
+        applyCameraLayout(s.layoutMode || 'blur');
         prompterTextWrap.style.setProperty('--text-opacity', s.textOpacity || 1);
         document.querySelector('.cam-bg video')?.style.setProperty('--cam-brightness', s.cameraBrightness || 1);
+        // Update focus button in controls bar
+        ctrlFocus.classList.toggle('active', s.focus);
       }
 
-      // ===== TOGGLE POPOVER =====
+      function applyCameraLayout(mode) {
+        if (mode === 'blur') {
+          camBg.style.display = 'block';
+          camCompact.style.display = 'none';
+          document.querySelector('.prompter-text-wrap').style.width = '100%';
+          document.querySelector('.prompter-text-wrap').style.maxWidth = '820px';
+          document.querySelector('.prompter-text-wrap').style.marginLeft = '0';
+          camBg.style.clipPath = 'none';
+        } else if (mode === 'side') {
+          camBg.style.display = 'block';
+          camCompact.style.display = 'none';
+          document.querySelector('.prompter-text-wrap').style.width = '50%';
+          document.querySelector('.prompter-text-wrap').style.maxWidth = '50%';
+          document.querySelector('.prompter-text-wrap').style.marginLeft = '50%';
+          camBg.style.clipPath = 'inset(0 50% 0 0)';
+        } else if (mode === 'compact') {
+          camBg.style.display = 'none';
+          camCompact.style.display = 'block';
+          document.querySelector('.prompter-text-wrap').style.width = '100%';
+          document.querySelector('.prompter-text-wrap').style.maxWidth = '820px';
+          document.querySelector('.prompter-text-wrap').style.marginLeft = '0';
+          camBg.style.clipPath = 'none';
+          const size = state.settings.compactSize || 'medium';
+          const sizes = { small: { w: 80, h: 142 }, medium: { w: 120, h: 213 }, large: { w: 160, h: 284 } };
+          const sz = sizes[size] || sizes.medium;
+          camCompact.style.width = sz.w + 'px';
+          camCompact.style.height = sz.h + 'px';
+          state.camCompactPos.w = sz.w;
+          state.camCompactPos.h = sz.h;
+        }
+      }
+
+      // ===== TOGGLE POPOVER (editor) =====
       settingsGear.addEventListener('click', (e) => {
         e.stopPropagation();
         popoverContent.classList.toggle('show');
@@ -1328,6 +1668,34 @@
         });
       });
 
+      // ===== MORE DROPDOWN =====
+      moreBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        moreDropdown.classList.toggle('open');
+        moreBtn.classList.toggle('open');
+      });
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.more-dropdown')) {
+          moreDropdown.classList.remove('open');
+          moreBtn.classList.remove('open');
+        }
+      });
+      moreDropdown.querySelectorAll('.item').forEach(el => {
+        el.addEventListener('click', () => {
+          const action = el.dataset.action;
+          switch(action) {
+            case 'theme': toggleTheme(); break;
+            case 'shortcuts': showShortcuts(); break;
+            case 'share': shareScript(); break;
+            case 'trash': showTrash(); break;
+            case 'stats': showStats(); break;
+            case 'activity': showActivity(); break;
+          }
+          moreDropdown.classList.remove('open');
+          moreBtn.classList.remove('open');
+        });
+      });
+
       // ===== SCRIPTS =====
       async function continueLast() {
         const scripts = await getAllScripts();
@@ -1337,9 +1705,10 @@
       }
 
       async function openScript(id) {
+        state.isLoading = true;
         const scripts = await getAllScripts();
         const script = scripts.find(s => s.id === id);
-        if (!script) return toast('Script not found');
+        if (!script) { state.isLoading = false; return toast('Script not found'); }
         state.currentScriptId = id;
         scriptTitle.value = script.title || 'Untitled';
         scriptText.value = script.content || '';
@@ -1350,9 +1719,11 @@
         const scrollPos = script.scrollPos || 0;
         scriptText.scrollTop = scrollPos;
         scriptText.focus();
+        state.isLoading = false;
       }
 
       async function newScript(content = '') {
+        state.isLoading = true;
         const data = { title: 'Untitled', content: content, updatedAt: Date.now(), settings: { ...state.settings }, scrollPos: 0 };
         const id = await saveScript(data);
         state.currentScriptId = id;
@@ -1362,10 +1733,11 @@
         updateWordCount();
         showPage('editor-page');
         scriptText.focus();
+        state.isLoading = false;
       }
 
       async function saveCurrentScript(pushHistory = true) {
-        if (!state.currentScriptId) return;
+        if (!state.currentScriptId || state.isLoading) return;
         const content = scriptText.value;
         const title = scriptTitle.value.trim() || 'Untitled';
         const scrollPos = scriptText.scrollTop || 0;
@@ -1386,6 +1758,7 @@
 
       let autoSaveTimer = null;
       function autoSaveScript() {
+        if (state.isLoading) return;
         saveIndicator.textContent = '💾 Saving…';
         clearTimeout(autoSaveTimer);
         autoSaveTimer = setTimeout(() => saveCurrentScript(true), 600);
@@ -1440,7 +1813,6 @@
       let currentTab = 'user';
 
       async function renderLibrary() {
-        // User scripts
         const scripts = await getAllScripts();
         const userGrid = libraryGrid;
         if (!scripts.length) {
@@ -1502,7 +1874,6 @@
           });
         }
 
-        // Tab switching
         libraryTabs.forEach(tab => {
           tab.classList.toggle('active', tab.dataset.tab === currentTab);
         });
@@ -1527,6 +1898,171 @@
       }
       modalClose.addEventListener('click', () => modalOverlay.classList.remove('active'));
       modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
+
+      // ===== GENERAL SETTINGS MODAL =====
+      function openSettingsModal() {
+        const s = state.settings;
+        const html = `
+          <div class="settings-modal-content">
+            <div class="section"><h3>Speed & Timing</h3>
+              <div class="row"><label>Speed</label><input type="range" id="modal-speed" min="1" max="10" step="0.5" value="${s.speed}" /><span class="value" id="modal-speed-val">${s.speed}</span></div>
+              <div class="row"><label>Auto-Delay</label><input type="range" id="modal-delay" min="0" max="5" step="0.5" value="${s.autoDelay}" /><span class="value" id="modal-delay-val">${s.autoDelay}s</span></div>
+              <div class="row"><label>VAD</label><div class="toggle ${s.vad?'active':''}" id="modal-vad"><div class="knob"></div></div></div>
+            </div>
+            <div class="section"><h3>Typography</h3>
+              <div class="row"><label>Font</label><select id="modal-font"><option value="'Inter', sans-serif" ${s.fontFamily.includes('Inter')?'selected':''}>Inter</option><option value="'Roboto', sans-serif" ${s.fontFamily.includes('Roboto')?'selected':''}>Roboto</option><option value="'SF Pro Display', sans-serif" ${s.fontFamily.includes('SF')?'selected':''}>SF Pro</option></select></div>
+              <div class="row"><label>Size</label><select id="modal-size"><option value="24" ${s.fontSize===24?'selected':''}>24</option><option value="28" ${s.fontSize===28?'selected':''}>28</option><option value="34" ${s.fontSize===34?'selected':''}>34</option><option value="42" ${s.fontSize===42?'selected':''}>42</option><option value="50" ${s.fontSize===50?'selected':''}>50</option></select></div>
+              <div class="row"><label>Line Ht</label><select id="modal-line-height"><option value="1.2" ${s.lineHeight===1.2?'selected':''}>1.2</option><option value="1.4" ${s.lineHeight===1.4?'selected':''}>1.4</option><option value="1.6" ${s.lineHeight===1.6?'selected':''}>1.6</option><option value="1.8" ${s.lineHeight===1.8?'selected':''}>1.8</option><option value="2.0" ${s.lineHeight===2.0?'selected':''}>2.0</option></select></div>
+              <div class="row"><label>Spacing</label><input type="range" id="modal-spacing" min="0" max="2" step="0.1" value="${s.letterSpacing}" /><span class="value" id="modal-spacing-val">${s.letterSpacing}</span></div>
+              <div class="row"><label>Glow</label><div class="toggle ${s.textShadow?'active':''}" id="modal-glow"><div class="knob"></div></div></div>
+            </div>
+            <div class="section"><h3>Visuals</h3>
+              <div class="row"><label>Text</label><input type="color" id="modal-text-color" value="${s.textColor}" /></div>
+              <div class="row"><label>Background</label><input type="color" id="modal-bg-color" value="${s.bgColor}" /></div>
+              <div class="row"><label>Bg Opacity</label><input type="range" id="modal-bg-opacity" min="0.3" max="1" step="0.05" value="${s.bgOpacity}" /><span class="value" id="modal-bg-opacity-val">${s.bgOpacity.toFixed(2)}</span></div>
+              <div class="row"><label>Overlay</label><input type="range" id="modal-overlay" min="0" max="0.7" step="0.05" value="${s.overlayOpacity}" /><span class="value" id="modal-overlay-val">${s.overlayOpacity.toFixed(2)}</span></div>
+            </div>
+            <div class="section"><h3>Display</h3>
+              <div class="row"><label>Focus</label><div class="toggle ${s.focus?'active':''}" id="modal-focus"><div class="knob"></div></div></div>
+            </div>
+            <div class="section"><h3>Camera</h3>
+              <div class="row"><label>Layout</label><select id="modal-layout"><option value="blur" ${s.layoutMode==='blur'?'selected':''}>Blur</option><option value="side" ${s.layoutMode==='side'?'selected':''}>Side‑by‑Side</option><option value="compact" ${s.layoutMode==='compact'?'selected':''}>Compact</option></select></div>
+              <div class="row"><label>Compact Size</label><select id="modal-compact-size"><option value="small" ${s.compactSize==='small'?'selected':''}>Small</option><option value="medium" ${s.compactSize==='medium'?'selected':''}>Medium</option><option value="large" ${s.compactSize==='large'?'selected':''}>Large</option></select></div>
+              <div class="row"><label>Source</label><select id="modal-camera-source"><option value="user" ${s.cameraSource==='user'?'selected':''}>Front</option><option value="environment" ${s.cameraSource==='environment'?'selected':''}>Rear</option></select></div>
+              <div class="row"><label>Resolution</label><select id="modal-resolution"><option value="480" ${s.resolution==='480'?'selected':''}>480p</option><option value="720" ${s.resolution==='720'?'selected':''}>720p</option><option value="1080" ${s.resolution==='1080'?'selected':''}>1080p</option></select></div>
+              <div class="row"><label>Text Opacity</label><input type="range" id="modal-text-opacity" min="0" max="1" step="0.05" value="${s.textOpacity||1}" /><span class="value" id="modal-text-opacity-val">${(s.textOpacity||1).toFixed(2)}</span></div>
+              <div class="row"><label>Brightness</label><input type="range" id="modal-cam-brightness" min="0.5" max="1.5" step="0.05" value="${s.cameraBrightness||1}" /><span class="value" id="modal-cam-brightness-val">${(s.cameraBrightness||1).toFixed(2)}</span></div>
+              <div class="row"><label>Torch Default</label><div class="toggle ${s.torchDefault?'active':''}" id="modal-torch"><div class="knob"></div></div></div>
+            </div>
+            <div class="section"><h3>Theme</h3>
+              <div class="row" style="gap:12px;"><label style="min-width:0;">Dark</label><label style="min-width:0;">Light</label><label style="min-width:0;">Deep Blue</label><div style="flex:1;"></div></div>
+            </div>
+            <div class="actions">
+              <button class="btn" id="modal-export-settings">📥 Export</button>
+              <button class="btn" id="modal-import-settings">📤 Import</button>
+              <button class="btn btn-danger" id="modal-reset-settings">↺ Reset</button>
+              <button class="btn btn-primary" id="modal-close-settings">💾 Save & Close</button>
+            </div>
+          </div>
+        `;
+        showModal('⚙️ General Settings', html);
+
+        // Bind events for this modal instance
+        document.getElementById('modal-speed').addEventListener('input', function() {
+          document.getElementById('modal-speed-val').textContent = this.value;
+        });
+        document.getElementById('modal-delay').addEventListener('input', function() {
+          document.getElementById('modal-delay-val').textContent = this.value + 's';
+        });
+        document.getElementById('modal-spacing').addEventListener('input', function() {
+          document.getElementById('modal-spacing-val').textContent = this.value;
+        });
+        document.getElementById('modal-bg-opacity').addEventListener('input', function() {
+          document.getElementById('modal-bg-opacity-val').textContent = parseFloat(this.value).toFixed(2);
+        });
+        document.getElementById('modal-overlay').addEventListener('input', function() {
+          document.getElementById('modal-overlay-val').textContent = parseFloat(this.value).toFixed(2);
+        });
+        document.getElementById('modal-text-opacity').addEventListener('input', function() {
+          document.getElementById('modal-text-opacity-val').textContent = parseFloat(this.value).toFixed(2);
+        });
+        document.getElementById('modal-cam-brightness').addEventListener('input', function() {
+          document.getElementById('modal-cam-brightness-val').textContent = parseFloat(this.value).toFixed(2);
+        });
+        document.querySelectorAll('#modal-content .toggle').forEach(toggle => {
+          toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+          });
+        });
+        document.getElementById('modal-close-settings').addEventListener('click', () => {
+          state.settings.speed = parseFloat(document.getElementById('modal-speed').value);
+          state.settings.autoDelay = parseFloat(document.getElementById('modal-delay').value);
+          state.settings.vad = document.getElementById('modal-vad').classList.contains('active');
+          state.settings.fontFamily = document.getElementById('modal-font').value;
+          state.settings.fontSize = parseInt(document.getElementById('modal-size').value);
+          state.settings.lineHeight = parseFloat(document.getElementById('modal-line-height').value);
+          state.settings.letterSpacing = parseFloat(document.getElementById('modal-spacing').value);
+          state.settings.textShadow = document.getElementById('modal-glow').classList.contains('active');
+          state.settings.textColor = document.getElementById('modal-text-color').value;
+          state.settings.bgColor = document.getElementById('modal-bg-color').value;
+          state.settings.bgOpacity = parseFloat(document.getElementById('modal-bg-opacity').value);
+          state.settings.overlayOpacity = parseFloat(document.getElementById('modal-overlay').value);
+          state.settings.focus = document.getElementById('modal-focus').classList.contains('active');
+          state.settings.layoutMode = document.getElementById('modal-layout').value;
+          state.settings.compactSize = document.getElementById('modal-compact-size').value;
+          state.settings.cameraSource = document.getElementById('modal-camera-source').value;
+          state.settings.resolution = document.getElementById('modal-resolution').value;
+          state.settings.textOpacity = parseFloat(document.getElementById('modal-text-opacity').value);
+          state.settings.cameraBrightness = parseFloat(document.getElementById('modal-cam-brightness').value);
+          state.settings.torchDefault = document.getElementById('modal-torch').classList.contains('active');
+          applySettingsToUI(state.settings);
+          localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+          if (prompterPage.classList.contains('active')) {
+            if (state.cameraStream) {
+              state.cameraStream.getTracks().forEach(t => t.stop());
+              state.cameraStream = null;
+            }
+            initCamera();
+          }
+          modalOverlay.classList.remove('active');
+          toast('Settings saved');
+        });
+        document.getElementById('modal-export-settings').addEventListener('click', () => {
+          const blob = new Blob([JSON.stringify(state.settings, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `promptica_settings_${Date.now()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          toast('Settings exported');
+        });
+        document.getElementById('modal-import-settings').addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = '.json';
+          input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+              try {
+                const data = JSON.parse(ev.target.result);
+                Object.assign(state.settings, data);
+                applySettingsToUI(state.settings);
+                localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+                toast('Settings imported');
+                modalOverlay.classList.remove('active');
+              } catch (err) { toast('Invalid file'); }
+            };
+            reader.readAsText(file);
+          };
+          input.click();
+        });
+        document.getElementById('modal-reset-settings').addEventListener('click', () => {
+          if (!confirm('Reset all settings to default?')) return;
+          const defaults = {
+            speed: 5, fontFamily: "'Inter', sans-serif", fontSize: 34, textColor: '#f5efe8', bgColor: '#0b0b0b',
+            bgOpacity: 1, focus: true, vad: false, lineHeight: 1.6, letterSpacing: 0.3, textShadow: true,
+            overlayOpacity: 0.35, autoDelay: 0, cameraSource: 'user', resolution: '720', torchDefault: false,
+            mirrorPreview: true, layoutMode: 'blur', compactSize: 'medium', textOpacity: 1, cameraBrightness: 1
+          };
+          Object.assign(state.settings, defaults);
+          applySettingsToUI(state.settings);
+          localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+          localStorage.removeItem('promptica_tour_completed');
+          toast('Settings reset to default');
+          modalOverlay.classList.remove('active');
+          if (prompterPage.classList.contains('active')) {
+            if (state.cameraStream) {
+              state.cameraStream.getTracks().forEach(t => t.stop());
+              state.cameraStream = null;
+            }
+            initCamera();
+          }
+        });
+      }
 
       // ===== LEARN HUB =====
       async function showLearnHub() {
@@ -1664,9 +2200,11 @@
             if (track && track.getCapabilities && track.getCapabilities().torch) {
               await track.applyConstraints({ advanced: [{ torch: true }] });
               state.torchOn = true;
-              ctrlFlash.textContent = '🔦 On';
+              flashBtn.textContent = '🔦 On';
+              flashBtn.style.color = '#c9b29a';
             }
           }
+          applyCameraLayout(state.settings.layoutMode || 'blur');
           return stream;
         } catch (e) { toast('Camera error: ' + e.message); return null; }
       }
@@ -1758,19 +2296,19 @@
       }
 
       // ===== MANUAL SCROLL =====
-      scrollUp.addEventListener('click', () => {
+      document.getElementById('scroll-up')?.addEventListener('click', () => {
         state.scrollProgress = Math.max(0, state.scrollProgress - 0.02);
         updateTextPosition();
         if (state.isPlaying) { state.isPlaying = false; updatePlayIcon(); }
       });
-      scrollDown.addEventListener('click', () => {
+      document.getElementById('scroll-down')?.addEventListener('click', () => {
         state.scrollProgress = Math.min(1, state.scrollProgress + 0.02);
         updateTextPosition();
         if (state.isPlaying) { state.isPlaying = false; updatePlayIcon(); }
       });
 
-      // ===== TORCH =====
-      async function toggleTorch() {
+      // ===== FLASHLIGHT =====
+      flashBtn.addEventListener('click', async () => {
         if (!state.cameraStream) { toast('Camera not ready'); return; }
         const track = state.cameraStream.getVideoTracks()[0];
         if (!track) { toast('No video track'); return; }
@@ -1780,11 +2318,109 @@
           const newState = !state.torchOn;
           await track.applyConstraints({ advanced: [{ torch: newState }] });
           state.torchOn = newState;
-          ctrlFlash.textContent = newState ? '🔦 On' : '🔦';
+          flashBtn.textContent = newState ? '🔦 On' : '💡';
+          flashBtn.style.color = newState ? '#c9b29a' : '';
           toast(newState ? '💡 Flash on' : '💡 Flash off');
         } catch (e) { toast('Flash error: ' + e.message); }
+      });
+
+      // ===== SETTINGS PANEL =====
+      let panelOpen = false;
+
+      function togglePanel() {
+        panelOpen = !panelOpen;
+        settingsPanel.classList.toggle('open', panelOpen);
+        gearBtn.classList.toggle('active', panelOpen);
       }
-      ctrlFlash.addEventListener('click', toggleTorch);
+
+      gearBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        togglePanel();
+      });
+
+      handle.addEventListener('click', () => {
+        if (!panelOpen) togglePanel();
+      });
+
+      layoutSelect.addEventListener('change', () => {
+        const val = layoutSelect.value;
+        compactSizeRow.style.display = (val === 'compact') ? 'flex' : 'none';
+        state.settings.layoutMode = val;
+        if (prompterPage.classList.contains('active')) applyCameraLayout(val);
+        localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+      });
+
+      compactSize.addEventListener('change', () => {
+        state.settings.compactSize = compactSize.value;
+        if (prompterPage.classList.contains('active')) applyCameraLayout(state.settings.layoutMode);
+        localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+      });
+
+      settingsPanel.querySelectorAll('input, select, .toggle').forEach(el => {
+        el.addEventListener('input', () => {
+          const row = el.closest('.row');
+          if (!row) return;
+          const label = row.querySelector('label');
+          if (!label) return;
+          const key = label.textContent.trim().toLowerCase().replace(/\s/g, '');
+          const map = {
+            'fontsize': 'fontSize',
+            'textcolor': 'textColor',
+            'bgcolor': 'bgColor',
+            'overlaydim': 'overlayOpacity',
+            'textopacity': 'textOpacity',
+            'brightness': 'cameraBrightness',
+            'layout': 'layoutMode',
+            'compactsize': 'compactSize',
+            'focus': 'focus'
+          };
+          const prop = map[key] || key;
+          if (el.type === 'range' || el.type === 'color') {
+            const val = el.type === 'range' ? parseFloat(el.value) : el.value;
+            state.settings[prop] = val;
+            const span = row.querySelector('span');
+            if (span) span.textContent = val;
+          } else if (el.tagName === 'SELECT') {
+            state.settings[prop] = el.value;
+          } else if (el.classList.contains('toggle')) {
+            state.settings[prop] = el.classList.contains('active');
+          }
+          if (prompterPage.classList.contains('active')) {
+            applyPrompterStyles();
+            if (prop === 'layoutMode') applyCameraLayout(state.settings.layoutMode);
+          }
+          localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+        });
+      });
+
+      focusToggle.addEventListener('click', () => {
+        focusToggle.classList.toggle('active');
+        state.settings.focus = focusToggle.classList.contains('active');
+        if (prompterPage.classList.contains('active')) applyPrompterStyles();
+        localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (panelOpen && !e.target.closest('.settings-panel') && !e.target.closest('.gear-btn')) {
+          togglePanel();
+        }
+      });
+
+      let startY = 0;
+      let isDraggingPanel = false;
+      const handleTouchStart = (e) => { startY = e.touches[0].clientY; isDraggingPanel = true; };
+      const handleTouchMove = (e) => {
+        if (!isDraggingPanel) return;
+        const deltaY = e.touches[0].clientY - startY;
+        if (deltaY < -30 && !panelOpen) togglePanel();
+        else if (deltaY > 30 && panelOpen) togglePanel();
+      };
+      const handleTouchEnd = () => { isDraggingPanel = false; };
+      [document.getElementById('controlsBar'), handle].forEach(el => {
+        el.addEventListener('touchstart', handleTouchStart, { passive: true });
+        el.addEventListener('touchmove', handleTouchMove, { passive: true });
+        el.addEventListener('touchend', handleTouchEnd, { passive: true });
+      });
 
       // ===== RECORDING =====
       function startRawRecording() {
@@ -1804,10 +2440,10 @@
           state.isRecording = false;
           recordingDot.classList.remove('active');
           recordIcon.textContent = '●';
-          recordLabel.textContent = 'Record';
+          recordLabel.textContent = 'Start';
+          recordBtn.classList.remove('recording');
           clearInterval(state.recordTimerInterval);
           recordTimer.textContent = '00:00';
-          // Show preview modal immediately
           showVideoPreview(blob);
           const duration = (Date.now() - state.recordStartTime) / 1000;
           saveSession({ timestamp: Date.now(), duration, confidence: state.confidence, filler: state.fillerCount });
@@ -1818,6 +2454,7 @@
         recordingDot.classList.add('active');
         recordIcon.textContent = '⏹';
         recordLabel.textContent = 'Stop';
+        recordBtn.classList.add('recording');
         state.recordStartTime = Date.now();
         state.recordTimerInterval = setInterval(() => {
           const el = (Date.now() - state.recordStartTime) / 1000;
@@ -1863,13 +2500,16 @@
           state.isRecording = false;
           recordingDot.classList.remove('active');
           recordIcon.textContent = '●';
-          recordLabel.textContent = 'Record';
+          recordLabel.textContent = 'Start';
+          recordBtn.classList.remove('recording');
           clearInterval(state.recordTimerInterval);
           toast('Stopping recording...');
         }
       }
+
       function toggleRecording() {
-        state.isRecording ? stopRawRecording() : startRawRecording();
+        if (state.isRecording) stopRawRecording();
+        else startRawRecording();
       }
 
       // ===== COUNTDOWN =====
@@ -1914,10 +2554,8 @@
         tick();
       }
 
-      // ===== START SESSION (now opens editor) =====
-      function startSession() {
-        newScript();
-      }
+      // ===== START SESSION =====
+      function startSession() { newScript(); }
 
       // ===== ENTER / EXIT PROMPTER =====
       async function enterPrompter(withCoach = false, onReady = null) {
@@ -1943,7 +2581,7 @@
             measureTextHeight();
             resetScroll();
             startAnimation();
-            showControlsTemporarily();
+            setTimeout(() => showControlsTemporarily(), 100);
             if (prompterPage.requestFullscreen) prompterPage.requestFullscreen().catch(() => {});
             if (onReady) onReady();
           }, 50);
@@ -1959,37 +2597,88 @@
         prompterPage.classList.remove('active');
         showPage('home-page');
         updateDashboard();
+        if (panelOpen) togglePanel();
       }
 
       // ===== CONTROLS AUTO-HIDE =====
       let controlsTimeout = null;
       function showControlsTemporarily() {
-        prompterControls.classList.add('visible');
+        const controls = document.querySelector('.controls-bar');
+        controls.style.opacity = '1';
         clearTimeout(controlsTimeout);
-        controlsTimeout = setTimeout(() => prompterControls.classList.remove('visible'), 3500);
+        controlsTimeout = setTimeout(() => { controls.style.opacity = '0.7'; }, 3500);
       }
 
       // ===== KEYBOARD SHORTCUTS =====
       document.addEventListener('keydown', (e) => {
         if (prompterPage.classList.contains('active')) {
-          if (e.key === ' ' || e.key === 'Space') { e.preventDefault(); togglePlay(); showControlsTemporarily(); return; }
-          if (e.key === 'Escape') { e.preventDefault(); exitPrompter(); return; }
-          if (e.key === 'ArrowUp') { e.preventDefault(); setSpeed(Math.min(10, state.settings.speed + 0.5)); showControlsTemporarily(); return; }
-          if (e.key === 'ArrowDown') { e.preventDefault(); setSpeed(Math.max(1, state.settings.speed - 0.5)); showControlsTemporarily(); return; }
-          if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFocusMode(); showControlsTemporarily(); return; }
-          if (e.key === 'r' || e.key === 'R') { e.preventDefault(); toggleRecording(); showControlsTemporarily(); return; }
-          if (e.key === 'c' || e.key === 'C') { e.preventDefault(); toggleCoach(); showControlsTemporarily(); return; }
+          if (e.key === ' ' || e.key === 'Space') {
+            e.preventDefault();
+            togglePlay();
+            showControlsTemporarily();
+            return;
+          }
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            if (panelOpen) togglePanel();
+            else exitPrompter();
+            return;
+          }
+          if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSpeed(Math.min(10, state.settings.speed + 0.5));
+            showControlsTemporarily();
+            return;
+          }
+          if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSpeed(Math.max(1, state.settings.speed - 0.5));
+            showControlsTemporarily();
+            return;
+          }
+          if (e.key === 'f' || e.key === 'F') {
+            e.preventDefault();
+            toggleFocusMode();
+            showControlsTemporarily();
+            return;
+          }
+          if (e.key === 'r' || e.key === 'R') {
+            e.preventDefault();
+            toggleRecording();
+            showControlsTemporarily();
+            return;
+          }
+          if (e.key === 'c' || e.key === 'C') {
+            e.preventDefault();
+            toggleCoach();
+            showControlsTemporarily();
+            return;
+          }
+          if (e.key === '?') {
+            e.preventDefault();
+            floatingHelp.click();
+            return;
+          }
         }
         if (editorPage.classList.contains('active') && e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          e.preventDefault(); enterPrompter();
+          e.preventDefault();
+          enterPrompter();
         }
       });
 
       // ===== TOGGLES =====
-      function toggleFocusMode() { state.settings.focus = !state.settings.focus; toggleFocus.classList.toggle('active', state.settings.focus); if (prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); }
+      function toggleFocusMode() {
+        state.settings.focus = !state.settings.focus;
+        toggleFocus.classList.toggle('active', state.settings.focus);
+        ctrlFocus.classList.toggle('active', state.settings.focus);
+        if (prompterPage.classList.contains('active')) applyPrompterStyles();
+        autoSaveScript();
+      }
+
       function toggleCoach() {
         if (prompterPage.classList.contains('active')) {
-          if (state.coachActive) stopCoach(); else startCoach();
+          if (state.coachActive) stopCoach();
+          else startCoach();
         } else toast('Enter prompter first');
       }
 
@@ -2236,6 +2925,12 @@
         if (!prompterPage.classList.contains('active')) return;
         const delta = state.lastTimestamp ? (ts - state.lastTimestamp) / 1000 : 0;
         state.lastTimestamp = ts;
+        const shouldThrottle = state.isRecording && !isDragging;
+        if (shouldThrottle && Math.random() > 0.5) {
+          // skip half frames during recording
+          state.animFrameId = requestAnimationFrame(animateScroll);
+          return;
+        }
         if (state.isPlaying && state.maxScrollPx > 0 && !isDragging) {
           const spd = state.settings.speed / 10;
           let pxPerSec = 300 * spd * 1.6;
@@ -2273,9 +2968,46 @@
           }
         }
       }
-      function updatePlayIcon() { ctrlPlayIcon.textContent = state.isPlaying ? '⏸' : '▶'; }
+      function updatePlayIcon() { playIcon.textContent = state.isPlaying ? '⏸' : '▶'; }
 
-      // ===== EVENT BINDINGS =====
+      // ===== RECORD BUTTON FLOW =====
+      recordBtn.addEventListener('click', async () => {
+        if (!state.isRecording) {
+          if (!state.cameraStream) { toast('Camera not ready'); return; }
+          startCountdown(() => {
+            startRawRecording();
+            if (!state.isPlaying) {
+              state.isPlaying = true;
+              updatePlayIcon();
+            }
+          });
+        } else {
+          stopRawRecording();
+        }
+      });
+
+      // ===== PLAY/PAUSE BUTTON =====
+      playBtn.addEventListener('click', () => {
+        togglePlay();
+      });
+
+      // ===== FOCUS BUTTON IN CONTROLS =====
+      ctrlFocus.addEventListener('click', toggleFocusMode);
+
+      // ===== COACH BUTTON IN CONTROLS =====
+      ctrlCoach.addEventListener('click', toggleCoach);
+
+      // ===== EXIT =====
+      prompterBack.addEventListener('click', exitPrompter);
+      document.getElementById('ctrl-exit')?.addEventListener('click', exitPrompter);
+
+      // ===== SPEED SLIDER IN CONTROLS =====
+      ctrlSpeed.addEventListener('input', () => {
+        setSpeed(parseFloat(ctrlSpeed.value));
+        ctrlSpeedLabel.textContent = ctrlSpeed.value;
+      });
+
+      // ===== EVENT BINDINGS (editor) =====
       editorBack.addEventListener('click', async () => { await saveCurrentScript(true); showPage('home-page'); updateDashboard(); });
       scriptTitle.addEventListener('input', () => { autoSaveScript(); updateWordCount(); });
       scriptText.addEventListener('input', () => { autoSaveScript(); updateWordCount(); });
@@ -2313,44 +3045,7 @@
         autoSaveScript();
       });
       btnCalibrate.addEventListener('click', startCalibration);
-      btnShortcuts.addEventListener('click', () => {
-        showModal('⌨️ Keyboard Shortcuts', `
-          <table style="width:100%;border-collapse:collapse;font-size:14px;color:var(--text-secondary);">
-            <tr><td style="padding:6px 0;"><kbd>Space</kbd></td><td>Play/Pause</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>↑</kbd> <kbd>↓</kbd></td><td>Speed up/down</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>Esc</kbd></td><td>Exit prompter</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>F</kbd></td><td>Focus toggle</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>R</kbd></td><td>Record toggle</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>C</kbd></td><td>Coach toggle</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>Ctrl+Enter</kbd></td><td>Enter prompter</td></tr>
-            <tr><td style="padding:6px 0;"><kbd>Ctrl+Shift+F</kbd></td><td>Fullscreen editor</td></tr>
-          </table>
-          <p style="margin-top:12px;color:var(--text-secondary);font-size:13px;">Also: drag the progress bar to scrub, use ↑↓ buttons to scroll manually.</p>
-        `);
-      });
-
-      ctrlPlay.addEventListener('click', () => { togglePlay(); showControlsTemporarily(); });
-      ctrlSpeed.addEventListener('input', () => { setSpeed(parseFloat(ctrlSpeed.value)); showControlsTemporarily(); });
-      ctrlFocus.addEventListener('click', toggleFocusMode);
-      ctrlRecord.addEventListener('click', toggleRecording);
-      ctrlCoach.addEventListener('click', () => { toggleCoach(); showControlsTemporarily(); });
-      ctrlExit.addEventListener('click', exitPrompter);
-      prompterBack.addEventListener('click', exitPrompter);
-
-      camToggle.addEventListener('click', toggleCameraMode);
-      initDraggable();
-      initProgressScrub();
-
-      prompterPage.addEventListener('mousemove', () => { if (prompterPage.classList.contains('active')) showControlsTemporarily(); });
-      prompterPage.addEventListener('touchstart', () => { if (prompterPage.classList.contains('active')) showControlsTemporarily(); });
-      window.addEventListener('resize', () => {
-        if (prompterPage.classList.contains('active')) {
-          requestAnimationFrame(() => { setTimeout(() => { measureTextHeight(); updateTextPosition(); }, 50); });
-        }
-      });
-      document.addEventListener('fullscreenchange', () => {
-        if (!document.fullscreenElement && prompterPage.classList.contains('active')) showControlsTemporarily();
-      });
+      btnShortcuts.addEventListener('click', showShortcuts);
 
       // ===== HERO START =====
       heroStart.addEventListener('click', startSession);
@@ -2364,166 +3059,128 @@
         `);
       });
 
-      // ===== SETTINGS MODAL =====
-      function openSettingsModal() {
-        const s = state.settings;
-        const html = `
-          <div class="section"><h3>Speed & Timing</h3>
-            <div class="row"><label>Speed</label><input type="range" id="modal-speed" min="1" max="10" step="0.5" value="${s.speed}" /><span class="value" id="modal-speed-val">${s.speed}</span></div>
-            <div class="row"><label>Auto-Delay</label><input type="range" id="modal-delay" min="0" max="5" step="0.5" value="${s.autoDelay}" /><span class="value" id="modal-delay-val">${s.autoDelay}s</span></div>
-            <div class="row"><label>VAD</label><div class="toggle ${s.vad?'active':''}" id="modal-vad"><div class="knob"></div></div></div>
-          </div>
-          <div class="section"><h3>Typography</h3>
-            <div class="row"><label>Font</label><select id="modal-font"><option value="'Inter', sans-serif" ${s.fontFamily.includes('Inter')?'selected':''}>Inter</option><option value="'Roboto', sans-serif" ${s.fontFamily.includes('Roboto')?'selected':''}>Roboto</option><option value="'SF Pro Display', sans-serif" ${s.fontFamily.includes('SF')?'selected':''}>SF Pro</option></select></div>
-            <div class="row"><label>Size</label><select id="modal-size"><option value="24" ${s.fontSize===24?'selected':''}>24</option><option value="28" ${s.fontSize===28?'selected':''}>28</option><option value="34" ${s.fontSize===34?'selected':''}>34</option><option value="42" ${s.fontSize===42?'selected':''}>42</option><option value="50" ${s.fontSize===50?'selected':''}>50</option></select></div>
-            <div class="row"><label>Line Ht</label><select id="modal-line-height"><option value="1.2" ${s.lineHeight===1.2?'selected':''}>1.2</option><option value="1.4" ${s.lineHeight===1.4?'selected':''}>1.4</option><option value="1.6" ${s.lineHeight===1.6?'selected':''}>1.6</option><option value="1.8" ${s.lineHeight===1.8?'selected':''}>1.8</option><option value="2.0" ${s.lineHeight===2.0?'selected':''}>2.0</option></select></div>
-            <div class="row"><label>Spacing</label><input type="range" id="modal-spacing" min="0" max="2" step="0.1" value="${s.letterSpacing}" /><span class="value" id="modal-spacing-val">${s.letterSpacing}</span></div>
-            <div class="row"><label>Glow</label><div class="toggle ${s.textShadow?'active':''}" id="modal-glow"><div class="knob"></div></div></div>
-          </div>
-          <div class="section"><h3>Visuals</h3>
-            <div class="row"><label>Text</label><input type="color" id="modal-text-color" value="${s.textColor}" /></div>
-            <div class="row"><label>Background</label><input type="color" id="modal-bg-color" value="${s.bgColor}" /></div>
-            <div class="row"><label>Bg Opacity</label><input type="range" id="modal-bg-opacity" min="0.3" max="1" step="0.05" value="${s.bgOpacity}" /><span class="value" id="modal-bg-opacity-val">${s.bgOpacity.toFixed(2)}</span></div>
-            <div class="row"><label>Overlay</label><input type="range" id="modal-overlay" min="0" max="0.7" step="0.05" value="${s.overlayOpacity}" /><span class="value" id="modal-overlay-val">${s.overlayOpacity.toFixed(2)}</span></div>
-          </div>
-          <div class="section"><h3>Display</h3>
-            <div class="row"><label>Focus</label><div class="toggle ${s.focus?'active':''}" id="modal-focus"><div class="knob"></div></div></div>
-          </div>
-          <div class="section"><h3>Camera</h3>
-            <div class="row"><label>Layout</label><select id="modal-layout"><option value="blur" ${s.layoutMode==='blur'?'selected':''}>Studio Blur</option><option value="split" ${s.layoutMode==='split'?'selected':''}>Side‑by‑Side</option><option value="compact" ${s.layoutMode==='compact'?'selected':''}>Compact</option></select></div>
-            <div class="row"><label>Source</label><select id="modal-camera-source"><option value="user" ${s.cameraSource==='user'?'selected':''}>Front</option><option value="environment" ${s.cameraSource==='environment'?'selected':''}>Rear</option></select></div>
-            <div class="row"><label>Resolution</label><select id="modal-resolution"><option value="480" ${s.resolution==='480'?'selected':''}>480p</option><option value="720" ${s.resolution==='720'?'selected':''}>720p</option><option value="1080" ${s.resolution==='1080'?'selected':''}>1080p</option></select></div>
-            <div class="row"><label>Text Opacity</label><input type="range" id="modal-text-opacity" min="0" max="1" step="0.05" value="${s.textOpacity||1}" /><span class="value" id="modal-text-opacity-val">${(s.textOpacity||1).toFixed(2)}</span></div>
-            <div class="row"><label>Camera Brightness</label><input type="range" id="modal-cam-brightness" min="0.5" max="1.5" step="0.05" value="${s.cameraBrightness||1}" /><span class="value" id="modal-cam-brightness-val">${(s.cameraBrightness||1).toFixed(2)}</span></div>
-            <div class="row"><label>Torch Default</label><div class="toggle ${s.torchDefault?'active':''}" id="modal-torch"><div class="knob"></div></div></div>
-            <div class="row"><label>Mirror Preview</label><div class="toggle ${s.mirrorPreview?'active':''}" id="modal-mirror"><div class="knob"></div></div></div>
-          </div>
-          <div class="section"><h3>Theme</h3>
-            <div class="row" style="gap:12px;"><label style="min-width:0;">Dark</label><label style="min-width:0;">Light</label><label style="min-width:0;">Deep Blue</label><div style="flex:1;"></div></div>
-          </div>
-          <div class="actions">
-            <button class="btn" id="modal-export-settings">📥 Export</button>
-            <button class="btn" id="modal-import-settings">📤 Import</button>
-            <button class="btn btn-danger" id="modal-reset-settings">↺ Reset</button>
-            <button class="btn btn-primary" id="modal-close-settings">💾 Save & Close</button>
+      // ===== TOUR =====
+      let tourActive = false;
+      let tourStep = 0;
+      const tourSteps = [
+        { element: '#hero-start-session', title: '🎙️ New Session', desc: 'Start a new script – this opens the editor so you can write before presenting.' },
+        { element: '#action-grid', title: '📂 Quick Actions', desc: 'Access all core features: New Script, Open Last, Library, Learn Hub, SpeakEasy, Calibrate, Import, and Export.' },
+        { element: '#sidebar .nav-item[data-page="library-page"]', title: '📚 Script Library', desc: 'All your saved scripts and templates. Click any script to open and edit it.' },
+        { element: '#sidebar .nav-item[data-action="speakeasy"]', title: '🎤 SpeakEasy', desc: 'Your public speaking coach – access warm‑up drills, script structures, and delivery tips.' },
+        { element: '#sidebar .nav-item[data-action="learn"]', title: '📖 Learn Hub', desc: 'Tutorials, FAQs, and best practices to master Promptica.' },
+        { element: '#editor-page .script-title-input', title: '📝 Script Title', desc: 'Give your script a clear title. It will be saved and displayed in your library.' },
+        { element: '#script-textarea', title: '✍️ Script Editor', desc: 'Write or paste your script here. Auto‑save keeps your work safe. Use Tab for indentation.' },
+        { element: '#settings-gear', title: '⚙️ Quick Settings', desc: 'Adjust speed, font, colours, and more – all without leaving the editor.' },
+        { element: '#btn-enter-prompter', title: '▶ Enter Prompter', desc: 'Click to go full‑screen with your script. This is where you present and record.' },
+      ];
+
+      function startTour() {
+        if (tourActive) return;
+        tourActive = true;
+        tourStep = 0;
+        showTourStep();
+      }
+
+      function showTourStep() {
+        const step = tourSteps[tourStep];
+        if (!step) { endTour(); return; }
+        const el = document.querySelector(step.element);
+        if (!el) { tourStep++; showTourStep(); return; }
+        const rect = el.getBoundingClientRect();
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.6);
+          z-index: 9999;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `;
+        const tooltip = document.createElement('div');
+        tooltip.style.cssText = `
+          background: var(--bg-panel);
+          color: var(--text-primary);
+          padding: 20px 24px;
+          border-radius: 12px;
+          max-width: 400px;
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow);
+          pointer-events: auto;
+          backdrop-filter: blur(12px);
+          font-family: var(--font-sans);
+        `;
+        tooltip.innerHTML = `
+          <h3 style="font-size:18px;font-weight:600;">${step.title}</h3>
+          <p style="font-size:14px;color:var(--text-secondary);margin:8px 0 16px;">${step.desc}</p>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button class="btn" id="tour-skip" style="padding:6px 14px;border-radius:6px;border:1px solid var(--border-color);background:transparent;color:var(--text-primary);cursor:pointer;">Skip</button>
+            <button class="btn btn-primary" id="tour-next" style="padding:6px 14px;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#0b0b0b;cursor:pointer;">${tourStep === tourSteps.length-1 ? 'Finish' : 'Next →'}</button>
           </div>
         `;
-        showModal('⚙️ General Settings', html);
-        // Bind events...
-        document.getElementById('modal-speed').addEventListener('input', function() {
-          document.getElementById('modal-speed-val').textContent = this.value;
+        overlay.appendChild(tooltip);
+        document.body.appendChild(overlay);
+        const tooltipRect = tooltip.getBoundingClientRect();
+        let top = rect.bottom + 10;
+        let left = rect.left + rect.width/2 - tooltipRect.width/2;
+        if (top + tooltipRect.height > window.innerHeight) top = rect.top - tooltipRect.height - 10;
+        if (left < 10) left = 10;
+        if (left + tooltipRect.width > window.innerWidth - 10) left = window.innerWidth - tooltipRect.width - 10;
+        tooltip.style.position = 'fixed';
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = left + 'px';
+        document.getElementById('tour-skip').addEventListener('click', endTour);
+        document.getElementById('tour-next').addEventListener('click', () => {
+          overlay.remove();
+          tourStep++;
+          if (tourStep < tourSteps.length) showTourStep();
+          else endTour();
         });
-        document.getElementById('modal-delay').addEventListener('input', function() {
-          document.getElementById('modal-delay-val').textContent = this.value + 's';
-        });
-        document.getElementById('modal-spacing').addEventListener('input', function() {
-          document.getElementById('modal-spacing-val').textContent = this.value;
-        });
-        document.getElementById('modal-bg-opacity').addEventListener('input', function() {
-          document.getElementById('modal-bg-opacity-val').textContent = parseFloat(this.value).toFixed(2);
-        });
-        document.getElementById('modal-overlay').addEventListener('input', function() {
-          document.getElementById('modal-overlay-val').textContent = parseFloat(this.value).toFixed(2);
-        });
-        document.getElementById('modal-text-opacity').addEventListener('input', function() {
-          document.getElementById('modal-text-opacity-val').textContent = parseFloat(this.value).toFixed(2);
-        });
-        document.getElementById('modal-cam-brightness').addEventListener('input', function() {
-          document.getElementById('modal-cam-brightness-val').textContent = parseFloat(this.value).toFixed(2);
-        });
-        document.querySelectorAll('#modal-content .toggle').forEach(toggle => {
-          toggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            this.classList.toggle('active');
-          });
-        });
-        document.getElementById('modal-close-settings').addEventListener('click', () => {
-          state.settings.speed = parseFloat(document.getElementById('modal-speed').value);
-          state.settings.autoDelay = parseFloat(document.getElementById('modal-delay').value);
-          state.settings.vad = document.getElementById('modal-vad').classList.contains('active');
-          state.settings.fontFamily = document.getElementById('modal-font').value;
-          state.settings.fontSize = parseInt(document.getElementById('modal-size').value);
-          state.settings.lineHeight = parseFloat(document.getElementById('modal-line-height').value);
-          state.settings.letterSpacing = parseFloat(document.getElementById('modal-spacing').value);
-          state.settings.textShadow = document.getElementById('modal-glow').classList.contains('active');
-          state.settings.textColor = document.getElementById('modal-text-color').value;
-          state.settings.bgColor = document.getElementById('modal-bg-color').value;
-          state.settings.bgOpacity = parseFloat(document.getElementById('modal-bg-opacity').value);
-          state.settings.overlayOpacity = parseFloat(document.getElementById('modal-overlay').value);
-          state.settings.focus = document.getElementById('modal-focus').classList.contains('active');
-          state.settings.layoutMode = document.getElementById('modal-layout').value;
-          state.settings.cameraSource = document.getElementById('modal-camera-source').value;
-          state.settings.resolution = document.getElementById('modal-resolution').value;
-          state.settings.textOpacity = parseFloat(document.getElementById('modal-text-opacity').value);
-          state.settings.cameraBrightness = parseFloat(document.getElementById('modal-cam-brightness').value);
-          state.settings.torchDefault = document.getElementById('modal-torch').classList.contains('active');
-          state.settings.mirrorPreview = document.getElementById('modal-mirror').classList.contains('active');
-          applySettingsToUI(state.settings);
-          localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
-          if (prompterPage.classList.contains('active')) {
-            if (state.cameraStream) {
-              state.cameraStream.getTracks().forEach(t => t.stop());
-              state.cameraStream = null;
-            }
-            initCamera();
-          }
-          modalOverlay.classList.remove('active');
-          toast('Settings saved');
-        });
-        document.getElementById('modal-export-settings').addEventListener('click', () => {
-          const blob = new Blob([JSON.stringify(state.settings, null, 2)], { type: 'application/json' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `promptica_settings_${Date.now()}.json`;
-          a.click();
-          URL.revokeObjectURL(url);
-          toast('Settings exported');
-        });
-        document.getElementById('modal-import-settings').addEventListener('click', () => {
-          const input = document.createElement('input');
-          input.type = 'file';
-          input.accept = '.json';
-          input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-              try {
-                const data = JSON.parse(ev.target.result);
-                Object.assign(state.settings, data);
-                applySettingsToUI(state.settings);
-                localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
-                toast('Settings imported');
-                modalOverlay.classList.remove('active');
-              } catch (err) { toast('Invalid file'); }
-            };
-            reader.readAsText(file);
-          };
-          input.click();
-        });
-        document.getElementById('modal-reset-settings').addEventListener('click', () => {
-          if (!confirm('Reset all settings to default?')) return;
-          const defaults = {
-            speed: 5, fontFamily: "'Inter', sans-serif", fontSize: 34, textColor: '#f5efe8', bgColor: '#0b0b0b',
-            bgOpacity: 1, focus: true, vad: false, lineHeight: 1.6, letterSpacing: 0.3, textShadow: true,
-            overlayOpacity: 0.35, autoDelay: 0, cameraSource: 'user', resolution: '720', torchDefault: false,
-            mirrorPreview: true, layoutMode: 'blur', compactSize: 'medium', textOpacity: 1, cameraBrightness: 1
-          };
-          Object.assign(state.settings, defaults);
-          applySettingsToUI(state.settings);
-          localStorage.setItem('prompter_global_settings', JSON.stringify(state.settings));
-          localStorage.removeItem('promptica_tour_completed');
-          toast('Settings reset to default');
-          modalOverlay.classList.remove('active');
-          if (prompterPage.classList.contains('active')) {
-            if (state.cameraStream) {
-              state.cameraStream.getTracks().forEach(t => t.stop());
-              state.cameraStream = null;
-            }
-            initCamera();
-          }
-        });
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) endTour(); });
+      }
+
+      function endTour() {
+        tourActive = false;
+        document.querySelectorAll('.tour-overlay').forEach(el => el.remove());
+        localStorage.setItem('promptica_tour_completed', 'true');
+        toast('🎉 You’re ready to create!');
+      }
+
+      // ===== SEED CONTENT =====
+      async function seedContent() {
+        const content = await getContent();
+        let seeded = false;
+        if (!content.speakEasy || content.speakEasy.length === 0) {
+          content.speakEasy = defaultSpeakEasy;
+          seeded = true;
+        }
+        if (!content.articles || content.articles.length === 0) {
+          content.articles = defaultArticles;
+          seeded = true;
+        }
+        if (!content.templates || content.templates.length === 0) {
+          content.templates = defaultTemplates;
+          seeded = true;
+        }
+        if (!content.contact || !content.contact.email) {
+          content.contact = { email: 'support@promptica.com', phone: '+1-800-555-PROM', hours: 'Mon-Fri 9am-6pm EST' };
+          seeded = true;
+        }
+        if (!content.documentation || content.documentation.length === 0) {
+          content.documentation = [
+            { id: generateId(), title: 'Getting Started with Promptica', content: '<p>Welcome to Promptica! Here\'s how to get started…</p>' },
+            { id: generateId(), title: 'Using the Teleprompter', content: '<p>Learn how to use the prompter effectively…</p>' }
+          ];
+          seeded = true;
+        }
+        if (!content.tutorials || content.tutorials.length === 0) {
+          content.tutorials = [
+            { id: generateId(), title: 'How to Record a Video', url: 'https://youtube.com/watch?v=example', description: '<p>A step-by-step guide to recording your first video.</p>' }
+          ];
+          seeded = true;
+        }
+        if (seeded) await saveContent(content);
       }
 
       // ===== OVERLAY MODE (OBS) =====
@@ -2533,7 +3190,7 @@
         const prompter = document.getElementById('prompter-page');
         prompter.style.display = 'flex';
         prompter.classList.add('active');
-        document.querySelector('.prompter-controls').style.display = 'none';
+        document.querySelector('.controls-bar').style.display = 'none';
         document.querySelector('.prompter-progress').style.display = 'none';
         document.querySelector('.prompter-back').style.display = 'none';
         document.querySelector('.cam-toggle').style.display = 'none';
@@ -2563,54 +3220,6 @@
             });
           }
         })();
-      }
-
-      // ===== SEED CONTENT =====
-      async function seedContent() {
-        const content = await getContent();
-        let seeded = false;
-        if (!content.speakEasy || content.speakEasy.length === 0) {
-          content.speakEasy = defaultSpeakEasy;
-          seeded = true;
-        }
-        if (!content.articles || content.articles.length === 0) {
-          content.articles = defaultArticles;
-          seeded = true;
-        }
-        if (!content.templates || content.templates.length === 0) {
-          content.templates = defaultTemplates;
-          seeded = true;
-        }
-        if (seeded) await saveContent(content);
-      }
-
-      // ===== ONBOARDING TOUR (driver.js) =====
-      function startTour() {
-        if (typeof Driver === 'undefined') {
-          toast('Tour library not loaded');
-          return;
-        }
-        const driver = new Driver();
-        driver.defineSteps([
-          { element: '#hero-start-session', popover: { title: '🎙️ New Session', description: 'Start a new script – this opens the editor so you can write before presenting.', position: 'bottom' } },
-          { element: '#action-grid', popover: { title: '📂 Quick Actions', description: 'Access all core features: New Script, Open Last, Library, Learn Hub, SpeakEasy, Calibrate, Import, and Export.', position: 'bottom' } },
-          { element: '#sidebar .nav-item[data-page="library-page"]', popover: { title: '📚 Script Library', description: 'All your saved scripts and templates. Click any script to open and edit it.', position: 'right' } },
-          { element: '#sidebar .nav-item[data-action="speakeasy"]', popover: { title: '🎤 SpeakEasy', description: 'Your public speaking coach – access warm‑up drills, script structures, and delivery tips.', position: 'right' } },
-          { element: '#sidebar .nav-item[data-action="learn"]', popover: { title: '📖 Learn Hub', description: 'Tutorials, FAQs, and best practices to master Promptica.', position: 'right' } },
-          { element: '#sidebar .nav-item[data-action="settings"]', popover: { title: '⚙️ Settings', description: 'Open the full settings modal to customise speed, font, colours, camera, and more.', position: 'right' } },
-          { element: '#editor-page .script-title-input', popover: { title: '📝 Script Title', description: 'Give your script a clear title. It will be saved and displayed in your library.', position: 'bottom' } },
-          { element: '#script-textarea', popover: { title: '✍️ Script Editor', description: 'Write or paste your script here. Auto‑save keeps your work safe. Use Tab for indentation.', position: 'bottom' } },
-          { element: '#settings-gear', popover: { title: '⚙️ Quick Settings', description: 'Adjust speed, font, colours, and more – all without leaving the editor.', position: 'top' } },
-          { element: '#btn-enter-prompter', popover: { title: '▶ Enter Prompter', description: 'Click to go full‑screen with your script. This is where you present and record.', position: 'bottom' } },
-        ]);
-        driver.start();
-        driver.on('dismissed', () => {
-          localStorage.setItem('promptica_tour_completed', 'true');
-        });
-        driver.on('finish', () => {
-          localStorage.setItem('promptica_tour_completed', 'true');
-          toast('🎉 You’re ready to create!');
-        });
       }
 
       // ===== INIT =====
