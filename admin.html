@@ -7,7 +7,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+
+  <!-- Quill.js (WYSIWYG Editor) -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -75,35 +79,24 @@
     .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: 14px; }
     .empty-state .icon { font-size: 40px; opacity: 0.3; margin-bottom: 8px; }
 
-    /* ===== MODAL (fullscreen editor) ===== */
     .modal-overlay { position: fixed; inset: 0; z-index: 5000; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.active { display: flex; }
-    .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 1100px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 0; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .modal-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 20px; max-width: 900px; width: 100%; max-height: 95vh; overflow-y: auto; padding: 0; box-shadow: var(--shadow); display: flex; flex-direction: column; }
     .modal-box .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
     .modal-box .modal-header h2 { font-size: 20px; font-weight: 600; }
     .modal-box .modal-header .close-btn { background: none; border: none; color: var(--text-secondary); font-size: 24px; cursor: pointer; }
     .modal-box .modal-body { padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; flex: 1; }
-    .modal-box .modal-body .editor-wrapper { background: #fff; border-radius: 8px; overflow: hidden; min-height: 300px; }
-    .modal-box .modal-body .editor-wrapper .ql-container { min-height: 300px; font-family: var(--font-sans); font-size: 16px; }
-    .modal-box .modal-body .editor-wrapper .ql-editor { min-height: 300px; }
-    .modal-box .modal-body .metadata-sidebar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
-    .modal-box .modal-body .metadata-sidebar label { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-    .modal-box .modal-body .metadata-sidebar input, .modal-box .modal-body .metadata-sidebar select { background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 4px; padding: 6px 10px; font-size: 14px; width: 100%; outline: none; }
-    .modal-box .modal-body .metadata-sidebar input:focus, .modal-box .modal-body .metadata-sidebar select:focus { border-color: var(--accent); }
+    .modal-box .modal-body .editor-wrapper { background: #fff; border-radius: 8px; overflow: hidden; min-height: 200px; }
+    .modal-box .modal-body .editor-wrapper .ql-container { min-height: 200px; font-family: var(--font-sans); font-size: 16px; }
+    .modal-box .modal-body .editor-wrapper .ql-editor { min-height: 200px; }
+    .modal-box .modal-body label { font-size: 13px; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 4px; margin-top: 12px; }
+    .modal-box .modal-body label:first-of-type { margin-top: 0; }
+    .modal-box .modal-body input, .modal-box .modal-body textarea { width: 100%; padding: 8px 12px; background: var(--bg-primary); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 6px; font-family: var(--font-sans); font-size: 14px; outline: none; transition: border-color 0.2s; }
+    .modal-box .modal-body input:focus, .modal-box .modal-body textarea:focus { border-color: var(--accent); }
     .modal-box .modal-body .btn-row { display: flex; gap: 10px; justify-content: flex-end; padding-top: 16px; border-top: 1px solid var(--border-color); }
     .modal-box .modal-body .btn-row .btn { padding: 8px 20px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 14px; cursor: pointer; transition: all 0.2s; }
     .modal-box .modal-body .btn-row .btn-primary { background: var(--accent); border-color: var(--accent); color: #0b0b0b; }
     .modal-box .modal-body .btn-row .btn-primary:hover { background: var(--accent-hover); }
-    .modal-box .modal-body .preview-toggle { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); }
-    .modal-box .modal-body .preview-toggle .toggle-switch { position: relative; width: 40px; height: 22px; background: var(--bg-primary); border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; transition: 0.25s; }
-    .modal-box .modal-body .preview-toggle .toggle-switch.active { background: var(--accent); }
-    .modal-box .modal-body .preview-toggle .toggle-switch .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: transform 0.25s; }
-    .modal-box .modal-body .preview-toggle .toggle-switch.active .knob { transform: translateX(18px); }
-    .modal-box .modal-body .preview-area { background: #0b0b0b; border-radius: 8px; padding: 20px; border: 1px solid var(--border-color); min-height: 200px; display: none; color: #f5efe8; font-family: 'Inter', sans-serif; font-size: 18px; line-height: 1.6; }
-    .modal-box .modal-body .preview-area.show { display: block; }
-    .modal-box .modal-body .preview-area h1, .modal-box .modal-body .preview-area h2, .modal-box .modal-body .preview-area h3 { color: #f5efe8; }
-    .modal-box .modal-body .preview-area p { color: #e0dcd6; }
-    .modal-box .modal-body .preview-area strong { color: #f5efe8; }
 
     .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--bg-panel); color: var(--text-primary); padding: 12px 24px; border-radius: 40px; border: 1px solid var(--border-color); box-shadow: var(--shadow); z-index: 9999; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; backdrop-filter: blur(12px); }
     .toast.show { opacity: 1; }
@@ -111,6 +104,9 @@
     .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; margin-top: 12px; }
     .bar { flex: 1; background: var(--accent); border-radius: 4px 4px 0 0; transition: height 0.4s; min-height: 4px; }
     .bar-label { font-size: 10px; text-align: center; color: var(--text-secondary); margin-top: 4px; }
+
+    .site-content-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .site-content-form .full { grid-column: span 2; }
 
     @media (max-width: 768px) {
       :root { --sidebar-width: 60px; }
@@ -123,8 +119,10 @@
       .admin-header .actions { flex-wrap: wrap; }
       .list-item { flex-wrap: wrap; gap: 8px; }
       .list-item .actions { margin-left: 0; width: 100%; justify-content: flex-end; }
-      .modal-box .modal-body .metadata-sidebar { grid-template-columns: 1fr; }
+      .modal-box { padding: 20px; }
       .list-item .info .preview-text { max-width: 100px; }
+      .site-content-form { grid-template-columns: 1fr; }
+      .site-content-form .full { grid-column: span 1; }
     }
     @media (max-width: 480px) {
       .stats-row { grid-template-columns: 1fr; }
@@ -159,6 +157,7 @@
       <div class="nav-item" data-page="analytics"><span class="icon">📈</span><span class="label">Analytics</span></div>
       <div class="nav-item" data-page="pairings"><span class="icon">📱</span><span class="label">Remote Pairings</span></div>
       <div class="nav-item" data-page="flags"><span class="icon">🚩</span><span class="label">Feature Flags</span></div>
+      <div class="nav-item" data-page="site-content"><span class="icon">📋</span><span class="label">Site Content</span></div>
       <div class="nav-item bottom" data-page="back" id="back-to-app"><span class="icon">←</span><span class="label">Back to App</span></div>
     </nav>
 
@@ -192,16 +191,8 @@
       </div>
 
       <div id="page-templates" class="page">
-        <div class="list-header">
-          <h3>📝 Script Templates</h3>
-          <div>
-            <button class="btn btn-primary" id="btn-new-template">+ New Template</button>
-            <button class="btn" id="btn-import-templates">📤 Import</button>
-          </div>
-        </div>
-        <div class="list-container" id="template-list">
-          <div class="empty-state"><div class="icon">📄</div><div>No templates yet. Click "New Template" to create one.</div></div>
-        </div>
+        <div class="list-header"><h3>📝 Script Templates</h3><div><button class="btn btn-primary" id="btn-new-template">+ New Template</button><button class="btn" id="btn-import-templates">📤 Import</button></div></div>
+        <div class="list-container" id="template-list"><div class="empty-state"><div class="icon">📄</div><div>No templates yet. Click "New Template" to create one.</div></div></div>
       </div>
 
       <div id="page-settings" class="page">
@@ -270,6 +261,42 @@
         </div>
       </div>
 
+      <!-- ===== SITE CONTENT PAGE ===== -->
+      <div id="page-site-content" class="page">
+        <div style="display:flex;flex-direction:column;gap:24px;max-width:900px;">
+
+          <!-- Contact Info -->
+          <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;backdrop-filter:blur(4px);">
+            <h3 style="font-size:16px;font-weight:500;color:var(--text-secondary);margin-bottom:12px;">📞 Contact Info</h3>
+            <div class="site-content-form">
+              <div><label style="font-size:13px;color:var(--text-secondary);">Email</label><input type="email" id="contact-email" placeholder="support@promptica.com" /></div>
+              <div><label style="font-size:13px;color:var(--text-secondary);">Phone</label><input type="text" id="contact-phone" placeholder="+1‑800‑555‑PROM" /></div>
+              <div class="full"><label style="font-size:13px;color:var(--text-secondary);">Support Hours</label><input type="text" id="contact-hours" placeholder="Mon‑Fri 9am‑6pm EST" /></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:10px;justify-content:flex-end;">
+              <button class="btn btn-primary" id="save-contact">💾 Save Contact</button>
+            </div>
+          </div>
+
+          <!-- Documentation -->
+          <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;backdrop-filter:blur(4px);">
+            <div class="list-header"><h3>📘 Documentation</h3><button class="btn btn-primary" id="add-doc">+ New Article</button></div>
+            <div class="list-container" id="doc-list" style="max-height:300px;">
+              <div class="empty-state"><div class="icon">📄</div><div>No documentation articles yet.</div></div>
+            </div>
+          </div>
+
+          <!-- Tutorials -->
+          <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px 20px;backdrop-filter:blur(4px);">
+            <div class="list-header"><h3>🎬 Video Tutorials</h3><button class="btn btn-primary" id="add-tutorial">+ New Tutorial</button></div>
+            <div class="list-container" id="tutorial-list" style="max-height:300px;">
+              <div class="empty-state"><div class="icon">🎥</div><div>No tutorials yet.</div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -277,6 +304,7 @@
     (function() {
       'use strict';
 
+      // ===== UTILITIES =====
       const $ = s => document.querySelector(s);
       const $$ = s => document.querySelectorAll(s);
       const toast = (msg, dur = 3000) => {
@@ -286,8 +314,7 @@
         clearTimeout(el._timer);
         el._timer = setTimeout(() => el.classList.remove('show'), dur);
       };
-      const escapeHtml = str => { const d = document.createElement('div');
-        d.textContent = str; return d.innerHTML; };
+      const escapeHtml = str => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
       const generateId = () => Date.now() + '-' + Math.random().toString(36).slice(2, 6);
 
       // ===== INDEXEDDB =====
@@ -305,9 +332,9 @@
             if (!db.objectStoreNames.contains('logs')) db.createObjectStore('logs', { keyPath: 'id' });
             if (!db.objectStoreNames.contains('pairings')) db.createObjectStore('pairings', { keyPath: 'id' });
             if (!db.objectStoreNames.contains('flags')) db.createObjectStore('flags', { keyPath: 'id' });
+            if (!db.objectStoreNames.contains('content')) db.createObjectStore('content', { keyPath: 'id' });
           };
-          req.onsuccess = () => { db = req.result;
-            res(db); };
+          req.onsuccess = () => { db = req.result; res(db); };
           req.onerror = () => rej(req.error);
         });
       }
@@ -345,41 +372,10 @@
       // ===== STATE =====
       let currentPage = 'dashboard';
       let editingTemplateId = null;
-
-      // ===== DEFAULT SPEAKEASY CONTENT =====
-      const defaultSpeakEasy = [{
-        name: 'Warm-Up Drills',
-        description: '5‑minute vocal and physical exercises to prepare your voice and body before speaking.',
-        icon: '🎯',
-        articles: [
-          'The 5‑Minute Vocal Warm‑Up – Lip trills, tongue twisters, humming, and diaphragmatic breathing.',
-          'Power Poses for Confidence – Use body language to boost confidence before stepping in front of the camera.'
-        ]
-      }, {
-        name: 'Script Structure',
-        description: 'Templates and frameworks for organising your speech (TED‑style, Storytelling, Sales Pitch).',
-        icon: '📝',
-        articles: [
-          'The TED‑Talk Formula – Hook, main idea, evidence, and a call to action.',
-          'The Hero’s Journey for Presentations – Use the classic narrative arc to captivate your audience.'
-        ]
-      }, {
-        name: 'Delivery Techniques',
-        description: 'Tips on pacing, pausing, emphasis, vocal variety, and non‑verbal communication.',
-        icon: '🎤',
-        articles: [
-          'The Art of the Pause – Why pausing is powerful and how to practice it.',
-          'Vocal Variety – Pitch, Pace, and Volume – Keep your audience engaged by varying your delivery.'
-        ]
-      }, {
-        name: 'Overcoming Nervousness',
-        description: 'Breathing exercises, visualisation techniques, and mindset shifts to calm pre‑speech jitters.',
-        icon: '🧘',
-        articles: [
-          'Box Breathing for Instant Calm – A 4‑4‑4‑4 breathing technique to use right before you speak.',
-          'Reframing Anxiety as Excitement – A psychological shift that changes how your body reacts.'
-        ]
-      }];
+      let editingDocId = null;
+      let editingTutorialId = null;
+      let quill = null;
+      let quillInitialized = false;
 
       // ===== NAVIGATION =====
       function navigateTo(page) {
@@ -396,15 +392,15 @@
           users: '👤 User Access',
           analytics: '📈 Analytics',
           pairings: '📱 Remote Pairings',
-          flags: '🚩 Feature Flags'
+          flags: '🚩 Feature Flags',
+          'site-content': '📋 Site Content'
         };
         $('#page-title').innerHTML = titles[page] || 'Dashboard';
 
         const actions = $('#header-actions');
-        if (page === 'templates') actions.innerHTML =
-          `<button class="btn btn-primary" onclick="openNewTemplate()">+ New Template</button>`;
-        else if (page === 'users') actions.innerHTML =
-          `<button class="btn btn-primary" onclick="openNewUser()">+ Add User</button>`;
+        if (page === 'templates') actions.innerHTML = `<button class="btn btn-primary" onclick="openNewTemplate()">+ New Template</button>`;
+        else if (page === 'users') actions.innerHTML = `<button class="btn btn-primary" onclick="openNewUser()">+ Add User</button>`;
+        else if (page === 'site-content') actions.innerHTML = '';
         else actions.innerHTML = '';
 
         if (page === 'dashboard') renderDashboard();
@@ -414,31 +410,27 @@
         else if (page === 'analytics') renderAnalytics();
         else if (page === 'pairings') renderPairings();
         else if (page === 'flags') loadFlags();
+        else if (page === 'site-content') loadSiteContent();
       }
       window.navigateTo = navigateTo;
 
-      // ===== DASHBOARD =====
+      // ===== DASHBOARD (unchanged) =====
       async function renderDashboard() {
         const templates = await getStore('templates');
         const users = await getStore('users');
         const logs = await getStore('logs');
-        const activeUsers = new Set(logs.filter(l => {
-          const d = new Date(l.startedAt);
-          const now = new Date();
-          const diff = (now - d) / (1000 * 60 * 60 * 24);
-          return diff <= 7;
-        }).map(l => l.userId)).size;
+        const activeUsers = new Set(logs.filter(l => { const d = new Date(l.startedAt); const now = new Date(); const diff = (now - d) / (1000*60*60*24); return diff <= 7; }).map(l => l.userId)).size;
         const totalSessions = logs.length;
         const durations = logs.map(l => l.duration || 0);
-        const avg = durations.length ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
+        const avg = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : 0;
         document.getElementById('stat-templates').textContent = templates.length;
         document.getElementById('stat-users').textContent = activeUsers;
         document.getElementById('stat-sessions').textContent = totalSessions;
-        document.getElementById('stat-avg-duration').textContent = avg > 60 ? Math.round(avg / 60) + 'm' : avg + 's';
+        document.getElementById('stat-avg-duration').textContent = avg > 60 ? Math.round(avg/60) + 'm' : avg + 's';
         document.getElementById('template-count').textContent = templates.length;
       }
 
-      // ===== TEMPLATES =====
+      // ===== TEMPLATES (unchanged – only showing core, no changes) =====
       async function renderTemplates() {
         const templates = await getStore('templates');
         const list = document.getElementById('template-list');
@@ -468,14 +460,12 @@
         const templates = await getStore('templates');
         const t = templates.find(t => t.id === id);
         if (!t) { toast('Template not found'); return; }
-        const newTemplate = { ...t, id: generateId(), title: t.title + ' (copy)', version: 1, usageCount: 0, createdAt: new Date()
-            .toISOString(), updatedAt: new Date().toISOString() };
+        const newTemplate = { ...t, id: generateId(), title: t.title + ' (copy)', version: 1, usageCount: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
         await putRecord('templates', newTemplate);
         renderTemplates();
         renderDashboard();
         toast('Template duplicated');
       };
-
       window.exportTemplate = async function(id) {
         const templates = await getStore('templates');
         const t = templates.find(t => t.id === id);
@@ -489,17 +479,8 @@
         URL.revokeObjectURL(url);
         toast('Template exported');
       };
-
-      window.openNewTemplate = function() {
-        editingTemplateId = null;
-        showModal('New Script Template', '');
-      };
-
-      window.editTemplate = function(id) {
-        editingTemplateId = id;
-        showModal('Edit Template', '');
-      };
-
+      window.openNewTemplate = function() { editingTemplateId = null; showModal('New Script Template', ''); };
+      window.editTemplate = function(id) { editingTemplateId = id; showModal('Edit Template', ''); };
       window.deleteTemplate = async function(id) {
         if (!confirm('Delete this template?')) return;
         await deleteRecord('templates', id);
@@ -508,84 +489,38 @@
         toast('Template deleted');
       };
 
-      // ===== MODAL (Tiptap-like fullscreen editor) =====
-      let quill = null;
-      let quillInitialized = false;
-
+      // ===== TEMPLATE MODAL (uses Quill) =====
       function showModal(title, html) {
         document.getElementById('modal-title').textContent = title;
-        document.getElementById('modal-body').innerHTML = `
-          <div class="editor-wrapper" id="editor-wrapper">
-            <div id="quill-editor" style="min-height:300px;background:#fff;color:#000;"></div>
-          </div>
-          <div class="metadata-sidebar">
+        document.getElementById('modal-body').innerHTML = html || `
+          <div class="editor-wrapper" id="editor-wrapper"><div id="quill-editor" style="min-height:200px;background:#fff;color:#000;"></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div><label>Title</label><input type="text" id="meta-title" placeholder="Template title" /></div>
-            <div><label>Slug</label><input type="text" id="meta-slug" placeholder="auto-generated" /></div>
             <div><label>Category</label><input type="text" id="meta-category" placeholder="e.g., Tutorial" /></div>
-            <div><label>Tags (comma separated)</label><input type="text" id="meta-tags" placeholder="tutorial, tips" /></div>
+            <div style="grid-column:span 2;"><label>Tags (comma separated)</label><input type="text" id="meta-tags" placeholder="tutorial, tips" /></div>
             <div><label>Publish Date</label><input type="date" id="meta-date" /></div>
             <div><label>Visibility</label><select id="meta-visibility"><option value="draft">Draft</option><option value="published">Published</option></select></div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-            <div class="preview-toggle">
-              <span>Live Preview</span>
-              <div class="toggle-switch" id="preview-toggle">
-                <div class="knob"></div>
-              </div>
-            </div>
-            <div class="btn-row">
-              <button class="btn" onclick="closeModal()">Cancel</button>
-              <button class="btn btn-primary" onclick="saveTemplateFromModal()">💾 Save</button>
-            </div>
+          <div class="btn-row">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveTemplateFromModal()">💾 Save</button>
           </div>
-          <div class="preview-area" id="preview-area"></div>
         `;
         document.getElementById('modal-overlay').classList.add('active');
-
         // Load existing data if editing
         if (editingTemplateId) {
           getStore('templates').then(templates => {
             const t = templates.find(t => t.id === editingTemplateId);
             if (t) {
               document.getElementById('meta-title').value = t.title || '';
-              document.getElementById('meta-slug').value = t.slug || '';
               document.getElementById('meta-category').value = t.category || '';
               document.getElementById('meta-tags').value = (t.tags || []).join(', ');
-              document.getElementById('meta-date').value = t.publishedAt ? t.publishedAt.split('T')[0] : new Date()
-                .toISOString().split('T')[0];
+              document.getElementById('meta-date').value = t.publishedAt ? t.publishedAt.split('T')[0] : new Date().toISOString().split('T')[0];
               document.getElementById('meta-visibility').value = t.visibility || 'draft';
               initQuill(t.content || '');
-            } else {
-              initQuill('');
-            }
+            } else initQuill('');
           });
-        } else {
-          initQuill('');
-        }
-
-        // Preview toggle
-        const toggle = document.getElementById('preview-toggle');
-        const previewArea = document.getElementById('preview-area');
-        toggle.addEventListener('click', () => {
-          toggle.classList.toggle('active');
-          previewArea.classList.toggle('show');
-          if (previewArea.classList.contains('show')) {
-            const content = quill ? quill.root.innerHTML : '';
-            previewArea.innerHTML = content;
-          }
-        });
-
-        // Auto-save draft every 10s
-        let autoSaveTimer = null;
-        const autoSaveDraft = () => {
-          clearTimeout(autoSaveTimer);
-          autoSaveTimer = setTimeout(() => {
-            toast('💾 Draft saved');
-          }, 10000);
-        };
-        document.getElementById('meta-title').addEventListener('input', autoSaveDraft);
-        document.getElementById('meta-category').addEventListener('input', autoSaveDraft);
-        document.getElementById('meta-tags').addEventListener('input', autoSaveDraft);
+        } else initQuill('');
       }
 
       function initQuill(initialContent) {
@@ -598,7 +533,7 @@
         setTimeout(() => {
           quill = new Quill('#quill-editor', {
             theme: 'snow',
-            placeholder: 'Write your template content here…',
+            placeholder: 'Write your content here…',
             modules: {
               toolbar: [
                 [{ 'header': [1, 2, 3, false] }],
@@ -644,7 +579,6 @@
 
       window.saveTemplateFromModal = async function() {
         const title = document.getElementById('meta-title').value.trim();
-        const slug = document.getElementById('meta-slug').value.trim() || title.toLowerCase().replace(/\s+/g, '-');
         const category = document.getElementById('meta-category').value.trim();
         const tags = document.getElementById('meta-tags').value.split(',').map(s => s.trim()).filter(Boolean);
         const publishedAt = document.getElementById('meta-date').value || new Date().toISOString().split('T')[0];
@@ -654,7 +588,6 @@
         const template = {
           id: editingTemplateId || generateId(),
           title,
-          slug,
           content,
           category,
           tags,
@@ -681,16 +614,15 @@
       window.closeModal = function() {
         document.getElementById('modal-overlay').classList.remove('active');
         editingTemplateId = null;
+        editingDocId = null;
+        editingTutorialId = null;
         quillInitialized = false;
         quill = null;
       };
-
       document.getElementById('modal-close').addEventListener('click', closeModal);
-      document.getElementById('modal-overlay').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeModal();
-      });
+      document.getElementById('modal-overlay').addEventListener('click', (e) => { if (e.target === e.currentTarget) closeModal(); });
 
-      // ===== SETTINGS =====
+      // ===== SETTINGS (unchanged) =====
       async function loadSettings() {
         const settings = (await getStore('settings'))[0] || {};
         document.getElementById('setting-font').value = settings.defaultFont || 'Inter';
@@ -712,7 +644,6 @@
         document.getElementById('setting-max-length').value = settings.maxScriptLength || 5000;
         document.getElementById('setting-max-scripts').value = settings.maxSavedScripts || 20;
       }
-
       document.getElementById('btn-save-settings').addEventListener('click', async () => {
         const settings = {
           id: 'global',
@@ -739,7 +670,7 @@
         toast('Settings saved');
       });
 
-      // ===== USERS =====
+      // ===== USERS (unchanged) =====
       async function renderUsers() {
         const users = await getStore('users');
         const list = document.getElementById('user-list');
@@ -760,19 +691,14 @@
           </div>
         `).join('');
       }
-
       window.openNewUser = function() {
         const id = prompt('Enter user ID (email):');
         if (!id) return;
         const name = prompt('Display name:') || id;
         const canAccess = confirm('Grant access?') ? true : false;
         const maxScripts = prompt('Max scripts (leave empty for unlimited):') || null;
-        putRecord('users', { id, name, canAccess, maxScripts: maxScripts ? parseInt(maxScripts) : null, grantedAt: new Date()
-            .toISOString(), lastActiveAt: null }).then(() => { renderUsers();
-          renderDashboard();
-          toast('User added'); });
+        putRecord('users', { id, name, canAccess, maxScripts: maxScripts ? parseInt(maxScripts) : null, grantedAt: new Date().toISOString(), lastActiveAt: null }).then(() => { renderUsers(); renderDashboard(); toast('User added'); });
       };
-
       window.editUser = function(id) {
         getStore('users').then(users => {
           const u = users.find(u => u.id === id);
@@ -780,49 +706,33 @@
           const name = prompt('Name:', u.name) || u.id;
           const canAccess = confirm('Access?') ? true : false;
           const maxScripts = prompt('Max scripts:', u.maxScripts || '') || null;
-          u.name = name;
-          u.canAccess = canAccess;
-          u.maxScripts = maxScripts ? parseInt(maxScripts) : null;
-          putRecord('users', u).then(() => { renderUsers();
-            toast('User updated'); });
+          u.name = name; u.canAccess = canAccess; u.maxScripts = maxScripts ? parseInt(maxScripts) : null;
+          putRecord('users', u).then(() => { renderUsers(); toast('User updated'); });
         });
       };
-
       window.deleteUser = async function(id) {
         if (!confirm('Remove this user?')) return;
         await deleteRecord('users', id);
         renderUsers();
         toast('User removed');
       };
-
       document.getElementById('btn-add-user').addEventListener('click', openNewUser);
 
-      // ===== ANALYTICS =====
+      // ===== ANALYTICS (unchanged) =====
       async function renderAnalytics() {
         const logs = await getStore('logs');
         const sessions = logs.filter(l => l.duration > 0);
-        const last7 = sessions.filter(l => {
-          const d = new Date(l.startedAt);
-          const now = new Date();
-          const diff = (now - d) / (1000 * 60 * 60 * 24);
-          return diff <= 7;
-        });
+        const last7 = sessions.filter(l => { const d = new Date(l.startedAt); const now = new Date(); const diff = (now - d) / (1000*60*60*24); return diff <= 7; });
         document.getElementById('analytics-sessions').textContent = last7.length;
-
-        const fontCount = {};
-        sessions.forEach(l => { if (l.fontUsed) fontCount[l.fontUsed] = (fontCount[l.fontUsed] || 0) + 1; });
-        const topFont = Object.entries(fontCount).sort((a, b) => b[1] - a[1])[0];
+        const fontCount = {}; sessions.forEach(l => { if (l.fontUsed) fontCount[l.fontUsed] = (fontCount[l.fontUsed] || 0) + 1; });
+        const topFont = Object.entries(fontCount).sort((a,b) => b[1] - a[1])[0];
         document.getElementById('analytics-font').textContent = topFont ? topFont[0] : '—';
-
-        const colorCount = {};
-        sessions.forEach(l => { if (l.textColor) colorCount[l.textColor] = (colorCount[l.textColor] || 0) + 1; });
-        const topColor = Object.entries(colorCount).sort((a, b) => b[1] - a[1])[0];
+        const colorCount = {}; sessions.forEach(l => { if (l.textColor) colorCount[l.textColor] = (colorCount[l.textColor] || 0) + 1; });
+        const topColor = Object.entries(colorCount).sort((a,b) => b[1] - a[1])[0];
         document.getElementById('analytics-color').textContent = topColor ? topColor[0] : '—';
-
         const days = [];
         for (let i = 6; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
+          const d = new Date(); d.setDate(d.getDate() - i);
           const dayStr = d.toISOString().split('T')[0];
           const count = sessions.filter(l => l.startedAt.startsWith(dayStr)).length;
           days.push({ label: d.toLocaleDateString('en', { weekday: 'short' }), count });
@@ -835,10 +745,8 @@
             <div class="bar-label">${d.label}</div>
           </div>
         `).join('');
-
-        const deviceCount = {};
-        sessions.forEach(l => { if (l.deviceType) deviceCount[l.deviceType] = (deviceCount[l.deviceType] || 0) + 1; });
-        const totalDevices = Object.values(deviceCount).reduce((a, b) => a + b, 0) || 1;
+        const deviceCount = {}; sessions.forEach(l => { if (l.deviceType) deviceCount[l.deviceType] = (deviceCount[l.deviceType] || 0) + 1; });
+        const totalDevices = Object.values(deviceCount).reduce((a,b) => a+b, 0) || 1;
         const deviceChart = document.getElementById('device-chart');
         deviceChart.innerHTML = Object.entries(deviceCount).map(([device, count]) => `
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;">
@@ -846,11 +754,10 @@
             <div class="bar-label">${device}</div>
           </div>
         `).join('');
-        if (!Object.keys(deviceCount).length) deviceChart.innerHTML =
-          '<p style="color:var(--text-secondary);font-size:14px;">No device data yet.</p>';
+        if (!Object.keys(deviceCount).length) deviceChart.innerHTML = '<p style="color:var(--text-secondary);font-size:14px;">No device data yet.</p>';
       }
 
-      // ===== PAIRINGS =====
+      // ===== PAIRINGS (unchanged) =====
       async function renderPairings() {
         const pairings = await getStore('pairings');
         const list = document.getElementById('pairing-list');
@@ -864,31 +771,25 @@
               <div class="title">${escapeHtml(p.deviceName)}</div>
               <div class="meta">${p.deviceType} · Last seen: ${p.lastSeenAt ? new Date(p.lastSeenAt).toLocaleString() : 'Never'} · ${p.isActive ? '✅ Active' : '⛔ Revoked'}</div>
             </div>
-            <div class="actions">
-              ${p.isActive ? `<button class="btn btn-danger" onclick="revokePairing('${p.id}')">Revoke</button>` : ''}
-            </div>
+            <div class="actions">${p.isActive ? `<button class="btn btn-danger" onclick="revokePairing('${p.id}')">Revoke</button>` : ''}</div>
           </div>
         `).join('');
       }
-
       window.revokePairing = async function(id) {
         if (!confirm('Revoke this pairing?')) return;
         const pairings = await getStore('pairings');
         const pairing = pairings.find(p => p.id === id);
         if (pairing) {
-          pairing.isActive = false;
-          pairing.revokedAt = new Date().toISOString();
+          pairing.isActive = false; pairing.revokedAt = new Date().toISOString();
           await putRecord('pairings', pairing);
           renderPairings();
           toast('Pairing revoked');
         }
       };
-
       document.getElementById('btn-refresh-pairings').addEventListener('click', renderPairings);
 
-      // ===== FEATURE FLAGS =====
+      // ===== FEATURE FLAGS (unchanged) =====
       let flagState = {};
-
       async function loadFlags() {
         const flags = (await getStore('flags'))[0] || {};
         flagState = flags;
@@ -899,7 +800,6 @@
           btn.style.borderColor = value ? '#4caf50' : '#ef5350';
         });
       }
-
       document.getElementById('flags-container').addEventListener('click', (e) => {
         const btn = e.target.closest('.flag-toggle');
         if (!btn) return;
@@ -909,13 +809,281 @@
         btn.style.borderColor = current ? '#ef5350' : '#4caf50';
         flagState[flag] = !current;
       });
-
       document.getElementById('btn-save-flags').addEventListener('click', async () => {
         await putRecord('flags', { id: 'flags', ...flagState, updatedAt: new Date().toISOString() });
         toast('Feature flags saved');
       });
 
-      // ===== IMPORT / EXPORT =====
+      // ===== SITE CONTENT =====
+      let contentData = { contact: {}, documentation: [], tutorials: [] };
+
+      async function loadSiteContent() {
+        const content = (await getStore('content'))[0] || {};
+        contentData = content;
+        // Populate contact form
+        document.getElementById('contact-email').value = content.contact?.email || '';
+        document.getElementById('contact-phone').value = content.contact?.phone || '';
+        document.getElementById('contact-hours').value = content.contact?.hours || '';
+        renderDocList(content.documentation || []);
+        renderTutorialList(content.tutorials || []);
+      }
+
+      function renderDocList(docs) {
+        const list = document.getElementById('doc-list');
+        if (!docs || !docs.length) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No documentation articles yet.</div></div>`;
+          return;
+        }
+        list.innerHTML = docs.map((d, i) => `
+          <div class="list-item">
+            <div class="info">
+              <div class="title">${escapeHtml(d.title)}</div>
+              <div class="meta">${d.id || ''}</div>
+            </div>
+            <div class="actions">
+              <button class="btn" onclick="editDoc('${d.id}')">✏️ Edit</button>
+              <button class="btn btn-danger" onclick="deleteDoc('${d.id}')">🗑 Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderTutorialList(tuts) {
+        const list = document.getElementById('tutorial-list');
+        if (!tuts || !tuts.length) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">🎥</div><div>No tutorials yet.</div></div>`;
+          return;
+        }
+        list.innerHTML = tuts.map((t, i) => `
+          <div class="list-item">
+            <div class="info">
+              <div class="title">${escapeHtml(t.title)}</div>
+              <div class="meta">${t.url ? '🔗 ' + t.url : ''}</div>
+            </div>
+            <div class="actions">
+              <button class="btn" onclick="editTutorial('${t.id}')">✏️ Edit</button>
+              <button class="btn btn-danger" onclick="deleteTutorial('${t.id}')">🗑 Delete</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Contact save
+      document.getElementById('save-contact').addEventListener('click', async () => {
+        const email = document.getElementById('contact-email').value.trim();
+        const phone = document.getElementById('contact-phone').value.trim();
+        const hours = document.getElementById('contact-hours').value.trim();
+        contentData.contact = { email, phone, hours };
+        await saveContent();
+        toast('Contact info saved');
+      });
+
+      // Documentation add
+      document.getElementById('add-doc').addEventListener('click', () => {
+        editingDocId = null;
+        showDocModal('New Documentation Article', '');
+      });
+
+      // Tutorial add
+      document.getElementById('add-tutorial').addEventListener('click', () => {
+        editingTutorialId = null;
+        showTutorialModal('New Tutorial', '');
+      });
+
+      window.editDoc = function(id) {
+        editingDocId = id;
+        const doc = contentData.documentation.find(d => d.id === id);
+        if (doc) {
+          showDocModal('Edit Documentation', doc.content || '', doc.title);
+        }
+      };
+
+      window.deleteDoc = async function(id) {
+        if (!confirm('Delete this article?')) return;
+        contentData.documentation = contentData.documentation.filter(d => d.id !== id);
+        await saveContent();
+        renderDocList(contentData.documentation);
+        toast('Article deleted');
+      };
+
+      window.editTutorial = function(id) {
+        editingTutorialId = id;
+        const tut = contentData.tutorials.find(t => t.id === id);
+        if (tut) {
+          showTutorialModal('Edit Tutorial', tut.description || '', tut.title, tut.url);
+        }
+      };
+
+      window.deleteTutorial = async function(id) {
+        if (!confirm('Delete this tutorial?')) return;
+        contentData.tutorials = contentData.tutorials.filter(t => t.id !== id);
+        await saveContent();
+        renderTutorialList(contentData.tutorials);
+        toast('Tutorial deleted');
+      };
+
+      function showDocModal(title, content, docTitle = '') {
+        const modalHtml = `
+          <div><label>Title</label><input type="text" id="doc-title" value="${escapeHtml(docTitle)}" /></div>
+          <div><label>Content</label><div class="editor-wrapper" id="doc-editor-wrapper"><div id="doc-editor" style="min-height:200px;background:#fff;color:#000;">${content}</div></div></div>
+          <div class="btn-row">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveDocFromModal()">💾 Save</button>
+          </div>
+        `;
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-body').innerHTML = modalHtml;
+        document.getElementById('modal-overlay').classList.add('active');
+        // init Quill for doc
+        initDocQuill(content);
+      }
+
+      let docQuill = null;
+      let docQuillInit = false;
+
+      function initDocQuill(initialContent) {
+        if (docQuillInit) {
+          if (docQuill) docQuill.root.innerHTML = initialContent;
+          return;
+        }
+        const container = document.getElementById('doc-editor');
+        if (!container) return;
+        setTimeout(() => {
+          docQuill = new Quill('#doc-editor', {
+            theme: 'snow',
+            placeholder: 'Write your documentation article here…',
+            modules: {
+              toolbar: [
+                [{ 'header': [1, 2, 3, false] }],
+                ['bold', 'italic', 'underline', 'strike', 'code'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['blockquote', 'code-block'],
+                ['link', 'image'],
+                ['clean']
+              ]
+            }
+          });
+          const toolbar = docQuill.getModule('toolbar');
+          toolbar.addHandler('image', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
+            input.onchange = () => {
+              const file = input.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = (e) => {
+                const range = docQuill.getSelection();
+                const index = range ? range.index : 0;
+                docQuill.insertEmbed(index, 'image', e.target.result);
+              };
+              reader.readAsDataURL(file);
+            };
+          });
+          if (initialContent) docQuill.root.innerHTML = initialContent;
+          docQuillInit = true;
+        }, 100);
+      }
+
+      window.saveDocFromModal = async function() {
+        const title = document.getElementById('doc-title').value.trim();
+        const content = docQuill ? docQuill.root.innerHTML : '';
+        if (!title) { toast('Title is required'); return; }
+        if (editingDocId) {
+          const existing = contentData.documentation.find(d => d.id === editingDocId);
+          if (existing) {
+            existing.title = title;
+            existing.content = content;
+          }
+        } else {
+          contentData.documentation.push({ id: generateId(), title, content });
+        }
+        await saveContent();
+        closeModal();
+        renderDocList(contentData.documentation);
+        toast(editingDocId ? 'Article updated' : 'Article created');
+        editingDocId = null;
+        docQuillInit = false;
+        docQuill = null;
+      };
+
+      function showTutorialModal(title, description, tutTitle = '', url = '') {
+        const modalHtml = `
+          <div><label>Title</label><input type="text" id="tut-title" value="${escapeHtml(tutTitle)}" /></div>
+          <div><label>URL (YouTube / Vimeo)</label><input type="text" id="tut-url" value="${escapeHtml(url)}" /></div>
+          <div><label>Description</label><div class="editor-wrapper" id="tut-editor-wrapper"><div id="tut-editor" style="min-height:150px;background:#fff;color:#000;">${description}</div></div></div>
+          <div class="btn-row">
+            <button class="btn" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveTutorialFromModal()">💾 Save</button>
+          </div>
+        `;
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-body').innerHTML = modalHtml;
+        document.getElementById('modal-overlay').classList.add('active');
+        initTutorialQuill(description);
+      }
+
+      let tutQuill = null;
+      let tutQuillInit = false;
+
+      function initTutorialQuill(initialContent) {
+        if (tutQuillInit) {
+          if (tutQuill) tutQuill.root.innerHTML = initialContent;
+          return;
+        }
+        const container = document.getElementById('tut-editor');
+        if (!container) return;
+        setTimeout(() => {
+          tutQuill = new Quill('#tut-editor', {
+            theme: 'snow',
+            placeholder: 'Write a short description…',
+            modules: {
+              toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['link'],
+                ['clean']
+              ]
+            }
+          });
+          if (initialContent) tutQuill.root.innerHTML = initialContent;
+          tutQuillInit = true;
+        }, 100);
+      }
+
+      window.saveTutorialFromModal = async function() {
+        const title = document.getElementById('tut-title').value.trim();
+        const url = document.getElementById('tut-url').value.trim();
+        const description = tutQuill ? tutQuill.root.innerHTML : '';
+        if (!title) { toast('Title is required'); return; }
+        if (editingTutorialId) {
+          const existing = contentData.tutorials.find(t => t.id === editingTutorialId);
+          if (existing) {
+            existing.title = title;
+            existing.url = url;
+            existing.description = description;
+          }
+        } else {
+          contentData.tutorials.push({ id: generateId(), title, url, description });
+        }
+        await saveContent();
+        closeModal();
+        renderTutorialList(contentData.tutorials);
+        toast(editingTutorialId ? 'Tutorial updated' : 'Tutorial created');
+        editingTutorialId = null;
+        tutQuillInit = false;
+        tutQuill = null;
+      };
+
+      async function saveContent() {
+        // Save the whole content object
+        const existing = (await getStore('content'))[0] || {};
+        const merged = { ...existing, ...contentData, id: 'main' };
+        await putRecord('content', merged);
+      }
+
+      // ===== EXPORT / IMPORT / SYNC (unchanged) =====
       window.exportData = async function() {
         const data = {
           templates: await getStore('templates'),
@@ -923,7 +1091,8 @@
           users: await getStore('users'),
           logs: await getStore('logs'),
           pairings: await getStore('pairings'),
-          flags: await getStore('flags')
+          flags: await getStore('flags'),
+          content: await getStore('content')
         };
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -959,6 +1128,7 @@
             renderPairings();
             loadSettings();
             loadFlags();
+            loadSiteContent();
           } catch (err) {
             toast('Invalid JSON file');
           }
@@ -966,7 +1136,6 @@
         input.click();
       };
 
-      // ===== GITHUB SYNC =====
       window.syncToGitHub = async function() {
         const token = prompt('Enter GitHub Personal Access Token (classic, repo scope):');
         if (!token) return;
@@ -979,7 +1148,8 @@
             users: await getStore('users'),
             logs: await getStore('logs'),
             pairings: await getStore('pairings'),
-            flags: await getStore('flags')
+            flags: await getStore('flags'),
+            content: await getStore('content')
           };
           const payload = {
             message: 'Update admin data from Promptica Admin',
@@ -990,8 +1160,7 @@
             headers: { Authorization: `token ${token}` }
           });
           let sha = null;
-          if (exists.ok) { const d = await exists.json();
-            sha = d.sha; }
+          if (exists.ok) { const d = await exists.json(); sha = d.sha; }
           const res = await fetch(`https://api.github.com/repos/${repo}/contents/admin_data.json`, {
             method: 'PUT',
             headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
@@ -1007,36 +1176,6 @@
           toast('Sync failed: ' + e.message);
         }
       };
-
-      // ===== SEED CONTENT =====
-      async function seedContent() {
-        const existing = await getStore('templates');
-        if (!existing.length) {
-          // Seed default SpeakEasy content as templates
-          for (const cat of defaultSpeakEasy) {
-            for (const article of cat.articles) {
-              const [title, ...contentParts] = article.split(' – ');
-              const content = contentParts.join(' – ');
-              await putRecord('templates', {
-                id: generateId(),
-                title: title || article,
-                slug: (title || article).toLowerCase().replace(/\s+/g, '-'),
-                content: `<p>${content || article}</p>`,
-                category: cat.name,
-                tags: ['speakeasy', cat.name.toLowerCase().replace(/\s+/g, '-')],
-                public: true,
-                visibility: 'published',
-                publishedAt: new Date().toISOString(),
-                version: 1,
-                usageCount: 0,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-              });
-            }
-          }
-          toast('📚 SpeakEasy content seeded');
-        }
-      }
 
       // ===== EVENT BINDINGS =====
       sidebar.querySelectorAll('.nav-item[data-page]').forEach(el => {
@@ -1095,7 +1234,22 @@
       // ===== INIT =====
       async function init() {
         await openDB();
-        await seedContent();
+        // Seed default content if missing
+        const content = await getStore('content');
+        if (!content.length) {
+          const defaultContent = {
+            id: 'main',
+            contact: { email: 'support@promptica.com', phone: '+1-800-555-PROM', hours: 'Mon-Fri 9am-6pm EST' },
+            documentation: [
+              { id: generateId(), title: 'Getting Started with Promptica', content: '<p>Welcome to Promptica! Here\'s how to get started…</p>' },
+              { id: generateId(), title: 'Using the Teleprompter', content: '<p>Learn how to use the prompter effectively…</p>' }
+            ],
+            tutorials: [
+              { id: generateId(), title: 'How to Record a Video', url: 'https://youtube.com/watch?v=example', description: '<p>A step-by-step guide to recording your first video.</p>' }
+            ]
+          };
+          await putRecord('content', defaultContent);
+        }
 
         const settings = await getStore('settings');
         if (!settings.length) {
@@ -1118,7 +1272,6 @@
             updatedAt: new Date().toISOString()
           });
         }
-
         const flags = await getStore('flags');
         if (!flags.length) {
           await putRecord('flags', {
@@ -1131,13 +1284,13 @@
             updatedAt: new Date().toISOString()
           });
         }
-
         navigateTo('dashboard');
         toast('🎙️ Admin Panel ready');
       }
 
       init();
 
+      // Expose functions for inline onclick
       window.openNewTemplate = openNewTemplate;
       window.exportData = exportData;
       window.importData = importData;
