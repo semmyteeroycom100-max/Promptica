@@ -4,12 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Promptica · Studio Prompter</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-
   <style>
+    /* ===== RESET & BASE ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
@@ -1403,7 +1402,12 @@
         });
         if (pageId === 'home-page') updateDashboard();
         else if (pageId === 'library-page') renderLibrary();
-        else if (pageId === 'editor-page') loadCurrentScript();
+        else if (pageId === 'editor-page') {
+          // Load script only if the editor page was not already active
+          if (!editorPage.classList.contains('active')) {
+            loadCurrentScript();
+          }
+        }
       }
 
       sidebar.querySelectorAll('.nav-item[data-page]').forEach(el => {
@@ -1718,8 +1722,10 @@
         state.isLoading = false;
       }
 
+      // ===== NEW SCRIPT (called from Start Session) =====
       async function newScript(content = '') {
         state.isLoading = true;
+        // If there's already a script, we could ask to save, but we'll just create a new one.
         const data = { title: 'Untitled', content: content, updatedAt: Date.now(), settings: { ...state.settings }, scrollPos: 0 };
         const id = await saveScript(data);
         state.currentScriptId = id;
@@ -1730,9 +1736,10 @@
         showPage('editor-page');
         scriptText.focus();
         state.isLoading = false;
+        toast('New script created');
       }
 
-      // Auto-save REMOVED – only manual save now
+      // ===== MANUAL SAVE (no auto-save) =====
       function saveCurrentScript(pushHistory = true) {
         if (!state.currentScriptId || state.isLoading) return;
         const content = scriptText.value;
@@ -1762,6 +1769,7 @@
         if (state.currentScriptId) {
           openScript(state.currentScriptId);
         } else {
+          // No script, leave empty
           scriptText.value = '';
           updateWordCount();
         }
@@ -2556,7 +2564,8 @@
 
       // ===== ENTER / EXIT PROMPTER =====
       async function enterPrompter(withCoach = false, onReady = null) {
-        await saveCurrentScript(false);
+        // Ensure current script is saved before entering prompter
+        saveCurrentScript(false);
         renderPrompterText();
         showPage('prompter-page');
         applyPrompterStyles();
