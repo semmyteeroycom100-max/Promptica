@@ -92,7 +92,6 @@
     }
     .separator { height: 1px; background: rgba(255,255,255,0.06); margin: 4px 0; }
 
-    /* Help & Support */
     .help-section { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
     .help-trigger {
       display: flex;
@@ -110,7 +109,6 @@
     .help-trigger .ico { font-size: 18px; width: 24px; text-align: center; }
     .help-trigger .arrow { margin-left: auto; font-size: 14px; opacity: 0.4; transition: 0.2s; }
     .help-trigger.open .arrow { transform: rotate(180deg); }
-
     .help-dropdown {
       display: none;
       flex-direction: column;
@@ -324,7 +322,6 @@
       text-transform: uppercase;
     }
 
-    /* More button (outside grid) */
     .more-wrapper {
       display: flex;
       justify-content: center;
@@ -932,7 +929,7 @@
           <div class="grid-item" data-action="export"><span class="icon">💾</span><span class="label">Export</span></div>
         </div>
 
-        <!-- More button (outside grid) -->
+        <!-- More button -->
         <div class="more-wrapper">
           <div class="more-dropdown" id="more-dropdown">
             <button class="more-btn" id="more-btn">
@@ -1549,7 +1546,6 @@
         applyCameraLayout(s.layoutMode || 'blur');
         prompterTextWrap.style.setProperty('--text-opacity', s.textOpacity || 1);
         document.querySelector('.cam-bg video')?.style.setProperty('--cam-brightness', s.cameraBrightness || 1);
-        // Update focus button in controls bar
         ctrlFocus.classList.toggle('active', s.focus);
       }
 
@@ -1736,37 +1732,39 @@
         state.isLoading = false;
       }
 
-      async function saveCurrentScript(pushHistory = true) {
+      // Auto-save REMOVED – only manual save now
+      function saveCurrentScript(pushHistory = true) {
         if (!state.currentScriptId || state.isLoading) return;
         const content = scriptText.value;
         const title = scriptTitle.value.trim() || 'Untitled';
         const scrollPos = scriptText.scrollTop || 0;
         const data = { id: state.currentScriptId, title, content, updatedAt: Date.now(), settings: { ...state.settings }, scrollPos };
         if (pushHistory) {
-          const history = await getHistory(state.currentScriptId);
-          const snapshots = history.slice(-9);
-          snapshots.push({ content, title, timestamp: Date.now() });
-          await saveHistory(state.currentScriptId, snapshots);
+          getHistory(state.currentScriptId).then(history => {
+            const snapshots = history.slice(-9);
+            snapshots.push({ content, title, timestamp: Date.now() });
+            saveHistory(state.currentScriptId, snapshots);
+          }).catch(() => {});
         }
-        await saveScript(data);
-        saveIndicator.textContent = '✅ Saved';
-        setTimeout(() => { saveIndicator.textContent = 'Saved'; }, 2000);
-        updateWordCount();
-        updateDashboard();
-        renderLibrary();
-      }
-
-      let autoSaveTimer = null;
-      function autoSaveScript() {
-        if (state.isLoading) return;
-        saveIndicator.textContent = '💾 Saving…';
-        clearTimeout(autoSaveTimer);
-        autoSaveTimer = setTimeout(() => saveCurrentScript(true), 600);
+        saveScript(data).then(() => {
+          saveIndicator.textContent = '✅ Saved';
+          setTimeout(() => { saveIndicator.textContent = 'Saved'; }, 2000);
+          updateWordCount();
+          updateDashboard();
+          renderLibrary();
+        }).catch(() => {
+          saveIndicator.textContent = '❌ Error';
+          toast('Error saving script');
+        });
       }
 
       function loadCurrentScript() {
-        if (state.currentScriptId) openScript(state.currentScriptId);
-        else scriptText.value = '';
+        if (state.currentScriptId) {
+          openScript(state.currentScriptId);
+        } else {
+          scriptText.value = '';
+          updateWordCount();
+        }
       }
 
       function updateWordCount() {
@@ -1947,7 +1945,7 @@
         `;
         showModal('⚙️ General Settings', html);
 
-        // Bind events for this modal instance
+        // Bind events
         document.getElementById('modal-speed').addEventListener('input', function() {
           document.getElementById('modal-speed-val').textContent = this.value;
         });
@@ -2168,7 +2166,6 @@
         state.settings.speed = val;
         settingSpeed.value = val; speedLabel.textContent = val;
         ctrlSpeed.value = val; ctrlSpeedLabel.textContent = val;
-        autoSaveScript();
       }
 
       // ===== PROMPTER =====
@@ -2672,7 +2669,6 @@
         toggleFocus.classList.toggle('active', state.settings.focus);
         ctrlFocus.classList.toggle('active', state.settings.focus);
         if (prompterPage.classList.contains('active')) applyPrompterStyles();
-        autoSaveScript();
       }
 
       function toggleCoach() {
@@ -2927,7 +2923,6 @@
         state.lastTimestamp = ts;
         const shouldThrottle = state.isRecording && !isDragging;
         if (shouldThrottle && Math.random() > 0.5) {
-          // skip half frames during recording
           state.animFrameId = requestAnimationFrame(animateScroll);
           return;
         }
@@ -2970,7 +2965,7 @@
       }
       function updatePlayIcon() { playIcon.textContent = state.isPlaying ? '⏸' : '▶'; }
 
-      // ===== RECORD BUTTON FLOW =====
+      // ===== RECORD BUTTON =====
       recordBtn.addEventListener('click', async () => {
         if (!state.isRecording) {
           if (!state.cameraStream) { toast('Camera not ready'); return; }
@@ -2986,55 +2981,52 @@
         }
       });
 
-      // ===== PLAY/PAUSE BUTTON =====
+      // ===== PLAY/PAUSE =====
       playBtn.addEventListener('click', () => {
         togglePlay();
       });
 
-      // ===== FOCUS BUTTON IN CONTROLS =====
+      // ===== FOCUS =====
       ctrlFocus.addEventListener('click', toggleFocusMode);
 
-      // ===== COACH BUTTON IN CONTROLS =====
+      // ===== COACH =====
       ctrlCoach.addEventListener('click', toggleCoach);
 
       // ===== EXIT =====
       prompterBack.addEventListener('click', exitPrompter);
       document.getElementById('ctrl-exit')?.addEventListener('click', exitPrompter);
 
-      // ===== SPEED SLIDER IN CONTROLS =====
+      // ===== SPEED =====
       ctrlSpeed.addEventListener('input', () => {
         setSpeed(parseFloat(ctrlSpeed.value));
         ctrlSpeedLabel.textContent = ctrlSpeed.value;
       });
 
-      // ===== EVENT BINDINGS (editor) =====
-      editorBack.addEventListener('click', async () => { await saveCurrentScript(true); showPage('home-page'); updateDashboard(); });
-      scriptTitle.addEventListener('input', () => { autoSaveScript(); updateWordCount(); });
-      scriptText.addEventListener('input', () => { autoSaveScript(); updateWordCount(); });
-      scriptText.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab') {
-          e.preventDefault();
-          const start = scriptText.selectionStart;
-          const end = scriptText.selectionEnd;
-          scriptText.value = scriptText.value.substring(0, start) + '  ' + scriptText.value.substring(end);
-          scriptText.selectionStart = scriptText.selectionEnd = start + 2;
-        }
-      });
+      // ===== EDITOR SAVE =====
       btnSave.addEventListener('click', () => saveCurrentScript(true));
+
+      // ===== EDITOR ENTER PROMPTER =====
       btnEnter.addEventListener('click', () => enterPrompter(false));
 
-      settingSpeed.addEventListener('input', () => { setSpeed(parseFloat(settingSpeed.value)); autoSaveScript(); });
-      settingFont.addEventListener('change', () => { state.settings.fontFamily = settingFont.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingSize.addEventListener('change', () => { state.settings.fontSize = parseInt(settingSize.value); if (prompterPage.classList.contains('active')) { applyPrompterStyles(); requestAnimationFrame(() => { setTimeout(() => { measureTextHeight(); updateTextPosition(); }, 30); }); } autoSaveScript(); });
-      settingTextColor.addEventListener('input', () => { state.settings.textColor = settingTextColor.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingBgColor.addEventListener('input', () => { state.settings.bgColor = settingBgColor.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingBgOpacity.addEventListener('input', () => { const v=parseFloat(settingBgOpacity.value); state.settings.bgOpacity=v; opacityLabel.textContent=v.toFixed(2); if(prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
+      // ===== EDITOR BACK =====
+      editorBack.addEventListener('click', async () => {
+        showPage('home-page');
+        updateDashboard();
+      });
+
+      // ===== SETTINGS CHANGES (editor) =====
+      settingSpeed.addEventListener('input', () => { setSpeed(parseFloat(settingSpeed.value)); });
+      settingFont.addEventListener('change', () => { state.settings.fontFamily = settingFont.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingSize.addEventListener('change', () => { state.settings.fontSize = parseInt(settingSize.value); if (prompterPage.classList.contains('active')) { applyPrompterStyles(); requestAnimationFrame(() => { setTimeout(() => { measureTextHeight(); updateTextPosition(); }, 30); }); } });
+      settingTextColor.addEventListener('input', () => { state.settings.textColor = settingTextColor.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingBgColor.addEventListener('input', () => { state.settings.bgColor = settingBgColor.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingBgOpacity.addEventListener('input', () => { const v=parseFloat(settingBgOpacity.value); state.settings.bgOpacity=v; opacityLabel.textContent=v.toFixed(2); if(prompterPage.classList.contains('active')) applyPrompterStyles(); });
       toggleFocus.addEventListener('click', toggleFocusMode);
-      toggleGlow.addEventListener('click', () => { state.settings.textShadow = !state.settings.textShadow; toggleGlow.classList.toggle('active', state.settings.textShadow); if(prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingLineHeight.addEventListener('change', () => { state.settings.lineHeight = parseFloat(settingLineHeight.value); if(prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingLetterSpacing.addEventListener('input', () => { const v=parseFloat(settingLetterSpacing.value); state.settings.letterSpacing=v; letterSpacingLabel.textContent=v.toFixed(1); if(prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingOverlayOpacity.addEventListener('input', () => { const v=parseFloat(settingOverlayOpacity.value); state.settings.overlayOpacity=v; overlayOpacityLabel.textContent=v.toFixed(2); if(prompterPage.classList.contains('active')) applyPrompterStyles(); autoSaveScript(); });
-      settingAutoDelay.addEventListener('input', () => { const v=parseFloat(settingAutoDelay.value); state.settings.autoDelay=v; autoDelayLabel.textContent=v+'s'; autoSaveScript(); });
+      toggleGlow.addEventListener('click', () => { state.settings.textShadow = !state.settings.textShadow; toggleGlow.classList.toggle('active', state.settings.textShadow); if(prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingLineHeight.addEventListener('change', () => { state.settings.lineHeight = parseFloat(settingLineHeight.value); if(prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingLetterSpacing.addEventListener('input', () => { const v=parseFloat(settingLetterSpacing.value); state.settings.letterSpacing=v; letterSpacingLabel.textContent=v.toFixed(1); if(prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingOverlayOpacity.addEventListener('input', () => { const v=parseFloat(settingOverlayOpacity.value); state.settings.overlayOpacity=v; overlayOpacityLabel.textContent=v.toFixed(2); if(prompterPage.classList.contains('active')) applyPrompterStyles(); });
+      settingAutoDelay.addEventListener('input', () => { const v=parseFloat(settingAutoDelay.value); state.settings.autoDelay=v; autoDelayLabel.textContent=v+'s'; });
 
       toggleVad.addEventListener('click', () => {
         state.settings.vad = !state.settings.vad;
@@ -3042,10 +3034,23 @@
         state.vadEnabled = state.settings.vad;
         if (state.vadEnabled) { if (!vadInitialized) initVAD(); else monitorVAD(); }
         else { state.vadSpeaking = false; clearTimeout(state.vadHoldTimer); state.isPlaying = false; updatePlayIcon(); }
-        autoSaveScript();
       });
       btnCalibrate.addEventListener('click', startCalibration);
-      btnShortcuts.addEventListener('click', showShortcuts);
+      btnShortcuts.addEventListener('click', () => {
+        showModal('⌨️ Keyboard Shortcuts', `
+          <table style="width:100%;border-collapse:collapse;font-size:14px;color:var(--text-secondary);">
+            <tr><td style="padding:6px 0;"><kbd>Space</kbd></td><td>Play/Pause</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>↑</kbd> <kbd>↓</kbd></td><td>Speed up/down</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>Esc</kbd></td><td>Exit prompter</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>F</kbd></td><td>Focus toggle</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>R</kbd></td><td>Record toggle</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>C</kbd></td><td>Coach toggle</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>Ctrl+Enter</kbd></td><td>Enter prompter</td></tr>
+            <tr><td style="padding:6px 0;"><kbd>Ctrl+Shift+F</kbd></td><td>Fullscreen editor</td></tr>
+          </table>
+          <p style="margin-top:12px;color:var(--text-secondary);font-size:13px;">Also: drag the progress bar to scrub, use ↑↓ buttons to scroll manually.</p>
+        `);
+      });
 
       // ===== HERO START =====
       heroStart.addEventListener('click', startSession);
@@ -3069,7 +3074,7 @@
         { element: '#sidebar .nav-item[data-action="speakeasy"]', title: '🎤 SpeakEasy', desc: 'Your public speaking coach – access warm‑up drills, script structures, and delivery tips.' },
         { element: '#sidebar .nav-item[data-action="learn"]', title: '📖 Learn Hub', desc: 'Tutorials, FAQs, and best practices to master Promptica.' },
         { element: '#editor-page .script-title-input', title: '📝 Script Title', desc: 'Give your script a clear title. It will be saved and displayed in your library.' },
-        { element: '#script-textarea', title: '✍️ Script Editor', desc: 'Write or paste your script here. Auto‑save keeps your work safe. Use Tab for indentation.' },
+        { element: '#script-textarea', title: '✍️ Script Editor', desc: 'Write or paste your script here. Click "Save" to keep your work safe. Use Tab for indentation.' },
         { element: '#settings-gear', title: '⚙️ Quick Settings', desc: 'Adjust speed, font, colours, and more – all without leaving the editor.' },
         { element: '#btn-enter-prompter', title: '▶ Enter Prompter', desc: 'Click to go full‑screen with your script. This is where you present and record.' },
       ];
@@ -3246,7 +3251,6 @@
         renderLibrary();
         initCamera();
         initVAD();
-        document.addEventListener('change', readSettingsFromUI);
         toast('🎙️ Promptica ready');
 
         window.addEventListener('online', () => { offlineBadge.classList.remove('show'); toast('Back online'); });
