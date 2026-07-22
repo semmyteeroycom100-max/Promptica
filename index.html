@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
   <style>
-    /* ===== RESET & BASE ===== */
+    /* ===== RESET & BASE (same as before) ===== */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg-primary: #0b0b0b; --bg-secondary: #161616; --bg-panel: #1e1e1e;
@@ -1226,6 +1226,20 @@
         { id: generateId(), title: 'Sales Pitch', content: 'Our product solves X. Here\'s how it works. Here\'s why it\'s better. Here\'s the price. Buy now.', category: 'Business' }
       ];
 
+      // ===== DEFINE defaultChallenges (was missing) =====
+      const defaultChallenges = [
+        'Record a 2‑minute speech using 3 power poses.',
+        'Deliver a 1‑minute monologue without using the word "um".',
+        'Practise your opening line 5 times with different vocal tones.',
+        'Record yourself telling a personal story with a clear beginning, middle, and end.',
+        'Give a 90‑second pitch for a product you love.',
+        'Read a passage from your favourite book with exaggerated expression.',
+        'Practise a 2‑minute speech while maintaining eye contact with the camera.',
+        'Record a 3‑minute talk using only short sentences (5‑7 words each).',
+        'Deliver a 1‑minute speech with a 3‑second pause after each sentence.',
+        'Try a vocal warm‑up (lip trills, tongue twisters) before recording.'
+      ];
+
       // ===== STATE =====
       const state = {
         scripts: [],
@@ -1403,7 +1417,7 @@
         if (pageId === 'home-page') updateDashboard();
         else if (pageId === 'library-page') renderLibrary();
         else if (pageId === 'editor-page') {
-          // Load script only if the editor page was not already active
+          // Only load if the editor page was not already active and we have a script
           if (!editorPage.classList.contains('active')) {
             loadCurrentScript();
           }
@@ -1725,7 +1739,6 @@
       // ===== NEW SCRIPT (called from Start Session) =====
       async function newScript(content = '') {
         state.isLoading = true;
-        // If there's already a script, we could ask to save, but we'll just create a new one.
         const data = { title: 'Untitled', content: content, updatedAt: Date.now(), settings: { ...state.settings }, scrollPos: 0 };
         const id = await saveScript(data);
         state.currentScriptId = id;
@@ -1739,7 +1752,7 @@
         toast('New script created');
       }
 
-      // ===== MANUAL SAVE (no auto-save) =====
+      // ===== MANUAL SAVE =====
       function saveCurrentScript(pushHistory = true) {
         if (!state.currentScriptId || state.isLoading) return;
         const content = scriptText.value;
@@ -1953,7 +1966,7 @@
         `;
         showModal('⚙️ General Settings', html);
 
-        // Bind events
+        // Bind events (shortened for brevity, but functional)
         document.getElementById('modal-speed').addEventListener('input', function() {
           document.getElementById('modal-speed-val').textContent = this.value;
         });
@@ -1982,6 +1995,7 @@
           });
         });
         document.getElementById('modal-close-settings').addEventListener('click', () => {
+          // Save settings...
           state.settings.speed = parseFloat(document.getElementById('modal-speed').value);
           state.settings.autoDelay = parseFloat(document.getElementById('modal-delay').value);
           state.settings.vad = document.getElementById('modal-vad').classList.contains('active');
@@ -2564,7 +2578,7 @@
 
       // ===== ENTER / EXIT PROMPTER =====
       async function enterPrompter(withCoach = false, onReady = null) {
-        // Ensure current script is saved before entering prompter
+        // Save before entering
         saveCurrentScript(false);
         renderPrompterText();
         showPage('prompter-page');
