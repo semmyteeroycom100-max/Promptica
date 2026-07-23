@@ -62,7 +62,6 @@
       transition: transform 0.3s ease;
       z-index: 20;
     }
-    /* Hamburger inside sidebar (hidden on desktop, shown in open state on mobile) */
     .sidebar-toggle {
       background: none;
       border: none;
@@ -73,7 +72,7 @@
       margin-bottom: 12px;
       align-self: flex-start;
       transition: color 0.2s;
-      display: none; /* hidden by default, shown on mobile when sidebar is open */
+      display: none;
     }
     .sidebar-toggle:hover { color: var(--text-primary); }
 
@@ -182,7 +181,6 @@
       text-transform: uppercase;
     }
 
-    /* Sidebar overlay for mobile */
     #sidebar-overlay {
       display: none;
       position: fixed;
@@ -192,7 +190,6 @@
     }
     #sidebar-overlay.active { display: block; }
 
-    /* ===== FLOATING HELP (?) ===== */
     .floating-help {
       position: fixed;
       top: 16px;
@@ -223,7 +220,7 @@
     .page { display: none; flex-direction: column; height: 100%; width: 100%; overflow-y: auto; padding: 24px 28px; }
     .page.active { display: flex; }
 
-    /* ===== HERO BAR (NEW LAYOUT) ===== */
+    /* ===== HERO BAR ===== */
     .hero-bar {
       background: var(--bg-secondary);
       border: 1px solid var(--border-color);
@@ -860,7 +857,6 @@
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       :root { --sidebar-width: 56px; }
-      /* Fixed hamburger */
       .sidebar-toggle-fixed { display: block; }
 
       #sidebar {
@@ -878,17 +874,16 @@
         transition: transform 0.3s ease;
       }
       #sidebar.open { transform: translateX(0); }
-      /* Show the internal hamburger only when sidebar is open, but we already have a fixed one, so hide internal */
       .sidebar-toggle { display: none; }
 
       #sidebar .logo span, #sidebar .nav-item .label, #sidebar .help-trigger span, #sidebar .help-dropdown .item .label {
-        display: none; /* hidden when sidebar closed */
+        display: none;
       }
       #sidebar.open .logo span,
       #sidebar.open .nav-item .label,
       #sidebar.open .help-trigger span,
       #sidebar.open .help-dropdown .item .label {
-        display: inline; /* show when open */
+        display: inline;
       }
       #sidebar .nav-item { padding: 10px; justify-content: center; }
       #sidebar.open .nav-item { justify-content: flex-start; }
@@ -950,7 +945,7 @@
 </head>
 <body>
 
-  <!-- ===== FIXED HAMBURGER (always visible on mobile) ===== -->
+  <!-- ===== FIXED HAMBURGER ===== -->
   <button class="sidebar-toggle-fixed" id="sidebarToggleFixed" aria-label="Toggle sidebar">☰</button>
 
   <!-- ===== TOAST ===== -->
@@ -981,7 +976,6 @@
 
     <!-- ===== SIDEBAR ===== -->
     <nav id="sidebar">
-      <!-- Hamburger inside sidebar (only visible when sidebar is open on mobile) -->
       <button class="sidebar-toggle" id="sidebarToggle">☰</button>
 
       <div class="logo">
@@ -1020,7 +1014,6 @@
       <!-- ========== HOME PAGE ========== -->
       <div id="home-page" class="page active">
 
-        <!-- Hero Bar -->
         <div class="hero-bar">
           <div class="brand">
             <span class="icon">🎙️</span>
@@ -1040,7 +1033,6 @@
           </div>
         </div>
 
-        <!-- Action Grid -->
         <div class="action-grid" id="action-grid">
           <div class="grid-item primary" data-action="start"><span class="icon">🎙️</span><span class="label">New Script</span></div>
           <div class="grid-item" data-action="continue"><span class="icon">⏯️</span><span class="label">Open Last</span></div>
@@ -1053,7 +1045,6 @@
           <div class="grid-item" data-action="export"><span class="icon">💾</span><span class="label">Export</span></div>
         </div>
 
-        <!-- More -->
         <div class="more-wrapper">
           <div class="more-dropdown" id="more-dropdown">
             <button class="more-btn" id="more-btn">
@@ -1071,7 +1062,6 @@
           </div>
         </div>
 
-        <!-- Activity & Spark -->
         <div class="activity-timeline">
           <h3>📋 Recent Activity</h3>
           <div id="activity-list"></div>
@@ -1155,12 +1145,10 @@
       <!-- ========== PROMPTER PAGE ========== -->
       <div id="prompter-page" class="page">
         <div class="prompter-viewport" id="prompter-viewport">
-          <!-- Camera background -->
           <div class="cam-bg" id="cam-bg" style="display:none;">
             <video id="cam-bg-video" autoplay muted playsinline></video>
             <div class="overlay"></div>
           </div>
-          <!-- Camera compact -->
           <div class="cam-compact" id="cam-compact" style="display:none;">
             <video id="cam-compact-video" autoplay muted playsinline></video>
             <div class="resize-handle" id="resize-handle"></div>
@@ -1296,7 +1284,7 @@
       const generateId = () => Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       const isOnline = () => navigator.onLine;
 
-      // ===== INDEXEDDB (SHARED WITH ADMIN) =====
+      // ===== INDEXEDDB =====
       const DB_NAME = 'PrompticaDB';
       const STORE_NAME = 'scripts';
       const HISTORY_STORE = 'history';
@@ -1575,33 +1563,27 @@
         }
       }
 
-      // Fixed hamburger (top-left)
       sidebarToggleFixed.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleSidebar();
       });
-      // Internal hamburger (inside sidebar)
       sidebarToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleSidebar();
       });
-      // Overlay click closes sidebar
       sidebarOverlay.addEventListener('click', () => {
         toggleSidebar(false);
       });
-      // Escape key closes sidebar
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && sidebar.classList.contains('open')) {
           toggleSidebar(false);
         }
       });
-      // Close sidebar on page click (mobile only)
       document.addEventListener('click', (e) => {
         if (window.innerWidth <= 768 && sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== sidebarToggleFixed && e.target !== sidebarToggle) {
           toggleSidebar(false);
         }
       });
-      // On resize to desktop, ensure sidebar is visible
       window.addEventListener('resize', () => {
         if (window.innerWidth >= 769) {
           sidebar.classList.remove('open');
@@ -1623,7 +1605,6 @@
         }
       });
 
-      // ===== HELP ACTIONS =====
       helpDropdown.querySelectorAll('.item[data-action]').forEach(item => {
         item.addEventListener('click', () => {
           const action = item.dataset.action;
@@ -1961,8 +1942,7 @@
         toast('New script created');
       }
 
-      // ===== SAVE =====
-      let saveTimeout;
+      // ===== MANUAL SAVE ONLY (no auto-save) =====
       function saveCurrentScript(pushHistory = true) {
         if (!state.currentScriptId || state.isLoading) return;
         const content = scriptText.value;
@@ -1981,24 +1961,7 @@
         });
       }
 
-      scriptText.addEventListener('input', () => {
-        clearTimeout(saveTimeout);
-        saveTimeout = setTimeout(() => saveCurrentScript(true), 500);
-      });
-
-      let scrollSaveTimeout;
-      scriptText.addEventListener('scroll', () => {
-        clearTimeout(scrollSaveTimeout);
-        scrollSaveTimeout = setTimeout(() => {
-          if (state.currentScriptId) {
-            saveScriptPartial(state.currentScriptId, { scrollPos: scriptText.scrollTop });
-          }
-        }, 300);
-      });
-
-      scriptTitle.addEventListener('change', () => {
-        saveCurrentScript(false);
-      });
+      // NO auto-save listeners – only manual save button
 
       function loadCurrentScript() {
         if (state.currentScriptId) {
@@ -2796,6 +2759,7 @@
 
       // ===== ENTER / EXIT PROMPTER =====
       async function enterPrompter(withCoach = false, onReady = null) {
+        // Save before entering (manual trigger)
         saveCurrentScript(false);
         renderPrompterText();
         showPage('prompter-page');
@@ -3279,7 +3243,7 @@
         updateDashboard();
       });
 
-      // ===== SETTINGS CHANGES (editor) =====
+      // ===== SETTINGS CHANGES (NO AUTO-SAVE) =====
       settingSpeed.addEventListener('input', () => { setSpeed(parseFloat(settingSpeed.value)); });
       settingFont.addEventListener('change', () => { state.settings.fontFamily = settingFont.value; if (prompterPage.classList.contains('active')) applyPrompterStyles(); });
       settingSize.addEventListener('change', () => { state.settings.fontSize = parseInt(settingSize.value); if (prompterPage.classList.contains('active')) { applyPrompterStyles(); requestAnimationFrame(() => { setTimeout(() => { measureTextHeight(); updateTextPosition(); }, 30); }); } });
