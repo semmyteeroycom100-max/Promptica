@@ -1262,7 +1262,7 @@
   </div>
 
   <!-- ============================================================= -->
-  <!--  JAVASCRIPT – Full Application (with fixes)                    -->
+  <!--  JAVASCRIPT – Full Application (with all fixes)               -->
   <!-- ============================================================= -->
   <script>
     (function() {
@@ -1284,7 +1284,7 @@
       const generateId = () => Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       const isOnline = () => navigator.onLine;
 
-      // ===== FIX: define defaultChallenges =====
+      // ===== DEFAULT CHALLENGES (FIXED) =====
       const defaultChallenges = [
         'Record a 2‑minute speech using 3 power poses.',
         'Deliver a 1‑minute monologue without using the word "um".',
@@ -1457,7 +1457,7 @@
         templatesLabel: 'Templates',
       };
 
-      // ===== DOM REFS (kept as in working version) =====
+      // ===== DOM REFS =====
       const sidebar = $('#sidebar');
       const sidebarToggleFixed = $('#sidebarToggleFixed');
       const sidebarToggle = $('#sidebarToggle');
@@ -2122,7 +2122,6 @@
       modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
 
       // ===== GENERAL SETTINGS MODAL =====
-      // (unchanged, but uses closeModal)
       function openSettingsModal() {
         const s = state.settings;
         const html = `
@@ -2170,7 +2169,6 @@
         `;
         showModal('⚙️ General Settings', html);
 
-        // Bind events (same as before)
         document.getElementById('modal-speed').addEventListener('input', function() {
           document.getElementById('modal-speed-val').textContent = this.value;
         });
@@ -2199,7 +2197,6 @@
           });
         });
         document.getElementById('modal-close-settings').addEventListener('click', () => {
-          // Save settings...
           state.settings.speed = parseFloat(document.getElementById('modal-speed').value);
           state.settings.autoDelay = parseFloat(document.getElementById('modal-delay').value);
           state.settings.vad = document.getElementById('modal-vad').classList.contains('active');
@@ -2301,7 +2298,7 @@
         `);
       }
 
-      // ===== SPEAKEASY (now uses defaultChallenges) =====
+      // ===== SPEAKEASY =====
       async function showSpeakEasy() {
         const content = await getContent();
         let categories = content.speakEasy || [];
@@ -2342,7 +2339,6 @@
           <button class="btn btn-primary" onclick="closeModal()">Close</button>
           <button class="btn" id="start-coach-session" style="margin-left:8px;">Start Practice</button>
         `);
-        // Safely attach listener
         const startBtn = document.getElementById('start-coach-session');
         if (startBtn) {
           startBtn.addEventListener('click', () => {
@@ -2968,9 +2964,9 @@
         updateDashboard();
       }
 
-      // ===== COACH =====
-      let coachInterval = null;
+      // ===== COACH (FIXED: speechRec declared globally) =====
       let speechRec = null;
+      let coachInterval = null;
       let fillerFlashTimeout = null;
       let breathInterval = null;
 
@@ -3301,6 +3297,7 @@
       // ===== HERO START =====
       heroStart.addEventListener('click', startSession);
 
+      // ===== TIP MORE =====
       tipMore.addEventListener('click', async () => {
         const content = await getContent();
         const tips = content.tips || state.tips;
