@@ -1262,7 +1262,7 @@
   </div>
 
   <!-- ============================================================= -->
-  <!--  JAVASCRIPT – Full Application                                 -->
+  <!--  JAVASCRIPT – Full Application (with fixes)                    -->
   <!-- ============================================================= -->
   <script>
     (function() {
@@ -1283,6 +1283,20 @@
       const escapeHtml = str => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
       const generateId = () => Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       const isOnline = () => navigator.onLine;
+
+      // ===== FIX: define defaultChallenges =====
+      const defaultChallenges = [
+        'Record a 2‑minute speech using 3 power poses.',
+        'Deliver a 1‑minute monologue without using the word "um".',
+        'Practise your opening line 5 times with different vocal tones.',
+        'Record yourself telling a personal story with a clear beginning, middle, and end.',
+        'Give a 90‑second pitch for a product you love.',
+        'Read a passage from your favourite book with exaggerated expression.',
+        'Practise a 2‑minute speech while maintaining eye contact with the camera.',
+        'Record a 3‑minute talk using only short sentences (5‑7 words each).',
+        'Deliver a 1‑minute speech with a 3‑second pause after each sentence.',
+        'Try a vocal warm‑up (lip trills, tongue twisters) before recording.'
+      ];
 
       // ===== INDEXEDDB =====
       const DB_NAME = 'PrompticaDB';
@@ -1443,7 +1457,7 @@
         templatesLabel: 'Templates',
       };
 
-      // ===== DOM REFS =====
+      // ===== DOM REFS (kept as in working version) =====
       const sidebar = $('#sidebar');
       const sidebarToggleFixed = $('#sidebarToggleFixed');
       const sidebarToggle = $('#sidebarToggle');
@@ -1691,7 +1705,7 @@
             ${c.hours ? `<div><strong>Support Hours:</strong> ${c.hours}</div>` : ''}
             ${!c.email && !c.phone && !c.hours ? '<p style="color:var(--text-secondary);">No contact information provided.</p>' : ''}
           </div>
-          <button class="btn btn-primary" onclick="document.getElementById('modal-close').click()" style="margin-top:12px;">Close</button>
+          <button class="btn btn-primary" onclick="closeModal()" style="margin-top:12px;">Close</button>
         `;
         showModal('💬 Contact Support', html);
       }
@@ -2100,10 +2114,15 @@
         modalContent.innerHTML = html;
         modalOverlay.classList.add('active');
       }
-      modalClose.addEventListener('click', () => modalOverlay.classList.remove('active'));
-      modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('active'); });
+      // Global close function for inline onclick
+      window.closeModal = function() {
+        modalOverlay.classList.remove('active');
+      };
+      modalClose.addEventListener('click', closeModal);
+      modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
 
       // ===== GENERAL SETTINGS MODAL =====
+      // (unchanged, but uses closeModal)
       function openSettingsModal() {
         const s = state.settings;
         const html = `
@@ -2151,6 +2170,7 @@
         `;
         showModal('⚙️ General Settings', html);
 
+        // Bind events (same as before)
         document.getElementById('modal-speed').addEventListener('input', function() {
           document.getElementById('modal-speed-val').textContent = this.value;
         });
@@ -2179,6 +2199,7 @@
           });
         });
         document.getElementById('modal-close-settings').addEventListener('click', () => {
+          // Save settings...
           state.settings.speed = parseFloat(document.getElementById('modal-speed').value);
           state.settings.autoDelay = parseFloat(document.getElementById('modal-delay').value);
           state.settings.vad = document.getElementById('modal-vad').classList.contains('active');
@@ -2276,11 +2297,11 @@
         showModal('📖 Learn Hub', `
           <p style="margin-bottom:16px;">Tips, tutorials, and best practices to master Promptica.</p>
           ${articlesHtml || '<p style="color:var(--text-secondary);">No articles yet. Admin can add them.</p>'}
-          <button class="btn btn-primary" onclick="document.getElementById('modal-close').click()">Close</button>
+          <button class="btn btn-primary" onclick="closeModal()">Close</button>
         `);
       }
 
-      // ===== SPEAKEASY =====
+      // ===== SPEAKEASY (now uses defaultChallenges) =====
       async function showSpeakEasy() {
         const content = await getContent();
         let categories = content.speakEasy || [];
@@ -2318,8 +2339,17 @@
               ${historyHtml || '<p style="color:var(--text-secondary);">No sessions yet.</p>'}
             </div>
           </div>
-          <button class="btn btn-primary" onclick="document.getElementById('modal-close').click()">Close</button>
+          <button class="btn btn-primary" onclick="closeModal()">Close</button>
+          <button class="btn" id="start-coach-session" style="margin-left:8px;">Start Practice</button>
         `);
+        // Safely attach listener
+        const startBtn = document.getElementById('start-coach-session');
+        if (startBtn) {
+          startBtn.addEventListener('click', () => {
+            closeModal();
+            enterPrompter(true);
+          });
+        }
       }
 
       // ===== SHORTCUTS =====
@@ -2336,6 +2366,7 @@
             <tr><td style="padding:6px 0;"><kbd>Ctrl+Shift+F</kbd></td><td>Fullscreen editor</td></tr>
           </table>
           <p style="margin-top:12px;color:var(--text-secondary);font-size:13px;">Also: drag the progress bar to scrub, use ↑↓ buttons to scroll manually.</p>
+          <button class="btn btn-primary" onclick="closeModal()">Close</button>
         `);
       }
 
@@ -2682,12 +2713,12 @@
           a.download = `promptica_recording_${Date.now()}.webm`;
           a.click();
           URL.revokeObjectURL(url);
-          modalOverlay.classList.remove('active');
+          closeModal();
           toast('Video saved');
         });
         document.getElementById('discard-video-btn').addEventListener('click', () => {
           URL.revokeObjectURL(url);
-          modalOverlay.classList.remove('active');
+          closeModal();
           toast('Discarded');
         });
         const closeHandler = () => { URL.revokeObjectURL(url); modalOverlay.removeEventListener('click', closeHandler); };
@@ -3277,7 +3308,7 @@
           <ul style="color:var(--text-secondary);font-size:14px;line-height:1.8;">
             ${tips.map(t => `<li>${t}</li>`).join('')}
           </ul>
-          <button class="btn btn-primary" onclick="document.getElementById('modal-close').click()">Close</button>
+          <button class="btn btn-primary" onclick="closeModal()">Close</button>
         `);
       });
 
