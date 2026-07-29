@@ -1262,7 +1262,7 @@
   </div>
 
   <!-- ============================================================= -->
-  <!--  JAVASCRIPT – Full Application (with all fixes)               -->
+  <!--  JAVASCRIPT – Full Application (all fixes applied)           -->
   <!-- ============================================================= -->
   <script>
     (function() {
@@ -1284,7 +1284,7 @@
       const generateId = () => Date.now() + '-' + Math.random().toString(36).slice(2, 6);
       const isOnline = () => navigator.onLine;
 
-      // ===== DEFAULT CHALLENGES (FIXED) =====
+      // ===== DEFAULT CHALLENGES =====
       const defaultChallenges = [
         'Record a 2‑minute speech using 3 power poses.',
         'Deliver a 1‑minute monologue without using the word "um".',
@@ -1875,7 +1875,7 @@
         el.addEventListener('click', () => {
           const action = el.dataset.action;
           switch(action) {
-            case 'start': newScript(); break;
+            case 'start': startNewSession(); break;
             case 'continue': continueLast(); break;
             case 'library': showPage('library-page'); renderLibrary(); break;
             case 'learn': showLearnHub(); break;
@@ -1956,7 +1956,75 @@
         toast('New script created');
       }
 
-      // ===== MANUAL SAVE ONLY (no auto-save) =====
+      // ===== NEW SESSION (updated) =====
+      function startNewSession() {
+        // Show a modal with options: Start New Script or Choose from Library
+        showModal('🎙️ Start Session', `
+          <p style="margin-bottom:16px;">Choose how you'd like to start:</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button class="btn btn-primary" id="start-new-script-btn" style="width:100%;padding:12px;">🚀 Start with a New Script</button>
+            <button class="btn" id="choose-from-library-btn" style="width:100%;padding:12px;">📚 Choose from Library</button>
+          </div>
+        `);
+        // Attach listeners
+        const newBtn = document.getElementById('start-new-script-btn');
+        const libBtn = document.getElementById('choose-from-library-btn');
+        if (newBtn) {
+          newBtn.addEventListener('click', () => {
+            closeModal();
+            newScriptAndEnterPrompter();
+          });
+        }
+        if (libBtn) {
+          libBtn.addEventListener('click', () => {
+            closeModal();
+            showScriptPicker();
+          });
+        }
+      }
+
+      async function newScriptAndEnterPrompter() {
+        const data = { title: 'Untitled', content: '', updatedAt: Date.now(), settings: { ...state.settings }, scrollPos: 0 };
+        const id = await saveScript(data);
+        state.currentScriptId = id;
+        scriptTitle.value = 'Untitled';
+        scriptText.value = '';
+        applySettingsToUI(state.settings);
+        updateWordCount();
+        // Enter prompter immediately
+        enterPrompter(false);
+      }
+
+      async function showScriptPicker() {
+        const scripts = await getAllScripts();
+        if (!scripts.length) {
+          toast('No scripts in library. Create one first.');
+          return;
+        }
+        const listHtml = scripts.sort((a,b) => b.updatedAt - a.updatedAt).map(s => `
+          <div class="script-card" data-id="${s.id}" style="cursor:pointer;padding:12px;margin-bottom:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;">
+            <div class="title" style="font-weight:600;">${escapeHtml(s.title)}</div>
+            <div class="meta" style="font-size:12px;color:var(--text-secondary);">${new Date(s.updatedAt).toLocaleDateString()} · ${s.content ? s.content.split(/\s+/).length : 0} words</div>
+          </div>
+        `).join('');
+        showModal('📚 Choose a Script', `
+          <p style="margin-bottom:12px;">Select a script to open in the prompter:</p>
+          <div style="max-height:300px;overflow-y:auto;">${listHtml}</div>
+          <button class="btn" onclick="closeModal()" style="margin-top:12px;">Cancel</button>
+        `);
+        // Attach click listeners to each script card
+        document.querySelectorAll('#modal-content .script-card').forEach(card => {
+          card.addEventListener('click', async () => {
+            const id = parseInt(card.dataset.id);
+            await openScript(id);
+            closeModal();
+            // Enter prompter after opening
+            enterPrompter(false);
+          });
+        });
+      }
+
+      // ===== MANUAL SAVE ONLY =====
       function saveCurrentScript(pushHistory = true) {
         if (!state.currentScriptId || state.isLoading) return;
         const content = scriptText.value;
@@ -2469,6 +2537,7 @@
       let dragData = null;
       function initDraggable() {
         const el = camCompact;
+        if (!el) return;
         el.addEventListener('pointerdown', (e) => {
           if (e.target === resizeHandle) return;
           const rect = el.getBoundingClientRect();
@@ -2513,6 +2582,7 @@
       let isDragging = false;
       function initProgressScrub() {
         const bar = prompterProgress;
+        if (!bar) return;
         bar.addEventListener('pointerdown', (e) => {
           isDragging = true;
           bar.setPointerCapture(e.pointerId);
@@ -2642,6 +2712,7 @@
       };
       const handleTouchEnd = () => { isDraggingPanel = false; };
       [document.getElementById('controlsBar'), handle].forEach(el => {
+        if (!el) return;
         el.addEventListener('touchstart', handleTouchStart, { passive: true });
         el.addEventListener('touchmove', handleTouchMove, { passive: true });
         el.addEventListener('touchend', handleTouchEnd, { passive: true });
@@ -2781,9 +2852,6 @@
         tick();
       }
 
-      // ===== START SESSION =====
-      function startSession() { newScript(); }
-
       // ===== ENTER / EXIT PROMPTER =====
       async function enterPrompter(withCoach = false, onReady = null) {
         // Save before entering (manual trigger)
@@ -2850,20 +2918,23 @@
       let controlsTimeout = null;
       const controlsBarElement = document.querySelector('.controls-bar');
       function showControlsTemporarily() {
+        if (!controlsBarElement) return;
         controlsBarElement.style.opacity = '1';
         clearTimeout(controlsTimeout);
         controlsTimeout = setTimeout(() => { controlsBarElement.style.opacity = '0.7'; }, 3500);
       }
-      controlsBarElement.addEventListener('mouseenter', () => {
-        controlsBarElement.style.opacity = '1';
-        clearTimeout(controlsTimeout);
-      });
-      controlsBarElement.addEventListener('mouseleave', () => {
-        controlsTimeout = setTimeout(() => { controlsBarElement.style.opacity = '0.7'; }, 3500);
-      });
-      controlsBarElement.querySelectorAll('.ctrl-btn, .gear-btn').forEach(btn => {
-        btn.addEventListener('click', showControlsTemporarily);
-      });
+      if (controlsBarElement) {
+        controlsBarElement.addEventListener('mouseenter', () => {
+          controlsBarElement.style.opacity = '1';
+          clearTimeout(controlsTimeout);
+        });
+        controlsBarElement.addEventListener('mouseleave', () => {
+          controlsTimeout = setTimeout(() => { controlsBarElement.style.opacity = '0.7'; }, 3500);
+        });
+        controlsBarElement.querySelectorAll('.ctrl-btn, .gear-btn').forEach(btn => {
+          btn.addEventListener('click', showControlsTemporarily);
+        });
+      }
 
       // ===== KEYBOARD SHORTCUTS =====
       document.addEventListener('keydown', (e) => {
@@ -2964,7 +3035,7 @@
         updateDashboard();
       }
 
-      // ===== COACH (FIXED: speechRec declared globally) =====
+      // ===== COACH (speechRec declared at top) =====
       let speechRec = null;
       let coachInterval = null;
       let fillerFlashTimeout = null;
@@ -3264,7 +3335,7 @@
       // ===== EDITOR ENTER PROMPTER =====
       btnEnter.addEventListener('click', () => enterPrompter(false));
 
-      // ===== EDITOR BACK =====
+      // ===== EDITOR BACK (FIXED) =====
       editorBack.addEventListener('click', async () => {
         showPage('home-page');
         updateDashboard();
@@ -3295,7 +3366,7 @@
       btnShortcuts.addEventListener('click', showShortcuts);
 
       // ===== HERO START =====
-      heroStart.addEventListener('click', startSession);
+      heroStart.addEventListener('click', startNewSession);
 
       // ===== TIP MORE =====
       tipMore.addEventListener('click', async () => {
