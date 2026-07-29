@@ -567,7 +567,6 @@
     .editor-textarea-wrapper { flex: 1; min-height: 0; position: relative; }
     .editor-textarea-wrapper textarea { width: 100%; height: 100%; padding: 16px; background: #111; color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius); font-family: var(--font-sans); font-size: 16px; line-height: 1.8; resize: none; outline: none; }
     .editor-textarea-wrapper textarea:focus { border-color: var(--accent); }
-    /* Fullscreen editor overlay – we'll add a fixed exit button */
     .editor-textarea-wrapper textarea.fullscreen {
       position: fixed;
       inset: 0;
@@ -577,7 +576,8 @@
       font-size: 20px;
       background: var(--bg-primary);
     }
-    /* Fullscreen exit button – fixed position when editor is fullscreen */
+
+    /* Fullscreen exit button – fixed position */
     .fullscreen-btn-exit {
       display: none;
       position: fixed;
@@ -998,6 +998,9 @@
   <!-- ===== SIDEBAR OVERLAY (mobile) ===== -->
   <div id="sidebar-overlay"></div>
 
+  <!-- ===== FULLSCREEN EXIT BUTTON (editor) ===== -->
+  <button class="fullscreen-btn-exit" id="fullscreen-exit-btn">⛶ Exit Fullscreen</button>
+
   <!-- ===== APP ===== -->
   <div id="app">
 
@@ -1231,6 +1234,7 @@
             </div>
           </div>
 
+          <!-- ===== CONTROLS BAR (with camera switch button) ===== -->
           <div class="controls-bar" id="controlsBar">
             <button class="ctrl-btn" id="playBtn" title="Play/Pause scroll">
               <span id="playIcon">▶</span>
@@ -1248,6 +1252,8 @@
             </button>
             <div class="separator"></div>
             <button class="ctrl-btn" id="flashBtn" title="Flashlight">💡</button>
+            <div class="separator"></div>
+            <button class="ctrl-btn" id="switchCameraBtn" title="Switch camera">🔄</button>
             <div class="separator"></div>
             <button class="ctrl-btn" id="ctrl-focus" title="Focus mode">⊞</button>
             <div class="separator"></div>
@@ -1288,11 +1294,8 @@
     </div>
   </div>
 
-  <!-- ===== FIXED EXIT BUTTON FOR FULLSCREEN EDITOR ===== -->
-  <button class="fullscreen-btn-exit" id="fullscreen-exit-btn">⛶ Exit Fullscreen</button>
-
   <!-- ============================================================= -->
-  <!--  JAVASCRIPT – Full Application (all fixes applied)           -->
+  <!--  JAVASCRIPT – Full Application                                 -->
   <!-- ============================================================= -->
   <script>
     (function() {
@@ -1557,6 +1560,7 @@
       const recordIcon = $('#record-icon');
       const recordLabel = $('#record-label');
       const flashBtn = $('#flash-btn');
+      const switchCameraBtn = $('#switchCameraBtn');
       const gearBtn = $('#gear-btn');
       const settingsPanel = $('#settingsPanel');
       const handle = $('#handle');
@@ -1595,6 +1599,11 @@
       const modalContent = $('#modal-content');
       const modalClose = $('#modal-close');
       const modalTitle = $('#modal-title');
+
+      // ===== GLOBAL closeModal (for inline onclick) =====
+      window.closeModal = function() {
+        if (modalOverlay) modalOverlay.classList.remove('active');
+      };
 
       // ===== SIDEBAR TOGGLE =====
       function toggleSidebar(force) {
@@ -1814,8 +1823,8 @@
         }
         applyCameraLayout(s.layoutMode || 'blur');
         if (prompterTextWrap) prompterTextWrap.style.setProperty('--text-opacity', s.textOpacity || 1);
-        const camBgVideo = document.querySelector('.cam-bg video');
-        if (camBgVideo) camBgVideo.style.setProperty('--cam-brightness', s.cameraBrightness || 1);
+        const camBgVid = document.querySelector('.cam-bg video');
+        if (camBgVid) camBgVid.style.setProperty('--cam-brightness', s.cameraBrightness || 1);
         if (ctrlFocus) ctrlFocus.classList.toggle('active', s.focus);
       }
 
@@ -1861,7 +1870,7 @@
         if (!e.target.closest('.settings-popover')) popoverContent.classList.remove('show');
       });
 
-      // ===== FULLSCREEN EDITOR (with fixed exit button) =====
+      // ===== FULLSCREEN EDITOR =====
       if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', toggleEditorFullscreen);
       }
@@ -1893,43 +1902,47 @@
 
       // ===== DASHBOARD =====
       async function updateDashboard() {
-        const scripts = await getAllScripts();
-        const sessions = await getSessions();
-        const totalTime = sessions.reduce((acc, s) => acc + (s.duration || 0), 0);
-        if (heroStreak) heroStreak.textContent = state.streakData.currentStreak;
-        if (heroTime) heroTime.textContent = formatTime(totalTime);
-        if (heroScripts) heroScripts.textContent = scripts.length;
-        const recent = sessions.sort((a,b) => b.timestamp - a.timestamp).slice(0, 3);
-        if (activityList) {
-          if (recent.length === 0) {
-            activityList.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No sessions yet. Start one now!</p>';
-          } else {
-            activityList.innerHTML = recent.map(s => {
-              const conf = s.confidence || 0;
-              const dot = conf > 70 ? 'green' : conf > 40 ? 'yellow' : 'red';
-              return `<div class="activity-item">
-                <span class="dot ${dot}"></span>
-                <div class="info">
-                  <div>${new Date(s.timestamp).toLocaleDateString()} at ${new Date(s.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
-                  <div class="time">${formatDuration(s.duration || 0)} · ${s.filler || 0} fillers</div>
-                </div>
-                <div class="score">${conf}%</div>
-              </div>`;
-            }).join('');
+        try {
+          const scripts = await getAllScripts();
+          const sessions = await getSessions();
+          const totalTime = sessions.reduce((acc, s) => acc + (s.duration || 0), 0);
+          if (heroStreak) heroStreak.textContent = state.streakData.currentStreak;
+          if (heroTime) heroTime.textContent = formatTime(totalTime);
+          if (heroScripts) heroScripts.textContent = scripts.length;
+          const recent = sessions.sort((a,b) => b.timestamp - a.timestamp).slice(0, 3);
+          if (activityList) {
+            if (recent.length === 0) {
+              activityList.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No sessions yet. Start one now!</p>';
+            } else {
+              activityList.innerHTML = recent.map(s => {
+                const conf = s.confidence || 0;
+                const dot = conf > 70 ? 'green' : conf > 40 ? 'yellow' : 'red';
+                return `<div class="activity-item">
+                  <span class="dot ${dot}"></span>
+                  <div class="info">
+                    <div>${new Date(s.timestamp).toLocaleDateString()} at ${new Date(s.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                    <div class="time">${formatDuration(s.duration || 0)} · ${s.filler || 0} fillers</div>
+                  </div>
+                  <div class="score">${conf}%</div>
+                </div>`;
+              }).join('');
+            }
           }
+          const content = await getContent();
+          const tips = content.tips || state.tips;
+          const today = new Date().getDate();
+          const tipIndex = today % tips.length;
+          if (tipText) tipText.textContent = tips[tipIndex];
+          const hour = new Date().getHours();
+          let greeting = 'Good morning';
+          if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
+          else if (hour >= 17) greeting = 'Good evening';
+          const greetingEl = document.getElementById('greeting');
+          if (greetingEl) greetingEl.textContent = `👋 ${greeting}`;
+          if (offlineBadge) offlineBadge.classList.toggle('show', !isOnline());
+        } catch (e) {
+          console.error('Dashboard update failed:', e);
         }
-        const content = await getContent();
-        const tips = content.tips || state.tips;
-        const today = new Date().getDate();
-        const tipIndex = today % tips.length;
-        if (tipText) tipText.textContent = tips[tipIndex];
-        const hour = new Date().getHours();
-        let greeting = 'Good morning';
-        if (hour >= 12 && hour < 17) greeting = 'Good afternoon';
-        else if (hour >= 17) greeting = 'Good evening';
-        const greetingEl = document.getElementById('greeting');
-        if (greetingEl) greetingEl.textContent = `👋 ${greeting}`;
-        if (offlineBadge) offlineBadge.classList.toggle('show', !isOnline());
       }
 
       // ===== GRID ACTIONS =====
@@ -2022,7 +2035,7 @@
         toast('New script created');
       }
 
-      // ===== NEW SESSION (updated) =====
+      // ===== NEW SESSION =====
       function startNewSession() {
         showModal('🎙️ Start Session', `
           <p style="margin-bottom:16px;">Choose how you'd like to start:</p>
@@ -2108,8 +2121,6 @@
           toast('Error saving script');
         });
       }
-
-      // NO auto-save listeners – only manual save button
 
       function loadCurrentScript() {
         if (state.currentScriptId) {
@@ -2265,15 +2276,13 @@
         modalContent.innerHTML = html;
         modalOverlay.classList.add('active');
       }
-      window.closeModal = function() {
-        if (modalOverlay) modalOverlay.classList.remove('active');
-      };
+
       if (modalClose) modalClose.addEventListener('click', closeModal);
       if (modalOverlay) {
         modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
       }
 
-      // ===== GENERAL SETTINGS MODAL =====
+      // ===== SETTINGS MODAL (FULL) =====
       function openSettingsModal() {
         const s = state.settings;
         const html = `
@@ -2321,11 +2330,12 @@
         `;
         showModal('⚙️ General Settings', html);
 
-        // Bind events (shortened)
+        // Helper to bind events
         const bind = (id, event, handler) => {
           const el = document.getElementById(id);
           if (el) el.addEventListener(event, handler);
         };
+
         bind('modal-speed', 'input', function() {
           const val = document.getElementById('modal-speed-val');
           if (val) val.textContent = this.value;
@@ -2354,12 +2364,14 @@
           const val = document.getElementById('modal-cam-brightness-val');
           if (val) val.textContent = parseFloat(this.value).toFixed(2);
         });
+
         document.querySelectorAll('#modal-content .toggle').forEach(toggle => {
           toggle.addEventListener('click', function(e) {
             e.stopPropagation();
             this.classList.toggle('active');
           });
         });
+
         const closeSettings = document.getElementById('modal-close-settings');
         if (closeSettings) {
           closeSettings.addEventListener('click', () => {
@@ -2396,6 +2408,7 @@
             toast('Settings saved');
           });
         }
+
         const exportSettings = document.getElementById('modal-export-settings');
         if (exportSettings) {
           exportSettings.addEventListener('click', () => {
@@ -2409,6 +2422,7 @@
             toast('Settings exported');
           });
         }
+
         const importSettings = document.getElementById('modal-import-settings');
         if (importSettings) {
           importSettings.addEventListener('click', () => {
@@ -2434,6 +2448,7 @@
             input.click();
           });
         }
+
         const resetSettings = document.getElementById('modal-reset-settings');
         if (resetSettings) {
           resetSettings.addEventListener('click', () => {
@@ -2623,6 +2638,22 @@
           applyCameraLayout(state.settings.layoutMode || 'blur');
           return stream;
         } catch (e) { toast('Camera error: ' + e.message); return null; }
+      }
+
+      // ===== SWITCH CAMERA (in prompter) =====
+      if (switchCameraBtn) {
+        switchCameraBtn.addEventListener('click', async () => {
+          if (!state.cameraStream) { toast('Camera not active'); return; }
+          const current = state.settings.cameraSource || 'user';
+          const next = current === 'user' ? 'environment' : 'user';
+          state.settings.cameraSource = next;
+          // Stop current stream
+          state.cameraStream.getTracks().forEach(t => t.stop());
+          state.cameraStream = null;
+          // Re-init camera with new source
+          await initCamera();
+          toast(`Switched to ${next === 'user' ? 'Front' : 'Rear'} camera`);
+        });
       }
 
       function toggleCameraMode() {
@@ -2999,7 +3030,6 @@
 
       // ===== ENTER / EXIT PROMPTER =====
       async function enterPrompter(withCoach = false, onReady = null) {
-        // Save before entering (manual trigger)
         saveCurrentScript(false);
         renderPrompterText();
         showPage('prompter-page');
@@ -3738,7 +3768,7 @@
 
       // ===== FETCH SHARED ADMIN DATA FROM GITHUB =====
       async function fetchAdminData() {
-        const GITHUB_REPO = 'semmyteeroycom100-max/Promptica'; // YOUR REPO
+        const GITHUB_REPO = 'semmyteeroycom100-max/Promptica';
         const url = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/admin_data.json`;
         if (!navigator.onLine) return;
         try {
