@@ -1,0 +1,21 @@
+{
+  "name": "Promptica Studio",
+  "short_name": "Promptica",
+  "description": "Professional teleprompter with post‑recording studio",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0b",
+  "theme_color": "#0b0b0b",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='64' fill='%230b0b0b'/%3E%3Ctext x='256' y='320' font-family='sans-serif' font-size='280' text-anchor='middle' fill='%23c9b29a'%3E🎙️%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='24' fill='%230b0b0b'/%3E%3Ctext x='96' y='120' font-family='sans-serif' font-size='100' text-anchor='middle' fill='%23c9b29a'%3E🎙️%3C/text%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}
