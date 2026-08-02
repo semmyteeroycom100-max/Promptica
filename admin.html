@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Promptica · Admin Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -66,6 +66,11 @@
     .nav-item .status-dot.on { background: #4caf50; }
     .nav-item .status-dot.off { background: #ef5350; }
     #sidebar .bottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border-color); }
+    #sidebar .bottom .admin-actions { display: flex; gap: 8px; padding: 4px 12px; flex-wrap: wrap; }
+    #sidebar .bottom .admin-actions .btn { flex: 1; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-secondary); font-size: 11px; cursor: pointer; transition: 0.2s; text-align: center; }
+    #sidebar .bottom .admin-actions .btn:hover { border-color: var(--accent); color: var(--text-primary); }
+    #sidebar .bottom .admin-actions .btn-danger { border-color: #ef5350; color: #ef5350; }
+    #sidebar .bottom .admin-actions .btn-danger:hover { background: rgba(239,83,80,0.1); }
 
     /* ===== CONTENT ===== */
     #content {
@@ -147,6 +152,13 @@
 
     .empty-state { text-align: center; padding: 30px 20px; color: var(--text-secondary); font-size: 14px; }
     .empty-state .icon { font-size: 32px; opacity: 0.3; margin-bottom: 6px; }
+    .load-more-btn { text-align: center; padding: 8px; color: var(--text-secondary); cursor: pointer; font-size: 13px; border-top: 1px solid var(--border-color); margin-top: 6px; transition: 0.2s; }
+    .load-more-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.03); }
+
+    /* ===== BULK ACTIONS BAR ===== */
+    .bulk-bar { display: none; align-items: center; gap: 10px; padding: 8px 14px; background: var(--bg-panel); border: 1px solid var(--accent); border-radius: 8px; margin-bottom: 10px; flex-shrink: 0; flex-wrap: wrap; }
+    .bulk-bar.show { display: flex; }
+    .bulk-bar .count { font-weight: 600; color: var(--accent); }
 
     /* ===== FORMS ===== */
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -184,11 +196,23 @@
       display: flex; flex-direction: column; gap: 12px; background: var(--bg-primary);
     }
 
-    /* ===== QUILL WRAPPER ===== */
-    .quill-wrapper { background: #fff; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); min-height: 200px; flex: 1; display: flex; flex-direction: column; }
-    .quill-wrapper .ql-container { min-height: 180px; font-family: var(--font-sans); font-size: 15px; flex: 1; }
-    .quill-wrapper .ql-editor { min-height: 180px; background: #fff; color: #1a1a1a; }
-    .quill-wrapper .ql-toolbar { border-bottom: 1px solid #ddd; background: #f5f5f5; border-radius: 8px 8px 0 0; }
+    /* ===== QUILL DARK THEME ===== */
+    .quill-wrapper { background: #1e1e1e; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); min-height: 200px; flex: 1; display: flex; flex-direction: column; }
+    .quill-wrapper .ql-container { min-height: 180px; font-family: var(--font-sans); font-size: 15px; flex: 1; background: #0b0b0b; color: #f0ece6; }
+    .quill-wrapper .ql-editor { min-height: 180px; background: #0b0b0b; color: #f0ece6; }
+    .quill-wrapper .ql-toolbar {
+      background: #1a1a1a !important;
+      border-bottom: 1px solid var(--border-color) !important;
+      border-radius: 8px 8px 0 0 !important;
+    }
+    .quill-wrapper .ql-toolbar .ql-stroke { stroke: #a8a29e !important; }
+    .quill-wrapper .ql-toolbar .ql-fill { fill: #a8a29e !important; }
+    .quill-wrapper .ql-toolbar .ql-picker { color: #a8a29e !important; }
+    .quill-wrapper .ql-toolbar .ql-picker-options { background: #1a1a1a !important; border-color: var(--border-color) !important; }
+    .quill-wrapper .ql-toolbar .ql-picker-item { color: #a8a29e !important; }
+    .quill-wrapper .ql-toolbar .ql-picker-item:hover { color: #f0ece6 !important; }
+    .quill-wrapper .ql-toolbar .ql-active .ql-stroke { stroke: var(--accent) !important; }
+    .quill-wrapper .ql-toolbar .ql-active .ql-fill { fill: var(--accent) !important; }
 
     /* ===== BUTTONS ===== */
     .btn { padding: 6px 16px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-primary); font-family: var(--font-sans); font-size: 13px; cursor: pointer; transition: all 0.2s; }
@@ -216,6 +240,10 @@
     }
     #impersonation-banner.show { display: flex; }
 
+    /* ===== LOADING SPINNER ===== */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.1); border-radius: 50%; border-top: 2px solid var(--accent); animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       :root { --sidebar-width: 56px; }
@@ -224,6 +252,7 @@
       #sidebar .nav-item .badge { display: none; }
       #sidebar .nav-group-header { padding: 6px 10px; justify-content: center; }
       #sidebar .nav-group-header .arrow { display: none; }
+      #sidebar .bottom .admin-actions .btn { font-size: 9px; padding: 2px 6px; }
       #content { padding: 12px 16px; }
       .stats-row { grid-template-columns: 1fr 1fr; }
       .admin-header { flex-direction: column; align-items: stretch; gap: 8px; }
@@ -355,8 +384,12 @@
         </div>
       </div>
 
-      <!-- Bottom -->
+      <!-- Bottom: Admin Actions -->
       <div class="bottom">
+        <div class="admin-actions">
+          <button class="btn" id="logout-btn" title="Log out and show password prompt">🔒 Logout</button>
+          <button class="btn btn-primary" id="change-password-btn" title="Change admin password">🔑 Change Password</button>
+        </div>
         <div class="nav-item" data-page="back"><span class="icon">←</span><span class="label">Back to App</span></div>
       </div>
     </nav>
@@ -421,43 +454,56 @@
             <button class="btn" id="btn-import-templates">📤 Import</button>
           </div>
         </div>
+        <div class="bulk-bar" id="template-bulk">
+          <span><span class="count" id="template-bulk-count">0</span> selected</span>
+          <button class="btn btn-danger" id="template-bulk-delete">🗑 Delete</button>
+          <button class="btn" id="template-bulk-export">📤 Export</button>
+          <button class="btn" id="template-bulk-clear">✕ Clear</button>
+        </div>
         <div class="list-container" id="template-list"><div class="empty-state"><div class="icon">📄</div><div>No templates yet.</div></div></div>
+        <div class="load-more-btn" id="template-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== LEARN HUB ===== -->
       <div id="page-learn-hub" class="page">
         <div class="list-header"><h3>📖 Learn Hub Articles</h3><button class="btn btn-primary" id="btn-new-article">+ New Article</button></div>
         <div class="list-container" id="article-list"><div class="empty-state"><div class="icon">📄</div><div>No articles yet.</div></div></div>
+        <div class="load-more-btn" id="article-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== SPEAKEASY ===== -->
       <div id="page-speakeasy" class="page">
         <div class="list-header"><h3>🎤 SpeakEasy Categories</h3><button class="btn btn-primary" id="btn-new-category">+ New Category</button></div>
         <div class="list-container" id="category-list"><div class="empty-state"><div class="icon">📂</div><div>No categories yet.</div></div></div>
+        <div class="load-more-btn" id="category-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== DAILY TIPS ===== -->
       <div id="page-tips" class="page">
         <div class="list-header"><h3>💡 Daily Tips</h3><button class="btn btn-primary" id="btn-new-tip">+ New Tip</button></div>
         <div class="list-container" id="tip-list"><div class="empty-state"><div class="icon">💡</div><div>No tips yet.</div></div></div>
+        <div class="load-more-btn" id="tip-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== USERS ===== -->
       <div id="page-users" class="page">
         <div class="list-header"><h3>👥 User Access</h3><button class="btn btn-primary" id="btn-add-user">+ Add User</button></div>
         <div class="list-container" id="user-list"><div class="empty-state"><div class="icon">👤</div><div>No users configured.</div></div></div>
+        <div class="load-more-btn" id="user-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== ANNOUNCEMENTS ===== -->
       <div id="page-announcements" class="page">
         <div class="list-header"><h3>📢 Announcements</h3><button class="btn btn-primary" id="btn-new-announcement">+ New Announcement</button></div>
         <div class="list-container" id="announcement-list"><div class="empty-state"><div class="icon">📢</div><div>No announcements yet.</div></div></div>
+        <div class="load-more-btn" id="announcement-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== DIRECT MESSAGES ===== -->
       <div id="page-messages" class="page">
         <div class="list-header"><h3>💬 Direct Messages</h3><button class="btn btn-primary" id="btn-new-message">+ New Message</button></div>
         <div class="list-container" id="message-list"><div class="empty-state"><div class="icon">💬</div><div>No messages sent.</div></div></div>
+        <div class="load-more-btn" id="message-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== USER FEEDBACK ===== -->
@@ -475,6 +521,7 @@
           </div>
         </div>
         <div class="list-container" id="feedback-list"><div class="empty-state"><div class="icon">📋</div><div>No feedback submissions yet.</div></div></div>
+        <div class="load-more-btn" id="feedback-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== ACTIVE USERS ===== -->
@@ -495,7 +542,7 @@
           <div id="impersonation-status" style="margin-top:12px;font-size:13px;color:var(--text-secondary);"></div>
           <div style="margin-top:16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:12px 16px;">
             <h4 style="font-size:13px;color:var(--text-secondary);margin-bottom:4px;">ℹ️ How it works</h4>
-            <p style="font-size:12px;color:var(--text-secondary);">Impersonation switches your view to match the selected user's experience. You'll see their dashboard, scripts, settings, and messages. A persistent banner will remind you that you're impersonating.</p>
+            <p style="font-size:12px;color:var(--text-secondary);">Impersonation switches your view to match the selected user's experience. A persistent banner will remind you.</p>
           </div>
         </div>
       </div>
@@ -532,6 +579,13 @@
               <span class="label" style="position:absolute;top:4px;left:10px;font-size:10px;color:var(--text-secondary);opacity:0.5;text-transform:uppercase;">Preview</span>
               <span class="text" id="preview-text">The quick brown fox jumps over the lazy dog.</span>
             </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-danger" onclick="resetCategory('typography')">↺ Reset Typography</button>
+            <button class="btn btn-danger" onclick="resetCategory('appearance')">↺ Reset Appearance</button>
+            <button class="btn btn-danger" onclick="resetCategory('camera')">↺ Reset Camera</button>
+            <button class="btn btn-danger" onclick="resetCategory('recording')">↺ Reset Recording</button>
+            <button class="btn btn-danger" onclick="resetCategory('advanced')">↺ Reset Advanced</button>
           </div>
         </div>
       </div>
@@ -585,6 +639,7 @@
           </div>
         </div>
         <div class="list-container" id="audit-list"><div class="empty-state"><div class="icon">📜</div><div>No audit entries yet.</div></div></div>
+        <div class="load-more-btn" id="audit-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== BACKUP & RESTORE ===== -->
@@ -673,12 +728,14 @@
       <div id="page-documentation" class="page">
         <div class="list-header"><h3>📘 Documentation</h3><button class="btn btn-primary" id="add-doc">+ New Article</button></div>
         <div class="list-container" id="doc-list"><div class="empty-state"><div class="icon">📄</div><div>No documentation yet.</div></div></div>
+        <div class="load-more-btn" id="doc-load-more" style="display:none;">Load More</div>
       </div>
 
       <!-- ===== VIDEO TUTORIALS ===== -->
       <div id="page-tutorials" class="page">
         <div class="list-header"><h3>🎬 Video Tutorials</h3><button class="btn btn-primary" id="add-tutorial">+ New Tutorial</button></div>
         <div class="list-container" id="tutorial-list"><div class="empty-state"><div class="icon">🎥</div><div>No tutorials yet.</div></div></div>
+        <div class="load-more-btn" id="tutorial-load-more" style="display:none;">Load More</div>
       </div>
 
     </div>
@@ -690,15 +747,17 @@
     // =========================================================================
     'use strict';
 
-    // ===== PASSWORD PROTECTION =====
-    (function() {
-      const ADMIN_PASSWORD = 'promptica2025';
+    // ===== PASSWORD PROTECTION (with change support) =====
+    let ADMIN_PASSWORD = localStorage.getItem('admin_password') || 'promptica2025';
+
+    function checkPassword() {
       const entered = prompt('Enter admin password:');
       if (entered !== ADMIN_PASSWORD) {
         document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#a8a29e;font-size:20px;background:#0b0b0b;">🔒 Access denied</div>';
         throw new Error('Access denied');
       }
-    })();
+    }
+    checkPassword();
 
     // ===== UTILITIES =====
     const $ = s => document.querySelector(s);
@@ -778,6 +837,22 @@
       });
     }
 
+    // ===== PAGINATION STATE =====
+    const PAGE_SIZE = 20;
+    const pagination = {
+      templates: 0,
+      articles: 0,
+      categories: 0,
+      tips: 0,
+      users: 0,
+      announcements: 0,
+      messages: 0,
+      feedback: 0,
+      audit: 0,
+      docs: 0,
+      tutorials: 0
+    };
+
     // ===== STATE =====
     let currentPage = 'dashboard';
     let editingTemplateId = null;
@@ -796,6 +871,7 @@
     let adminUser = { id: 'admin@promptica.com', name: 'Super Admin', role: 'owner' };
     let impersonating = false;
     let originalUserId = null;
+    let selectedTemplates = new Set();
 
     // ===== SEED TEMPLATES =====
     const SEED_TEMPLATES = [
@@ -893,6 +969,39 @@
           await putRecord('templates', tpl);
         }
         toast('📦 Seeded 6 example templates');
+      }
+    }
+
+    // ===== GENERIC PAGINATION HELPER =====
+    async function renderPaginatedList(storeName, containerId, loadMoreBtnId, pageKey, renderItem, sortFn) {
+      const items = await getStore(storeName);
+      const container = document.getElementById(containerId);
+      const loadMoreBtn = document.getElementById(loadMoreBtnId);
+      if (!container) return;
+
+      const total = items.length;
+      const start = pagination[pageKey] * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, total);
+      const pageItems = items.sort(sortFn).slice(start, end);
+
+      if (pagination[pageKey] === 0) {
+        if (!items.length) {
+          container.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No items yet.</div></div>`;
+          if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+          return;
+        }
+        container.innerHTML = '';
+      }
+      const html = pageItems.map(renderItem).join('');
+      container.insertAdjacentHTML('beforeend', html);
+
+      if (loadMoreBtn) {
+        if (end < total) {
+          loadMoreBtn.style.display = 'block';
+          loadMoreBtn.onclick = () => { pagination[pageKey]++; renderPaginatedList(storeName, containerId, loadMoreBtnId, pageKey, renderItem, sortFn); };
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
       }
     }
 
@@ -1071,34 +1180,85 @@
     }
 
     // ===== TEMPLATES =====
-    async function renderTemplates() {
-      const templates = await getStore('templates');
-      const list = document.getElementById('template-list');
-      if (!list) return;
-      if (!templates.length) {
-        list.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No templates yet. Click "New Template" to create one.<br><span style="font-size:13px;color:var(--text-secondary);">💡 Tip: Use placeholders like {{name}} to make templates dynamic.</span></div></div>`;
-        return;
-      }
-      list.innerHTML = templates.sort((a,b) => new Date(b.updatedAt) - new Date(a.updatedAt)).map(t => `
+    function renderTemplateItem(t) {
+      return `
         <div class="list-item">
+          <input type="checkbox" class="checkbox template-check" data-id="${t.id}" />
           <div class="info">
             <div class="title">${escapeHtml(t.title)} <span style="font-size:11px;color:var(--text-secondary);">${t.category || 'General'}</span></div>
             <div class="meta">v${t.version || 1} · ${t.public ? 'Public' : 'Private'} · ${t.usageCount || 0} uses · ${t.placeholders?.length ? '📌 ' + t.placeholders.join(', ') : ''}</div>
             <div class="preview-text">${escapeHtml((t.content || '').replace(/<[^>]*>/g, '').slice(0, 80))}...</div>
           </div>
           <div class="actions">
-            <button class="btn" onclick="editTemplate('${t.id}')">✏️ Edit</button>
-            <button class="btn btn-success" onclick="duplicateTemplate('${t.id}')">📋</button>
-            <button class="btn btn-primary" onclick="previewTemplate('${t.id}')">👁️</button>
-            <button class="btn btn-danger" onclick="deleteTemplate('${t.id}')">🗑</button>
+            <button class="btn" onclick="editTemplate('${t.id}')" title="Edit">✏️</button>
+            <button class="btn btn-success" onclick="duplicateTemplate('${t.id}')" title="Duplicate">📋</button>
+            <button class="btn btn-primary" onclick="previewTemplate('${t.id}')" title="Preview">👁️</button>
+            <button class="btn btn-danger" onclick="deleteTemplate('${t.id}')" title="Delete">🗑</button>
           </div>
         </div>
-      `).join('');
-      document.getElementById('nav-templates').textContent = templates.length;
+      `;
     }
 
+    function sortTemplates(a, b) { return new Date(b.updatedAt) - new Date(a.updatedAt); }
+
+    async function renderTemplates(loadMore = false) {
+      if (!loadMore) pagination.templates = 0;
+      await renderPaginatedList('templates', 'template-list', 'template-load-more', 'templates', renderTemplateItem, sortTemplates);
+      document.getElementById('nav-templates').textContent = (await getStore('templates')).length;
+      // Bulk selection events
+      document.querySelectorAll('.template-check').forEach(el => {
+        el.addEventListener('change', function() {
+          const id = this.dataset.id;
+          if (this.checked) selectedTemplates.add(id);
+          else selectedTemplates.delete(id);
+          updateTemplateBulk();
+        });
+      });
+    }
+
+    // Bulk actions
+    function updateTemplateBulk() {
+      const bar = document.getElementById('template-bulk');
+      const count = document.getElementById('template-bulk-count');
+      if (count) count.textContent = selectedTemplates.size;
+      if (bar) bar.classList.toggle('show', selectedTemplates.size > 0);
+    }
+
+    document.getElementById('template-bulk-delete')?.addEventListener('click', async () => {
+      if (!confirm(`Delete ${selectedTemplates.size} templates?`)) return;
+      for (const id of selectedTemplates) {
+        await deleteRecord('templates', id);
+      }
+      selectedTemplates.clear();
+      renderTemplates();
+      toast('Templates deleted');
+    });
+
+    document.getElementById('template-bulk-export')?.addEventListener('click', async () => {
+      const templates = await getStore('templates');
+      const data = templates.filter(t => selectedTemplates.has(t.id));
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `templates_export_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast('Templates exported');
+    });
+
+    document.getElementById('template-bulk-clear')?.addEventListener('click', () => {
+      selectedTemplates.clear();
+      document.querySelectorAll('.template-check').forEach(el => el.checked = false);
+      updateTemplateBulk();
+    });
+
+    // Template CRUD functions
     window.openNewTemplate = function() { editingTemplateId = null; showTemplateEditor('📄 New Template', { title: '', category: 'General', content: '<p>Start writing your template here…</p>', tags: '', placeholders: '', public: true }); };
     window.editTemplate = function(id) { editingTemplateId = id; getStore('templates').then(templates => { const t = templates.find(t => t.id === id); if (t) { showTemplateEditor('✏️ Edit Template', { title: t.title || '', category: t.category || 'General', content: t.content || '<p>Write your content here…</p>', tags: (t.tags || []).join(', '), placeholders: (t.placeholders || []).join(', '), public: t.public !== false }); } else toast('Template not found'); }); };
+    window.deleteTemplate = async function(id) { if (!confirm('Delete this template?')) return; await deleteRecord('templates', id); renderTemplates(); renderDashboard(); toast('Template deleted'); };
+    window.duplicateTemplate = async function(id) { const templates = await getStore('templates'); const t = templates.find(t => t.id === id); if (!t) { toast('Template not found'); return; } const newTpl = { ...t, id: generateId(), title: t.title + ' (copy)', version: 1, usageCount: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }; await putRecord('templates', newTpl); renderTemplates(); toast('Template duplicated'); };
+    window.previewTemplate = async function(id) { const templates = await getStore('templates'); const t = templates.find(t => t.id === id); if (!t) { toast('Template not found'); return; } showModal('👁️ Template Preview', `<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px;max-height:400px;overflow-y:auto;"><h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">${escapeHtml(t.title)}</h3><div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">Category: ${t.category || 'General'} · ${t.public ? 'Public' : 'Private'} · ${t.placeholders?.length ? '📌 Placeholders: ' + t.placeholders.join(', ') : ''}</div><div style="border-top:1px solid var(--border-color);padding-top:12px;font-size:15px;line-height:1.8;color:var(--text-primary);">${t.content || '<p style="color:var(--text-secondary);">No content</p>'}</div></div><div class="modal-btn-row"><button class="btn" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="closeModal();editTemplate('${t.id}')">✏️ Edit</button></div>`); };
 
     function showTemplateEditor(title, data) {
       const modal = document.getElementById('modal-overlay');
@@ -1129,7 +1289,7 @@
           </div>
           <div class="full"><label>Content</label>
             <div class="quill-wrapper" id="quill-wrapper">
-              <div id="quill-editor" style="min-height:200px;background:#fff;color:#1a1a1a;"></div>
+              <div id="quill-editor" style="min-height:200px;"></div>
             </div>
           </div>
         </div>
@@ -1213,42 +1373,6 @@
       editingTemplateId = null;
     };
 
-    window.previewTemplate = async function(id) {
-      const templates = await getStore('templates');
-      const t = templates.find(t => t.id === id);
-      if (!t) { toast('Template not found'); return; }
-      showModal('👁️ Template Preview', `
-        <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--radius);padding:16px;max-height:400px;overflow-y:auto;">
-          <h3 style="font-size:18px;font-weight:600;margin-bottom:8px;">${escapeHtml(t.title)}</h3>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;">Category: ${t.category || 'General'} · ${t.public ? 'Public' : 'Private'} · ${t.placeholders?.length ? '📌 Placeholders: ' + t.placeholders.join(', ') : ''}</div>
-          <div style="border-top:1px solid var(--border-color);padding-top:12px;font-size:15px;line-height:1.8;color:var(--text-primary);">${t.content || '<p style="color:var(--text-secondary);">No content</p>'}</div>
-        </div>
-        <div class="modal-btn-row"><button class="btn" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="closeModal();editTemplate('${t.id}')">✏️ Edit</button></div>
-      `);
-    };
-
-    window.duplicateTemplate = async function(id) {
-      const templates = await getStore('templates');
-      const t = templates.find(t => t.id === id);
-      if (!t) { toast('Template not found'); return; }
-      const newTpl = { ...t, id: generateId(), title: t.title + ' (copy)', version: 1, usageCount: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
-      await putRecord('templates', newTpl);
-      await logAudit('duplicate-template', newTpl.id, 'template', `Duplicated template "${t.title}"`);
-      renderTemplates();
-      toast('Template duplicated');
-    };
-
-    window.deleteTemplate = async function(id) {
-      if (!confirm('Delete this template?')) return;
-      const templates = await getStore('templates');
-      const t = templates.find(t => t.id === id);
-      await deleteRecord('templates', id);
-      await logAudit('delete-template', id, 'template', `Deleted template "${t?.title || id}"`);
-      renderTemplates();
-      renderDashboard();
-      toast('Template deleted');
-    };
-
     document.getElementById('btn-new-template')?.addEventListener('click', openNewTemplate);
     document.getElementById('btn-import-templates')?.addEventListener('click', () => {
       const input = document.createElement('input');
@@ -1278,22 +1402,22 @@
     });
 
     // ===== LEARN HUB ARTICLES =====
-    async function renderArticles() {
-      const content = (await getStore('content'))[0] || {};
-      const articles = content.articles || [];
-      const list = document.getElementById('article-list');
-      if (!list) return;
-      if (!articles.length) { list.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No articles yet.</div></div>`; return; }
-      list.innerHTML = articles.map(a => `
+    function renderArticleItem(a) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title">${escapeHtml(a.title)} <span class="status-badge ${a.status || 'draft'}">${a.status || 'draft'}</span> ${a.featured ? '⭐ Featured' : ''}</div>
             <div class="meta">${a.content ? a.content.slice(0, 80) + '…' : ''}</div>
           </div>
-          <div class="actions"><button class="btn" onclick="editArticle('${a.id}')">✏️</button><button class="btn btn-danger" onclick="deleteArticle('${a.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="editArticle('${a.id}')" title="Edit">✏️</button><button class="btn btn-danger" onclick="deleteArticle('${a.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
-      document.getElementById('nav-learn').textContent = articles.length;
+      `;
+    }
+
+    async function renderArticles(loadMore = false) {
+      if (!loadMore) pagination.articles = 0;
+      await renderPaginatedList('content', 'article-list', 'article-load-more', 'articles', renderArticleItem, (a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      document.getElementById('nav-learn').textContent = (await getStore('content'))[0]?.articles?.length || 0;
     }
 
     window.editArticle = function(id) {
@@ -1359,22 +1483,22 @@
     };
 
     // ===== SPEAKEASY =====
-    async function renderCategories() {
-      const content = (await getStore('content'))[0] || {};
-      const categories = content.speakEasy || [];
-      const list = document.getElementById('category-list');
-      if (!list) return;
-      if (!categories.length) { list.innerHTML = `<div class="empty-state"><div class="icon">📂</div><div>No categories yet.</div></div>`; return; }
-      list.innerHTML = categories.map(c => `
+    function renderCategoryItem(c) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title">${c.icon || '🎤'} ${escapeHtml(c.name)}</div>
             <div class="meta">${c.description || ''} · ${(c.articles || []).length} exercises · ${c.difficulty || 'Beginner'}</div>
           </div>
-          <div class="actions"><button class="btn" onclick="editCategory('${c.id}')">✏️</button><button class="btn btn-danger" onclick="deleteCategory('${c.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="editCategory('${c.id}')" title="Edit">✏️</button><button class="btn btn-danger" onclick="deleteCategory('${c.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
-      document.getElementById('nav-speakeasy').textContent = categories.length;
+      `;
+    }
+
+    async function renderCategories(loadMore = false) {
+      if (!loadMore) pagination.categories = 0;
+      await renderPaginatedList('content', 'category-list', 'category-load-more', 'categories', renderCategoryItem, (a,b) => a.name.localeCompare(b.name));
+      document.getElementById('nav-speakeasy').textContent = (await getStore('content'))[0]?.speakEasy?.length || 0;
     }
 
     window.editCategory = function(id) {
@@ -1446,19 +1570,49 @@
     };
 
     // ===== DAILY TIPS =====
-    async function renderTips() {
-      const content = (await getStore('content'))[0] || {};
-      const tips = content.tips || [];
-      const list = document.getElementById('tip-list');
-      if (!list) return;
-      if (!tips.length) { list.innerHTML = `<div class="empty-state"><div class="icon">💡</div><div>No tips yet.</div></div>`; return; }
-      list.innerHTML = tips.map((tip, i) => `
+    function renderTipItem(tip, i, content) {
+      return `
         <div class="list-item">
           <div class="info"><div class="title">${escapeHtml(tip)} ${content.tipSchedule?.[i] ? `📅 Day ${content.tipSchedule[i]}` : ''} ${content.tipCategories?.[i] ? `<span class="status-badge info">${content.tipCategories[i]}</span>` : ''}</div></div>
-          <div class="actions"><button class="btn" onclick="editTip(${i})">✏️</button><button class="btn btn-danger" onclick="deleteTip(${i})">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="editTip(${i})" title="Edit">✏️</button><button class="btn btn-danger" onclick="deleteTip(${i})" title="Delete">🗑</button></div>
         </div>
-      `).join('');
+      `;
+    }
+
+    async function renderTips(loadMore = false) {
+      if (!loadMore) pagination.tips = 0;
+      const contentStore = await getStore('content');
+      const content = contentStore[0] || {};
+      const tips = content.tips || [];
+      const list = document.getElementById('tip-list');
+      const loadMoreBtn = document.getElementById('tip-load-more');
+      if (!list) return;
+
+      const total = tips.length;
+      const start = pagination.tips * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, total);
+      const pageItems = tips.slice(start, end);
+
+      if (pagination.tips === 0) {
+        if (!tips.length) {
+          list.innerHTML = `<div class="empty-state"><div class="icon">💡</div><div>No tips yet.</div></div>`;
+          if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+          return;
+        }
+        list.innerHTML = '';
+      }
+      const html = pageItems.map((tip, i) => renderTipItem(tip, start + i, content)).join('');
+      list.insertAdjacentHTML('beforeend', html);
       document.getElementById('nav-tips').textContent = tips.length;
+
+      if (loadMoreBtn) {
+        if (end < total) {
+          loadMoreBtn.style.display = 'block';
+          loadMoreBtn.onclick = () => { pagination.tips++; renderTips(true); };
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+      }
     }
 
     window.editTip = function(index) {
@@ -1528,21 +1682,22 @@
     };
 
     // ===== USERS =====
-    async function renderUsers() {
-      const users = await getStore('users');
-      const list = document.getElementById('user-list');
-      if (!list) return;
-      if (!users.length) { list.innerHTML = `<div class="empty-state"><div class="icon">👤</div><div>No users configured.</div></div>`; return; }
-      list.innerHTML = users.map(u => `
+    function renderUserItem(u) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title">${escapeHtml(u.name || u.email || u.id)} <span class="status-badge ${u.canAccess ? 'published' : 'closed'}">${u.canAccess ? 'Active' : 'Revoked'}</span></div>
             <div class="meta">Role: ${u.role || 'user'} · Max Scripts: ${u.maxScripts || '∞'} · Last Active: ${formatDate(u.lastActiveAt)}</div>
           </div>
-          <div class="actions"><button class="btn" onclick="editUser('${u.id}')">✏️</button><button class="btn btn-danger" onclick="deleteUser('${u.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="editUser('${u.id}')" title="Edit">✏️</button><button class="btn btn-danger" onclick="deleteUser('${u.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
-      document.getElementById('nav-users').textContent = users.length;
+      `;
+    }
+
+    async function renderUsers(loadMore = false) {
+      if (!loadMore) pagination.users = 0;
+      await renderPaginatedList('users', 'user-list', 'user-load-more', 'users', renderUserItem, (a,b) => a.name?.localeCompare(b.name) || 0);
+      document.getElementById('nav-users').textContent = (await getStore('users')).length;
     }
 
     window.openNewUser = function() {
@@ -1578,12 +1733,8 @@
     document.getElementById('btn-add-user')?.addEventListener('click', openNewUser);
 
     // ===== ANNOUNCEMENTS =====
-    async function renderAnnouncements() {
-      const announcements = await getStore('announcements');
-      const list = document.getElementById('announcement-list');
-      if (!list) return;
-      if (!announcements.length) { list.innerHTML = `<div class="empty-state"><div class="icon">📢</div><div>No announcements yet.</div></div>`; return; }
-      list.innerHTML = announcements.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(a => `
+    function renderAnnouncementItem(a) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title"><span class="status-badge ${a.type}">${a.type || 'info'}</span> ${escapeHtml(a.title)}</div>
@@ -1591,17 +1742,24 @@
             <div class="preview-text">${escapeHtml((a.content || '').slice(0, 80))}...</div>
           </div>
           <div class="actions">
-            <button class="btn" onclick="editAnnouncement('${a.id}')">✏️</button>
-            ${!a.sentAt ? `<button class="btn btn-success" onclick="sendAnnouncementNow('${a.id}')">📤 Send</button>` : ''}
-            <button class="btn btn-danger" onclick="deleteAnnouncement('${a.id}')">🗑</button>
+            <button class="btn" onclick="editAnnouncement('${a.id}')" title="Edit">✏️</button>
+            ${!a.sentAt ? `<button class="btn btn-success" onclick="sendAnnouncementNow('${a.id}')" title="Send">📤</button>` : ''}
+            <button class="btn btn-danger" onclick="deleteAnnouncement('${a.id}')" title="Delete">🗑</button>
           </div>
         </div>
-      `).join('');
-      document.getElementById('nav-announcements').textContent = announcements.length;
+      `;
+    }
+
+    async function renderAnnouncements(loadMore = false) {
+      if (!loadMore) pagination.announcements = 0;
+      await renderPaginatedList('announcements', 'announcement-list', 'announcement-load-more', 'announcements', renderAnnouncementItem, (a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      document.getElementById('nav-announcements').textContent = (await getStore('announcements')).length;
     }
 
     window.openNewAnnouncement = function() { editingAnnouncementId = null; showAnnouncementModal('New Announcement', ''); };
     window.editAnnouncement = function(id) { editingAnnouncementId = id; showAnnouncementModal('Edit Announcement', ''); };
+    window.deleteAnnouncement = async function(id) { if (!confirm('Delete this announcement?')) return; await deleteRecord('announcements', id); renderAnnouncements(); toast('Announcement deleted'); };
+    window.sendAnnouncementNow = async function(id) { if (!confirm('Send this announcement now?')) return; const announcements = await getStore('announcements'); const a = announcements.find(a => a.id === id); if (!a) { toast('Announcement not found'); return; } a.sentAt = new Date().toISOString(); await putRecord('announcements', a); await logAudit('send-announcement', id, 'announcement', `Sent announcement "${a.title}"`); renderAnnouncements(); toast('Announcement sent!'); };
 
     function showAnnouncementModal(title, html) {
       document.getElementById('modal-title').textContent = title;
@@ -1674,44 +1832,26 @@
       toast(editingAnnouncementId ? 'Announcement updated' : 'Announcement created');
       editingAnnouncementId = null;
     };
-
-    window.sendAnnouncementNow = async function(id) {
-      if (!confirm('Send this announcement now to all users?')) return;
-      const announcements = await getStore('announcements');
-      const a = announcements.find(a => a.id === id);
-      if (!a) { toast('Announcement not found'); return; }
-      a.sentAt = new Date().toISOString();
-      await putRecord('announcements', a);
-      await logAudit('send-announcement', id, 'announcement', `Sent announcement "${a.title}"`);
-      renderAnnouncements();
-      toast('Announcement sent!');
-    };
-
-    window.deleteAnnouncement = async function(id) {
-      if (!confirm('Delete this announcement?')) return;
-      await deleteRecord('announcements', id);
-      renderAnnouncements();
-      toast('Announcement deleted');
-    };
     document.getElementById('btn-new-announcement')?.addEventListener('click', openNewAnnouncement);
 
     // ===== DIRECT MESSAGES =====
-    async function renderMessages() {
-      const messages = await getStore('messages');
-      const list = document.getElementById('message-list');
-      if (!list) return;
-      if (!messages.length) { list.innerHTML = `<div class="empty-state"><div class="icon">💬</div><div>No messages sent.</div></div>`; return; }
-      list.innerHTML = messages.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(m => `
+    function renderMessageItem(m) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title">${escapeHtml(m.subject)} <span class="status-badge ${m.read ? 'resolved' : 'pending'}">${m.read ? 'Read' : 'Unread'}</span></div>
             <div class="meta">To: ${escapeHtml(m.to)} · ${formatDate(m.createdAt)} · ${m.type || 'general'}</div>
             <div class="preview-text">${escapeHtml((m.content || '').slice(0, 80))}...</div>
           </div>
-          <div class="actions"><button class="btn" onclick="viewMessage('${m.id}')">👁️</button><button class="btn btn-danger" onclick="deleteMessage('${m.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="viewMessage('${m.id}')" title="View">👁️</button><button class="btn btn-danger" onclick="deleteMessage('${m.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
-      document.getElementById('nav-messages').textContent = messages.filter(m => !m.read).length;
+      `;
+    }
+
+    async function renderMessages(loadMore = false) {
+      if (!loadMore) pagination.messages = 0;
+      await renderPaginatedList('messages', 'message-list', 'message-load-more', 'messages', renderMessageItem, (a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+      document.getElementById('nav-messages').textContent = (await getStore('messages')).filter(m => !m.read).length;
     }
 
     window.viewMessage = function(id) {
@@ -1810,14 +1950,8 @@
     };
 
     // ===== USER FEEDBACK =====
-    async function renderFeedback() {
-      const feedback = await getStore('feedback');
-      const list = document.getElementById('feedback-list');
-      if (!list) return;
-      if (!feedback.length) { list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><div>No feedback submissions yet.</div></div>`; return; }
-      const filter = document.getElementById('feedback-filter-status')?.value || 'all';
-      const filtered = filter === 'all' ? feedback : feedback.filter(f => f.status === filter);
-      list.innerHTML = filtered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(f => `
+    function renderFeedbackItem(f) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title"><span class="status-badge ${f.priority}">${f.priority}</span> ${escapeHtml(f.subject)}</div>
@@ -1825,13 +1959,48 @@
             <div class="preview-text">${escapeHtml((f.content || '').slice(0, 80))}...</div>
           </div>
           <div class="actions">
-            <button class="btn" onclick="viewFeedback('${f.id}')">👁️</button>
-            <button class="btn btn-success" onclick="resolveFeedback('${f.id}')">✅</button>
-            <button class="btn btn-danger" onclick="deleteFeedback('${f.id}')">🗑</button>
+            <button class="btn" onclick="viewFeedback('${f.id}')" title="View">👁️</button>
+            <button class="btn btn-success" onclick="resolveFeedback('${f.id}')" title="Resolve">✅</button>
+            <button class="btn btn-danger" onclick="deleteFeedback('${f.id}')" title="Delete">🗑</button>
           </div>
         </div>
-      `).join('');
+      `;
+    }
+
+    async function renderFeedback(loadMore = false) {
+      if (!loadMore) pagination.feedback = 0;
+      const feedback = await getStore('feedback');
+      const filter = document.getElementById('feedback-filter-status')?.value || 'all';
+      const filtered = filter === 'all' ? feedback : feedback.filter(f => f.status === filter);
+      const container = document.getElementById('feedback-list');
+      const loadMoreBtn = document.getElementById('feedback-load-more');
+      if (!container) return;
+
+      const total = filtered.length;
+      const start = pagination.feedback * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, total);
+      const pageItems = filtered.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(start, end);
+
+      if (pagination.feedback === 0) {
+        if (!filtered.length) {
+          container.innerHTML = `<div class="empty-state"><div class="icon">📋</div><div>No feedback submissions yet.</div></div>`;
+          if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+          return;
+        }
+        container.innerHTML = '';
+      }
+      const html = pageItems.map(renderFeedbackItem).join('');
+      container.insertAdjacentHTML('beforeend', html);
       document.getElementById('nav-feedback').textContent = feedback.filter(f => f.status === 'pending' || f.status === 'in-progress').length;
+
+      if (loadMoreBtn) {
+        if (end < total) {
+          loadMoreBtn.style.display = 'block';
+          loadMoreBtn.onclick = () => { pagination.feedback++; renderFeedback(true); };
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+      }
     }
 
     window.viewFeedback = function(id) {
@@ -1904,6 +2073,8 @@
     });
 
     // ===== ACTIVE USERS =====
+    let activeUsersInterval = null;
+
     async function renderActiveUsers() {
       const logs = await getStore('logs');
       const active = logs.filter(l => {
@@ -1913,7 +2084,10 @@
       });
       const list = document.getElementById('active-user-list');
       if (!list) return;
-      if (!active.length) { list.innerHTML = `<div class="empty-state"><div class="icon">🟢</div><div>No active users in the last 5 minutes.</div></div>`; return; }
+      if (!active.length) {
+        list.innerHTML = `<div class="empty-state"><div class="icon">🟢</div><div>No active users in the last 5 minutes.</div></div>`;
+        return;
+      }
       const unique = new Map();
       active.forEach(l => {
         const id = l.userId || l.id || 'anonymous';
@@ -1925,20 +2099,62 @@
         </div>
       `).join('');
     }
+
+    // Set interval when active-users page is shown
+    const originalNavigate = navigateTo;
+    navigateTo = function(page) {
+      originalNavigate(page);
+      if (page === 'active-users') {
+        if (activeUsersInterval) clearInterval(activeUsersInterval);
+        activeUsersInterval = setInterval(renderActiveUsers, 30000);
+      } else {
+        if (activeUsersInterval) { clearInterval(activeUsersInterval); activeUsersInterval = null; }
+      }
+    };
+
     document.getElementById('btn-refresh-active')?.addEventListener('click', renderActiveUsers);
 
     // ===== IMPERSONATION =====
     function renderImpersonation() {
       if (impersonating) {
         document.getElementById('impersonation-status').innerHTML = `
-          <span style="color:var(--accent);">🔑 Impersonating ${escapeHtml(currentUser.name || currentUser.id)}</span>
+          <span style="color:var(--accent);">🔑 Impersonating ${escapeHtml(adminUser.name)}</span>
           <button class="btn" onclick="stopImpersonation()" style="margin-left:10px;padding:2px 12px;font-size:12px;">Stop</button>
         `;
         document.getElementById('impersonation-banner').classList.add('show');
-        document.getElementById('impersonation-user').textContent = currentUser.name || currentUser.id;
+        document.getElementById('impersonation-user').textContent = adminUser.name;
       } else {
         document.getElementById('impersonation-status').innerHTML = '';
         document.getElementById('impersonation-banner').classList.remove('show');
+      }
+    }
+
+    function saveImpersonationState() {
+      if (impersonating) {
+        localStorage.setItem('impersonation_state', JSON.stringify({
+          impersonating: true,
+          originalUserId: originalUserId,
+          currentUserId: adminUser.id,
+          currentUserName: adminUser.name
+        }));
+      } else {
+        localStorage.removeItem('impersonation_state');
+      }
+    }
+
+    function restoreImpersonation() {
+      const stored = localStorage.getItem('impersonation_state');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          if (data.impersonating && data.originalUserId && data.currentUserId) {
+            impersonating = true;
+            originalUserId = data.originalUserId;
+            adminUser.id = data.currentUserId;
+            adminUser.name = data.currentUserName || 'User';
+            renderImpersonation();
+          }
+        } catch (e) {}
       }
     }
 
@@ -1953,10 +2169,10 @@
       adminUser.id = user.id;
       adminUser.name = user.name || user.id;
       impersonating = true;
+      saveImpersonationState();
       await logAudit('impersonate', user.id, 'user', `Impersonated user ${user.id}`);
       renderImpersonation();
       toast(`🔑 Now viewing as ${user.name || user.id}`);
-      // Refresh all pages
       renderDashboard();
       renderTemplates();
       renderArticles();
@@ -1975,6 +2191,7 @@
       adminUser.name = 'Super Admin';
       impersonating = false;
       originalUserId = null;
+      saveImpersonationState();
       renderImpersonation();
       toast('✅ Returned to admin view');
       renderDashboard();
@@ -1989,9 +2206,52 @@
       renderActiveUsers();
     };
 
+    // Restore on load
+    restoreImpersonation();
+
+    // ===== LOGOUT & CHANGE PASSWORD =====
+    document.getElementById('logout-btn')?.addEventListener('click', function() {
+      if (confirm('Log out of admin panel?')) {
+        localStorage.removeItem('admin_password');
+        localStorage.removeItem('impersonation_state');
+        location.reload();
+      }
+    });
+
+    document.getElementById('change-password-btn')?.addEventListener('click', function() {
+      const newPass = prompt('Enter new admin password:');
+      if (newPass && newPass.length >= 6) {
+        localStorage.setItem('admin_password', newPass);
+        ADMIN_PASSWORD = newPass;
+        toast('✅ Password updated');
+      } else {
+        toast('Password must be at least 6 characters');
+      }
+    });
+
+    // ===== PER-CATEGORY RESET =====
+    window.resetCategory = function(category) {
+      if (!confirm(`Reset ${category} settings to default?`)) return;
+      const defaults = {
+        typography: { fontFamily: "'Inter', sans-serif", fontSize: 34, lineHeight: 1.6, letterSpacing: 0.3, textShadow: true },
+        appearance: { textColor: '#f5efe8', bgColor: '#0b0b0b', bgOpacity: 1, overlayOpacity: 0.35 },
+        camera: { cameraSource: 'user', resolution: '720', layoutMode: 'blur', compactSize: 'medium' },
+        recording: { vad: false, autoDelay: 0 },
+        advanced: { speed: 5, maxScriptLength: 5000, maxSavedScripts: 20 }
+      };
+      const def = defaults[category];
+      if (!def) return;
+      Object.assign(state.settings, def);
+      loadSettings();
+      toast(`${category} reset to defaults`);
+    };
+
     // ===== GLOBAL SETTINGS =====
+    let stateSettings = {};
+
     async function loadSettings() {
       const settings = (await getStore('settings'))[0] || {};
+      stateSettings = settings;
       const fields = {
         'setting-font': settings.defaultFont || 'Inter',
         'setting-font-size': settings.defaultFontSize || 34,
@@ -2191,19 +2451,20 @@
     }
 
     // ===== ADMIN AUDIT LOG =====
-    async function renderAuditLog() {
-      const audit = await getStore('auditLog');
-      const list = document.getElementById('audit-list');
-      if (!list) return;
-      if (!audit.length) { list.innerHTML = `<div class="empty-state"><div class="icon">📜</div><div>No audit entries yet.</div></div>`; return; }
-      list.innerHTML = audit.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 100).map(log => `
+    function renderAuditItem(log) {
+      return `
         <div class="list-item">
           <div class="info">
             <div class="title">${escapeHtml(log.action)} <span style="font-size:11px;color:var(--text-secondary);">${log.targetType || ''}</span></div>
             <div class="meta">${escapeHtml(log.details || '')} · ${escapeHtml(log.adminName || log.adminId)} · ${formatDate(log.timestamp)}</div>
           </div>
         </div>
-      `).join('');
+      `;
+    }
+
+    async function renderAuditLog(loadMore = false) {
+      if (!loadMore) pagination.audit = 0;
+      await renderPaginatedList('auditLog', 'audit-list', 'audit-load-more', 'audit', renderAuditItem, (a,b) => new Date(b.timestamp) - new Date(a.timestamp));
     }
 
     document.getElementById('audit-export-csv')?.addEventListener('click', async () => {
@@ -2228,7 +2489,7 @@
     });
 
     async function logAudit(action, target, targetType, details) {
-      if (impersonating) return; // Don't log impersonation actions as the impersonated user
+      if (impersonating) return;
       await putRecord('auditLog', {
         id: generateId(),
         adminId: adminUser.id,
@@ -2244,17 +2505,18 @@
     }
 
     // ===== BACKUP & RESTORE =====
-    async function renderBackups() {
-      const backups = await getStore('backups');
-      const list = document.getElementById('backup-list');
-      if (!list) return;
-      if (!backups.length) { list.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No backups yet.</p>'; return; }
-      list.innerHTML = backups.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(b => `
+    function renderBackupItem(b) {
+      return `
         <div class="list-item">
           <div class="info"><div class="title">📦 Backup ${formatDateShort(b.createdAt)}</div><div class="meta">${b.size || 'Unknown'} · ${b.stores?.length || 0} stores · Created by ${escapeHtml(b.createdBy || 'admin')}</div></div>
-          <div class="actions"><button class="btn" onclick="restoreBackup('${b.id}')">📤 Restore</button><button class="btn btn-danger" onclick="deleteBackup('${b.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="restoreBackup('${b.id}')" title="Restore">📤</button><button class="btn btn-danger" onclick="deleteBackup('${b.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
+      `;
+    }
+
+    async function renderBackups(loadMore = false) {
+      if (!loadMore) pagination.backups = 0;
+      await renderPaginatedList('backups', 'backup-list', null, 'backups', renderBackupItem, (a,b) => new Date(b.createdAt) - new Date(a.createdAt));
     }
 
     document.getElementById('btn-create-backup')?.addEventListener('click', async () => {
@@ -2312,6 +2574,10 @@
       renderBackups();
       toast('Backup deleted');
     };
+
+    document.getElementById('btn-restore-backup')?.addEventListener('click', () => {
+      toast('Use the "Restore from Backup" button on a backup item');
+    });
 
     // ===== MAINTENANCE MODE =====
     async function loadMaintenance() {
@@ -2409,16 +2675,45 @@
     });
 
     // ===== DOCUMENTATION =====
-    function renderDocList(docs) {
-      const list = document.getElementById('doc-list');
-      if (!list) return;
-      if (!docs || !docs.length) { list.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No documentation articles yet.</div></div>`; return; }
-      list.innerHTML = docs.map(d => `
+    function renderDocItem(d) {
+      return `
         <div class="list-item">
           <div class="info"><div class="title">${escapeHtml(d.title)}</div><div class="meta">${d.content ? d.content.slice(0, 60) + '…' : ''}</div></div>
-          <div class="actions"><button class="btn" onclick="editDoc('${d.id}')">✏️</button><button class="btn btn-danger" onclick="deleteDoc('${d.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="editDoc('${d.id}')" title="Edit">✏️</button><button class="btn btn-danger" onclick="deleteDoc('${d.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
+      `;
+    }
+
+    async function renderDocList(docs, loadMore = false) {
+      if (!loadMore) pagination.docs = 0;
+      const container = document.getElementById('doc-list');
+      const loadMoreBtn = document.getElementById('doc-load-more');
+      if (!container) return;
+
+      const total = docs.length;
+      const start = pagination.docs * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, total);
+      const pageItems = docs.slice(start, end);
+
+      if (pagination.docs === 0) {
+        if (!docs.length) {
+          container.innerHTML = `<div class="empty-state"><div class="icon">📄</div><div>No documentation yet.</div></div>`;
+          if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+          return;
+        }
+        container.innerHTML = '';
+      }
+      const html = pageItems.map(renderDocItem).join('');
+      container.insertAdjacentHTML('beforeend', html);
+
+      if (loadMoreBtn) {
+        if (end < total) {
+          loadMoreBtn.style.display = 'block';
+          loadMoreBtn.onclick = () => { pagination.docs++; renderDocList(docs, true); };
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+      }
     }
 
     window.editDoc = function(id) {
@@ -2501,16 +2796,45 @@
     };
 
     // ===== VIDEO TUTORIALS =====
-    function renderTutorialList(tuts) {
-      const list = document.getElementById('tutorial-list');
-      if (!list) return;
-      if (!tuts || !tuts.length) { list.innerHTML = `<div class="empty-state"><div class="icon">🎥</div><div>No tutorials yet.</div></div>`; return; }
-      list.innerHTML = tuts.map(t => `
+    function renderTutorialItem(t) {
+      return `
         <div class="list-item">
           <div class="info"><div class="title">${escapeHtml(t.title)}</div><div class="meta">${t.url ? '🔗 ' + t.url : ''}</div></div>
-          <div class="actions"><button class="btn" onclick="editTutorial('${t.id}')">✏️</button><button class="btn btn-danger" onclick="deleteTutorial('${t.id}')">🗑</button></div>
+          <div class="actions"><button class="btn" onclick="editTutorial('${t.id}')" title="Edit">✏️</button><button class="btn btn-danger" onclick="deleteTutorial('${t.id}')" title="Delete">🗑</button></div>
         </div>
-      `).join('');
+      `;
+    }
+
+    async function renderTutorialList(tuts, loadMore = false) {
+      if (!loadMore) pagination.tutorials = 0;
+      const container = document.getElementById('tutorial-list');
+      const loadMoreBtn = document.getElementById('tutorial-load-more');
+      if (!container) return;
+
+      const total = tuts.length;
+      const start = pagination.tutorials * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, total);
+      const pageItems = tuts.slice(start, end);
+
+      if (pagination.tutorials === 0) {
+        if (!tuts.length) {
+          container.innerHTML = `<div class="empty-state"><div class="icon">🎥</div><div>No tutorials yet.</div></div>`;
+          if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+          return;
+        }
+        container.innerHTML = '';
+      }
+      const html = pageItems.map(renderTutorialItem).join('');
+      container.insertAdjacentHTML('beforeend', html);
+
+      if (loadMoreBtn) {
+        if (end < total) {
+          loadMoreBtn.style.display = 'block';
+          loadMoreBtn.onclick = () => { pagination.tutorials++; renderTutorialList(tuts, true); };
+        } else {
+          loadMoreBtn.style.display = 'none';
+        }
+      }
     }
 
     window.editTutorial = function(id) {
@@ -2727,14 +3051,37 @@
         if (items) {
           items.classList.toggle('open');
           if (arrow) arrow.classList.toggle('open');
+          const group = this.dataset.group;
+          if (group) {
+            const state = items.classList.contains('open');
+            const saved = JSON.parse(localStorage.getItem('sidebar_groups') || '{}');
+            saved[group] = state;
+            localStorage.setItem('sidebar_groups', JSON.stringify(saved));
+          }
         }
       });
-      // Open all groups by default
-      const items = header.nextElementSibling;
-      if (items) {
-        items.classList.add('open');
+      const group = header.dataset.group;
+      if (group) {
+        const saved = JSON.parse(localStorage.getItem('sidebar_groups') || '{}');
+        const items = header.nextElementSibling;
         const arrow = header.querySelector('.arrow');
-        if (arrow) arrow.classList.add('open');
+        if (saved[group] !== undefined) {
+          if (saved[group]) {
+            if (items) items.classList.add('open');
+            if (arrow) arrow.classList.add('open');
+          } else {
+            if (items) items.classList.remove('open');
+            if (arrow) arrow.classList.remove('open');
+          }
+        } else {
+          if (group === 'users' || group === 'analytics' || group === 'system' || group === 'site') {
+            if (items) items.classList.remove('open');
+            if (arrow) arrow.classList.remove('open');
+          } else {
+            if (items) items.classList.add('open');
+            if (arrow) arrow.classList.add('open');
+          }
+        }
       }
     });
 
@@ -2745,95 +3092,108 @@
 
     // ===== INIT =====
     async function init() {
-      await openDB();
-      await seedTemplates();
+      try {
+        await openDB();
+        await seedTemplates();
 
-      // Seed default content if missing
-      const content = await getStore('content');
-      if (!content.length) {
-        const defaultContent = {
-          id: 'main',
-          contact: { email: 'support@promptica.com', phone: '+1-800-555-PROM', hours: 'Mon-Fri 9am-6pm EST' },
-          documentation: [
-            { id: generateId(), title: 'Getting Started with Promptica', content: '<p>Welcome to Promptica! Here\'s how to get started…</p>' },
-            { id: generateId(), title: 'Using the Teleprompter', content: '<p>Learn how to use the prompter effectively…</p>' }
-          ],
-          tutorials: [
-            { id: generateId(), title: 'How to Record a Video', url: 'https://youtube.com/watch?v=example', description: '<p>A step-by-step guide to recording your first video.</p>' }
-          ],
-          articles: [
-            { id: generateId(), title: 'How to Use Promptica – A Quick Start Guide', content: '<p>Promptica is a professional teleprompter…</p>' },
-            { id: generateId(), title: '5 Tips for Better Recordings', content: '<p>1. Practice your script…</p>' }
-          ],
-          speakEasy: [
-            { id: generateId(), name: 'Warm-Up Drills', description: '5‑minute vocal exercises.', icon: '🎯', articles: ['Lip trills', 'Tongue twisters'], exerciseTypes: ['warmup', 'drill'], difficulty: 'beginner' },
-            { id: generateId(), name: 'Script Structure', description: 'Templates for organising your speech.', icon: '📝', articles: ['TED‑Talk Formula', 'Hero\'s Journey'], exerciseTypes: ['speech', 'drill'], difficulty: 'intermediate' }
-          ],
-          tips: [
-            'Pause for 3 seconds after every key point.',
-            'Vary your pitch to keep the audience engaged.',
-            'Practice your opening line until it feels natural.'
-          ]
-        };
-        await putRecord('content', defaultContent);
+        const content = await getStore('content');
+        if (!content.length) {
+          const defaultContent = {
+            id: 'main',
+            contact: { email: 'support@promptica.com', phone: '+1-800-555-PROM', hours: 'Mon-Fri 9am-6pm EST' },
+            documentation: [
+              { id: generateId(), title: 'Getting Started with Promptica', content: '<p>Welcome to Promptica! Here\'s how to get started…</p>' },
+              { id: generateId(), title: 'Using the Teleprompter', content: '<p>Learn how to use the prompter effectively…</p>' }
+            ],
+            tutorials: [
+              { id: generateId(), title: 'How to Record a Video', url: 'https://youtube.com/watch?v=example', description: '<p>A step-by-step guide to recording your first video.</p>' }
+            ],
+            articles: [
+              { id: generateId(), title: 'How to Use Promptica – A Quick Start Guide', content: '<p>Promptica is a professional teleprompter…</p>' },
+              { id: generateId(), title: '5 Tips for Better Recordings', content: '<p>1. Practice your script…</p>' }
+            ],
+            speakEasy: [
+              { id: generateId(), name: 'Warm-Up Drills', description: '5‑minute vocal exercises.', icon: '🎯', articles: ['Lip trills', 'Tongue twisters'], exerciseTypes: ['warmup', 'drill'], difficulty: 'beginner' },
+              { id: generateId(), name: 'Script Structure', description: 'Templates for organising your speech.', icon: '📝', articles: ['TED‑Talk Formula', 'Hero\'s Journey'], exerciseTypes: ['speech', 'drill'], difficulty: 'intermediate' }
+            ],
+            tips: [
+              'Pause for 3 seconds after every key point.',
+              'Vary your pitch to keep the audience engaged.',
+              'Practice your opening line until it feels natural.'
+            ]
+          };
+          await putRecord('content', defaultContent);
+        }
+
+        const settings = await getStore('settings');
+        if (!settings.length) {
+          await putRecord('settings', {
+            id: 'global',
+            defaultFont: 'Inter',
+            defaultFontSize: 34,
+            defaultTextColor: '#f5efe8',
+            defaultBgColor: '#0b0b0b',
+            defaultBgOpacity: 1,
+            defaultFocus: true,
+            defaultSpeed: 5,
+            defaultLineHeight: 1.6,
+            defaultLetterSpacing: 0.3,
+            defaultGlow: true,
+            defaultOverlayOpacity: 0.35,
+            defaultAutoDelay: 0,
+            maxScriptLength: 5000,
+            maxSavedScripts: 20,
+            labels: { libraryLabel: 'Scripts', templatesLabel: 'Templates' },
+            updatedAt: new Date().toISOString()
+          });
+        }
+
+        const flags = await getStore('flags');
+        if (!flags.length) {
+          await putRecord('flags', {
+            id: 'flags',
+            enableVoiceControl: false,
+            enableFocus: true,
+            enableAutoPause: false,
+            enableUpload: true,
+            updatedAt: new Date().toISOString()
+          });
+        }
+
+        const users = await getStore('users');
+        if (!users.length) {
+          await putRecord('users', {
+            id: 'admin@promptica.com',
+            name: 'Super Admin',
+            role: 'owner',
+            canAccess: true,
+            maxScripts: null,
+            grantedAt: new Date().toISOString(),
+            lastActiveAt: new Date().toISOString()
+          });
+        }
+
+        navigateTo('dashboard');
+        toast('🎙️ Admin Panel ready');
+
+        // Auto-refresh
+        setInterval(() => {
+          if (currentPage === 'active-users') renderActiveUsers();
+          if (currentPage === 'dashboard') renderDashboard();
+        }, 30000);
+
+        // Refresh lists periodically when on their pages
+        setInterval(() => {
+          if (currentPage === 'templates') renderTemplates();
+          if (currentPage === 'users') renderUsers();
+          if (currentPage === 'feedback') renderFeedback();
+          if (currentPage === 'audit-log') renderAuditLog();
+        }, 60000);
+
+      } catch (e) {
+        console.error('Init error:', e);
+        toast('Error loading admin panel – refreshing may help');
       }
-
-      const settings = await getStore('settings');
-      if (!settings.length) {
-        await putRecord('settings', {
-          id: 'global',
-          defaultFont: 'Inter',
-          defaultFontSize: 34,
-          defaultTextColor: '#f5efe8',
-          defaultBgColor: '#0b0b0b',
-          defaultBgOpacity: 1,
-          defaultFocus: true,
-          defaultSpeed: 5,
-          defaultLineHeight: 1.6,
-          defaultLetterSpacing: 0.3,
-          defaultGlow: true,
-          defaultOverlayOpacity: 0.35,
-          defaultAutoDelay: 0,
-          maxScriptLength: 5000,
-          maxSavedScripts: 20,
-          labels: { libraryLabel: 'Scripts', templatesLabel: 'Templates' },
-          updatedAt: new Date().toISOString()
-        });
-      }
-
-      const flags = await getStore('flags');
-      if (!flags.length) {
-        await putRecord('flags', {
-          id: 'flags',
-          enableVoiceControl: false,
-          enableFocus: true,
-          enableAutoPause: false,
-          enableUpload: true,
-          updatedAt: new Date().toISOString()
-        });
-      }
-
-      const users = await getStore('users');
-      if (!users.length) {
-        await putRecord('users', {
-          id: 'admin@promptica.com',
-          name: 'Super Admin',
-          role: 'owner',
-          canAccess: true,
-          maxScripts: null,
-          grantedAt: new Date().toISOString(),
-          lastActiveAt: new Date().toISOString()
-        });
-      }
-
-      navigateTo('dashboard');
-      toast('🎙️ Admin Panel ready');
-
-      // Auto-refresh
-      setInterval(() => {
-        if (currentPage === 'active-users') renderActiveUsers();
-        if (currentPage === 'dashboard') renderDashboard();
-      }, 30000);
     }
 
     // Expose functions for inline onclick
@@ -2843,6 +3203,10 @@
     window.syncToGitHub = syncToGitHub;
     window.closeModal = closeModal;
     window.navigateTo = navigateTo;
+    window.impersonateUser = impersonateUser;
+    window.stopImpersonation = stopImpersonation;
+    window.resetCategory = resetCategory;
+    window.restoreBackup = restoreBackup;
 
     init();
   </script>
